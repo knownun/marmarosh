@@ -15,9 +15,6 @@ Marmarosh based on [sintez](https://github.com/frankland/sintez) tasks with deve
 To view a component in the browser:
 
 * run **dev** task
-* open your browser (default [localhost:3000](http://localhost:3000))
-* goto **/view/{folder_name}/{component_name}** or index page
-
-To change default theme add **?t={custom_theme_name}**
+* open in your browser [localhost:3000](http://localhost:3000)
 
 [Docs](wiki)
