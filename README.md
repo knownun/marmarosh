@@ -17,4 +17,4 @@ To view a component in the browser:
 * open in your browser [localhost:3000](http://localhost:3000)
 
 ---
-[Docs](wiki)
+[Docs](https://github.com/marmarosh-js/marmarosh/wiki)
