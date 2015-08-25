@@ -10,11 +10,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/marmarosh-js/marmarosh.git"
+    "url": "https://github.com/marmarosh/marmarosh.git"
   },
   "author": "Eugene A. Molchanov",
   "license": "ISC",
-  "homepage": "https://github.com/marmarosh-js/marmarosh#readme",
+  "homepage": "https://github.com/marmarosh/marmarosh#readme",
   "dependencies": {
     "body-parser": "^1.13.3",
     "express": "^4.13.3",
