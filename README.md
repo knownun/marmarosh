@@ -17,4 +17,5 @@ To view a component in the browser:
 * run **dev** task
 * open in your browser [localhost:3000](http://localhost:3000)
 
+---
 [Docs](wiki)
