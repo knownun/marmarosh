@@ -3,4 +3,4 @@
 Marmarosh based on [sintez](https://github.com/frankland/sintez) tasks with development server and package tasks
 
 ---
-[Wiki](https://github.com/marmarosh-js/marmarosh/wiki)
+[Wiki](https://github.com/marmarosh/marmarosh/wiki)
