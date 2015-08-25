@@ -1,0 +1,49 @@
+{
+  "name": "marmarosh",
+  "version": "1.1.0",
+  "description": "Markup development tool",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "./node_modules/.bin/gulp build --silent",
+    "postinstall": "./node_modules/.bin/gulp build --silent"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marmarosh-js/marmarosh.git"
+  },
+  "author": "Eugene A. Molchanov",
+  "license": "ISC",
+  "homepage": "https://github.com/marmarosh-js/marmarosh#readme",
+  "dependencies": {
+    "body-parser": "^1.13.3",
+    "express": "^4.13.3",
+    "glob": "^5.0.14",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.2.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-filter": "^3.0.0",
+    "gulp-jade": "^1.1.0",
+    "gulp-less": "^3.0.3",
+    "gulp-newer": "^0.5.1",
+    "gulp-plumber": "^1.0.1",
+    "gulp-util": "^3.0.6",
+    "gulp-watch": "^4.3.5",
+    "jade": "^1.11.0",
+    "js-yaml": "^3.3.1",
+    "less": "^2.5.1",
+    "lodash": "^3.10.1",
+    "map-stream": "0.0.6",
+    "merge-stream": "^1.0.0",
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.4.2",
+    "serve-favicon": "^2.3.0",
+    "webpack": "^1.11.0",
+    "webpack-dev-middleware": "^1.2.0",
+    "babel": "^5.4.2",
+    "babel-core": "^5.4.2",
+    "object-description": "0.0.2",
+    "prettyjson": "^1.1.2",
+    "run-sequence": "^1.1.0"
+  }
+}
