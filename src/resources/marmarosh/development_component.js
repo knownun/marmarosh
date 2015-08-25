@@ -10,12 +10,13 @@ export default class DevComponent extends Base {
 
   include(path, newName) {
     var component = new this.constructor(path);
-    var newConfig = this.getConfig(`widgets.${newName}`);
+    var name = newName || component.getName();
+    var extendOptions = this.getConfig(`widgets.${name}`);
     var theme = this.getTheme();
 
-    component.updateConfig(newConfig);
-    component.setTheme(theme);
-    component.setPlace(newName);
+    lo.isObject(extendOptions) && component.updateConfig(extendOptions);
+    lo.isString(theme) && component.setTheme(theme);
+    lo.isString(newName) && component.setPlace(newName);
 
     if (component.hasIndexJS) {
       var scriptOpt = lo.get(component.getConfig(), 'script_options') || {};
