@@ -151,6 +151,8 @@ export default class Base {
 
     this.setTemplateLocal("render", this.renderString.bind(this));
 
+    this.setTemplateLocal("includeSet", this.includeSet.bind(this));
+
   }
 
   include() {
@@ -268,7 +270,12 @@ export default class Base {
     var output = {};
     if (lo.isObject(input)) {
       lo.forOwn(input, (value, key) => {
-        output[key] = lo.get(value, propertyPath)
+        if (lo.isString(value)) {
+          output[key] = value;
+        }
+        if (lo.isObject(value) && lo.has(value, propertyPath)) {
+          output[key] = lo.get(value, propertyPath);
+        }
       });
     }
     return output;

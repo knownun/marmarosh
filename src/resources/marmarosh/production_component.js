@@ -82,14 +82,14 @@ export default class ProdComponent extends Base {
     };
   }
 
-  getHTML(theme) {
-    //var RX = /(\/\/|<!--) RAZOR >> (.*) << \/\/(-->)?/gm;
-    var html = super.getHTML(theme);
-    //if (lo.isString(html)) {
-    //html = html.replace(RX, '$2');
-    //}
-    return html;
-  }
+  //getHTML(theme) {
+  //var RX = /(\/\/|<!--) RAZOR >> (.*) << \/\/(-->)?/gm;
+  //var html = super.getHTML(theme);
+  //if (lo.isString(html)) {
+  //html = html.replace(RX, '$2');
+  //}
+  //return html;
+  //}
 
   readTemplate(theme) {
     return this.readTemplateForTheme(theme, this.getName()) || null;
@@ -102,5 +102,12 @@ export default class ProdComponent extends Base {
       html = this.templateFn(this.getTemplateLocals());
     }
     return html;
+  }
+
+  includeSet(componentPath, models, template) {
+    var name = path.basename(componentPath), template = template || null;
+    this.widgetsSets = this.widgetsSets || {};
+    lo.set(this.widgetsSets, name, true);
+    return '\n' + `@RepeatWidget("${componentPath}", ${models}, ${template})` + '\n';
   }
 }

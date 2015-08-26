@@ -8,6 +8,22 @@ export default class DevComponent extends Base {
     super(config, overrideConfigObj, childInstance);
   }
 
+  includeSet(name, widgetArrayName, template) {
+    var out = '', template = template || '{body}';
+    var theme = this.getTheme();
+    var widgetsObj = this.getConfig(widgetArrayName);
+    if (lo.isObject(Array)) {
+      lo.forOwn(widgetsObj, (options)=> {
+        var instance = new this.constructor(name);
+        instance.updateConfig(options);
+        instance.setTheme(theme);
+        out += instance.getHTML();
+      });
+      out = out.length > 0 ? template.replace('{body}', out) : out;
+    }
+    return out;
+  }
+
   include(path, newName) {
     var component = new this.constructor(path);
     var name = newName || component.getName();
