@@ -42,4 +42,9 @@ export default class DevComponent extends Base {
     return ins;
   }
 
+  initTemplateLocals() {
+    super.initTemplateLocals();
+    this.setTemplateLocal("dev", true);
+  }
+
 }

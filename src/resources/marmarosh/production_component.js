@@ -62,16 +62,13 @@ export default class ProdComponent extends Base {
     return (lo.isString(template) ? template : '@ServerConfigurations()') + '\n'
   }
 
+  renderString(prod, dev) {
+    return prod || ''
+  }
+
   initTemplateLocals() {
     super.initTemplateLocals();
-    this.setTemplateLocal("includeCSS", this.includeCSS.bind(this));
-    this.setTemplateLocal("includeJS", this.includeJS.bind(this));
-    this.setTemplateLocal("includeJSOptions", this.includeJSOptions.bind(this));
-
-    this.setTemplateLocal("includeBody", this.includeBody.bind(this));
-    this.setTemplateLocal("getString", this.getString.bind(this));
-    this.setTemplateLocal("getOption", this.getOption.bind(this));
-    this.setTemplateLocal("getLink", this.getLink.bind(this));
+    this.setTemplateLocal("dev", false);
   }
 
   getServerConfig() {
@@ -86,11 +83,11 @@ export default class ProdComponent extends Base {
   }
 
   getHTML(theme) {
-    var RX = /(\/\/|<!--) RAZOR >> (.*) << \/\/(-->)?/gm;
+    //var RX = /(\/\/|<!--) RAZOR >> (.*) << \/\/(-->)?/gm;
     var html = super.getHTML(theme);
-    if (lo.isString(html)) {
-      html = html.replace(RX, '$2');
-    }
+    //if (lo.isString(html)) {
+    //html = html.replace(RX, '$2');
+    //}
     return html;
   }
 

@@ -132,17 +132,25 @@ export default class Base {
     lo.set(this[local.templateLocals], path, obj);
   }
 
+  renderString(prod, dev) {
+    return dev || ''
+  }
+
   initTemplateLocals() {
     this.setTemplateLocal("include", this.include.bind(this));
-    this.setTemplateLocal("includeBody", this.includeBody.bind(this));
     this.setTemplateLocal("getString", this.getString.bind(this));
     this.setTemplateLocal("getOption", this.getOption.bind(this));
     this.setTemplateLocal("getLink", this.getLink.bind(this));
+
+    this.setTemplateLocal("includeBody", this.includeBody.bind(this));
 
     // for layout
     this.setTemplateLocal('includeCSS', this.includeCSS.bind(this));
     this.setTemplateLocal('includeJS', this.includeJS.bind(this));
     this.setTemplateLocal('includeJSOptions', this.includeJSOptions.bind(this));
+
+    this.setTemplateLocal("render", this.renderString.bind(this));
+
   }
 
   include() {
