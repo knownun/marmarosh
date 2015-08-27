@@ -83,12 +83,12 @@ export default class ProdComponent extends Base {
   }
 
   //getHTML(theme) {
-  //var RX = /(\/\/|<!--) RAZOR >> (.*) << \/\/(-->)?/gm;
-  //var html = super.getHTML(theme);
-  //if (lo.isString(html)) {
-  //html = html.replace(RX, '$2');
-  //}
-  //return html;
+  //  var RX = /(\/\/|<!--)>>(.*)<<\/\/(-->)?/gm;
+  //  var html = super.getHTML(theme);
+  //  if (lo.isString(html)) {
+  //    html = html.replace(RX, '$2');
+  //  }
+  //  return html;
   //}
 
   readTemplate(theme) {
@@ -104,10 +104,10 @@ export default class ProdComponent extends Base {
     return html;
   }
 
-  includeSet(componentPath, models, template) {
-    var name = path.basename(componentPath), template = template || null;
+  includeSet(componentPath, models) {
+    var name = path.basename(componentPath);
     this.widgetsSets = this.widgetsSets || {};
     lo.set(this.widgetsSets, name, true);
-    return '\n' + `@RepeatWidget("${componentPath}", ${models}, ${template})` + '\n';
+    return '\n' + `@RepeatWidget("${name}", ${models})` + '\n';
   }
 }

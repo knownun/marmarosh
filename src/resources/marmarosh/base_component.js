@@ -270,11 +270,10 @@ export default class Base {
     var output = {};
     if (lo.isObject(input)) {
       lo.forOwn(input, (value, key) => {
-        if (lo.isString(value)) {
-          output[key] = value;
-        }
-        if (lo.isObject(value) && lo.has(value, propertyPath)) {
+        if (lo.isObject(value)) {
           output[key] = lo.get(value, propertyPath);
+        } else {
+          output[key] = value;
         }
       });
     }
