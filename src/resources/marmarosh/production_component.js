@@ -106,8 +106,8 @@ export default class ProdComponent extends Base {
 
   includeSet(componentPath, models) {
     var name = path.basename(componentPath);
-    this.widgetsSets = this.widgetsSets || {};
-    lo.set(this.widgetsSets, name, true);
+    this.widgets = this.widgets || {};
+    lo.set(this.widgets, name, {'default': name});
     return '\n' + `@RepeatWidget("${name}", ${models})` + '\n';
   }
 }
