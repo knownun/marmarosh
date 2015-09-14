@@ -120,11 +120,11 @@ export default class Task extends Base {
     }
 
     if (lo.isObject(config.strings)) {
-      data.strings = lo.mapValues(getVars(config.strings, ['default']), 'default');
+      data.strings = getVars(config.strings, ['default'], 'default');
     }
 
     if (lo.isObject(config.links)) {
-      data.links = lo.mapValues(getVars(config.links, ['default']), 'default');
+      data.links = getVars(config.links, ['default'], 'default');
     }
 
     data.widgets = instance.widgets || {};
@@ -142,17 +142,26 @@ export default class Task extends Base {
     return globSync(path.join(src, mask)).map((url) => path.resolve(url));
   }
 
-  getVars(input, properties) {
+  getVars(input, properties, map) {
     var output = {};
     lo.forOwn(input, (value, key) => {
-      var obj = null;
-      if (!lo.isUndefined(value)) {
-        obj = properties ? lo.pick(value, properties) : value;
-        if (!lo.isEmpty(obj)) {
-          output[key] = obj
+      if (lo.isObject(value)) {
+        var obj = null;
+        if (!lo.isUndefined(value)) {
+          obj = properties ? lo.pick(value, properties) : value;
+          if (!lo.isEmpty(obj)) {
+            output[key] = obj
+          }
         }
+      } else if (!lo.isEmpty(value)) {
+        output[key] = value
       }
     });
+
+    if (map) {
+      lo.mapValues(output, map)
+    }
+
     return output;
   }
 
