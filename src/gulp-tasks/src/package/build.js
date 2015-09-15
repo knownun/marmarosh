@@ -123,6 +123,10 @@ export default class Task extends Base {
       data.strings = getVars(config.strings, ['default'], 'default');
     }
 
+    if (lo.isObject(config.images)) {
+      data.images = getVars(config.images, ['default'], 'default');
+    }
+
     if (lo.isObject(config.links)) {
       data.links = getVars(config.links, ['default'], 'default');
     }
