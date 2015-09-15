@@ -41,10 +41,21 @@ export default class ProdComponent extends Base {
     return placeholder || lo.isString(template) ? template.replace('${name}', name) : `@ViewBag.urls.${name}`
   }
 
+  getImageURL(name) {
+    var placeholder = lo.get(this.getServerConfig(), `images.${name}`);
+    var template = this.getConfig("builder.serverReplace.getImageURL");
+    return placeholder || lo.isString(template) ? template.replace('${name}', name) : `@ViewBag.images.${name}`
+  }
+
   getOption(name) {
     var placeholder = lo.get(this.getServerConfig(), `template_options.${name}`);
     var template = this.getConfig("builder.serverReplace.getOption");
     return placeholder || lo.isString(template) ? template.replace('${name}', name) : `@ViewBag.template.${name}`
+  }
+
+  includeMeta() {
+    var template = this.getConfig("builder.serverReplace.includeMeta");
+    return (lo.isString(template) ? template : '@Meta()') + '\n'
   }
 
   includeCSS() {
@@ -78,18 +89,10 @@ export default class ProdComponent extends Base {
       script_options: this.getPropsFrom(config.script_options, 'placeholder'),
       widgets: this.getPropsFrom(config.widgets, 'placeholder'),
       strings: this.getPropsFrom(config.strings, 'placeholder'),
+      images: this.getPropsFrom(config.images, 'placeholder'),
       links: this.getPropsFrom(config.links, 'placeholder')
     };
   }
-
-  //getHTML(theme) {
-  //  var RX = /(\/\/|<!--)>>(.*)<<\/\/(-->)?/gm;
-  //  var html = super.getHTML(theme);
-  //  if (lo.isString(html)) {
-  //    html = html.replace(RX, '$2');
-  //  }
-  //  return html;
-  //}
 
   readTemplate(theme) {
     return this.readTemplateForTheme(theme, this.getName()) || null;

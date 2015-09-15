@@ -141,10 +141,12 @@ export default class Base {
     this.setTemplateLocal("getString", this.getString.bind(this));
     this.setTemplateLocal("getOption", this.getOption.bind(this));
     this.setTemplateLocal("getLink", this.getLink.bind(this));
+    this.setTemplateLocal("getImageURL", this.getImageURL.bind(this));
 
     this.setTemplateLocal("includeBody", this.includeBody.bind(this));
 
     // for layout
+    this.setTemplateLocal('includeMeta', this.includeMeta.bind(this));
     this.setTemplateLocal('includeCSS', this.includeCSS.bind(this));
     this.setTemplateLocal('includeJS', this.includeJS.bind(this));
     this.setTemplateLocal('includeJSOptions', this.includeJSOptions.bind(this));
@@ -241,6 +243,11 @@ export default class Base {
     return lo.get(config, `links.${name}`)
   }
 
+  getImageURL(name) {
+    var config = this.getClientConfig();
+    return lo.get(config, `images.${name}`)
+  }
+
   getOption(name) {
     var config = this.getClientConfig();
     return lo.get(config, `template_options.${name}`)
@@ -259,6 +266,7 @@ export default class Base {
         template_options: this.getPropsFrom(config.template_options, 'default'),
         script_options: this.getPropsFrom(config.script_options, 'default'),
         strings: this.getPropsFrom(config.strings, 'default'),
+        images: this.getPropsFrom(config.images, 'default'),
         links: this.getPropsFrom(config.links, 'default')
       }
     }
@@ -297,6 +305,10 @@ export default class Base {
     });
 
     return out
+  }
+
+  includeMeta() {
+    return ''
   }
 
   includeJS() {
