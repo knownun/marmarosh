@@ -134,7 +134,7 @@ export default class Task extends Base {
     data.widgets = instance.widgets || {};
 
     if (lo.isObject(config.widgets)) {
-      data.widgets = lo.merge(data.widgets, getVars(config.widgets, ['default', 'values', 'template_options', 'script_options']));
+      data.widgets = lo.merge(data.widgets, config.widgets);
     }
 
     return this.createFile(output, name, JSON.stringify(data, null, 2));
