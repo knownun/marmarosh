@@ -154,6 +154,7 @@ export default class Base {
     this.setTemplateLocal("render", this.renderString.bind(this));
 
     this.setTemplateLocal("includeSet", this.includeSet.bind(this));
+    this.setTemplateLocal("if", this.helperIF.bind(this));
 
   }
 
@@ -345,6 +346,10 @@ export default class Base {
       out = {name, src, config, configPath}
     }
     return out;
+  }
+
+  helperIF(cond, markup) {
+    return ''
   }
 
 }

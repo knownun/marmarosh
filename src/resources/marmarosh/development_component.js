@@ -63,4 +63,14 @@ export default class DevComponent extends Base {
     this.setTemplateLocal("dev", true);
   }
 
+  helperIF(cond, markup) {
+    var config = this.getClientConfig();
+    var option = lo.get(config, cond);
+    var out = '';
+    if (option) {
+      out = markup
+    }
+    return out
+  }
+
 }

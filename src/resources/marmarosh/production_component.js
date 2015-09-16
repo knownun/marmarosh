@@ -73,6 +73,22 @@ export default class ProdComponent extends Base {
     return (lo.isString(template) ? template : '@ServerConfigurations()') + '\n'
   }
 
+  helperIF(cond, markup) {
+    var out = '', condStr = 'null';
+    cond = cond.split('.');
+
+    switch (cond[0]) {
+      case 'strings': condStr = this.getString(cond[1]); break;
+      case 'links': condStr = this.getLink(cond[1]); break;
+      case 'images': condStr = this.getImageURL(cond[1]); break;
+      case 'template_options': condStr = this.getOption(cond[1]); break;
+    }
+
+    out += `@if(${condStr}!=null)` + '\n{\n' + markup + '\n}\n';
+
+    return out
+  }
+
   renderString(prod, dev) {
     return prod || ''
   }
