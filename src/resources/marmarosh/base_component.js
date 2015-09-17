@@ -154,7 +154,8 @@ export default class Base {
     this.setTemplateLocal("render", this.renderString.bind(this));
 
     this.setTemplateLocal("includeSet", this.includeSet.bind(this));
-    this.setTemplateLocal("if", this.helperIF.bind(this));
+    this.setTemplateLocal("if", this.IF.bind(this));
+    this.setTemplateLocal("endif", this.ENDIF.bind(this));
 
   }
 
@@ -348,7 +349,11 @@ export default class Base {
     return out;
   }
 
-  helperIF(cond, markup) {
+  IF(cond) {
+    return ''
+  }
+
+  ENDIF() {
     return ''
   }
 

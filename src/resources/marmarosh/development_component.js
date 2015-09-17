@@ -2,6 +2,10 @@ import lo from 'lodash'
 
 import Base from './base_component'
 
+var local = {
+  conditions: Symbol('template_conditions')
+};
+
 export default class DevComponent extends Base {
 
   constructor(config, overrideConfigObj, childInstance) {
@@ -63,14 +67,22 @@ export default class DevComponent extends Base {
     this.setTemplateLocal("dev", true);
   }
 
-  helperIF(cond, markup) {
+  IF(cond) {
+    this[local.conditions] = this[local.conditions] || [];
+
     var config = this.getClientConfig();
     var option = lo.get(config, cond);
-    var out = '';
-    if (option) {
-      out = markup
-    }
-    return out
+
+    this[local.conditions].push(!!option);
+
+    console.log(this[local.conditions]);
+
+    return option ? '' : '<!--'
+  }
+
+  ENDIF() {
+    var option = this[local.conditions].pop();
+    return option ? '' : '-->'
   }
 
 }
