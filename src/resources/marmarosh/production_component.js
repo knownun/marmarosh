@@ -73,27 +73,10 @@ export default class ProdComponent extends Base {
     return (lo.isString(template) ? template : '@ServerConfigurations()') + '\n'
   }
 
-  IF(cond) {
-
-    var condStr = 'null';
-    cond = cond.split('.');
-
-    switch (cond[0]) {
-      case 'strings':
-        condStr = this.getString(cond[1]);
-        break;
-      case 'links':
-        condStr = this.getLink(cond[1]);
-        break;
-      case 'images':
-        condStr = this.getImageURL(cond[1]);
-        break;
-      case 'template_options':
-        condStr = this.getOption(cond[1]);
-        break;
-    }
-
-    return '\n' + `@if(${condStr}!=null)` + '{\n'
+  IF(left, operand = '!=', right = 'null') {
+    var leftStr = parseSelector.bind(this)(left);
+    var rightStr = parseSelector.bind(this)(right);
+    return '\n' + `@if(${leftStr} ${operand} ${rightStr})` + '{\n'
   }
 
   ENDIF() {
@@ -140,4 +123,25 @@ export default class ProdComponent extends Base {
     lo.set(this.widgets, name, {'default': name});
     return '\n' + `@RepeatWidget("${name}", ${models})` + '\n';
   }
+}
+
+function parseSelector(selector) {
+  var out = selector || 'null';
+  if (selector && selector.split && selector.split('.').length == 2) {
+    switch (selector.split('.')[0]) {
+      case 'strings':
+        out = this.getString(selector.split('.')[1]);
+        break;
+      case 'links':
+        out = this.getLink(selector.split('.')[1]);
+        break;
+      case 'images':
+        out = this.getImageURL(selector.split('.')[1]);
+        break;
+      case 'template_options':
+        out = this.getOption(selector.split('.')[1]);
+        break;
+    }
+  }
+  return out
 }

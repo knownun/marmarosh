@@ -67,12 +67,13 @@ export default class DevComponent extends Base {
     this.setTemplateLocal("dev", true);
   }
 
-  IF(cond) {
+  IF(left, operand = '!=', right = undefined) {
     this[local.conditions] = this[local.conditions] || [];
-    var config = this.getClientConfig();
-    var option = lo.get(config, cond);
-    this[local.conditions].push(!!option);
-    return option ? '' : '<!--'
+    var leftStr = parseSelector.bind(this)(left);
+    var rightStr = parseSelector.bind(this)(right);
+    var result = !!eval(`${leftStr}${operand}${rightStr}`);
+    this[local.conditions].push(result);
+    return result ? '' : '<!--'
   }
 
   ENDIF() {
@@ -80,4 +81,19 @@ export default class DevComponent extends Base {
     return option ? '' : '-->'
   }
 
+}
+
+function parseSelector(selector) {
+  var out = selector || undefined;
+  if (selector && selector.split && selector.split('.').length == 2) {
+    switch (selector.split('.')[0]) {
+      case 'strings':
+      case 'links':
+      case 'images':
+      case 'template_options':
+        out = lo.get(this.getClientConfig(), selector);
+        break;
+    }
+  }
+  return JSON.stringify(out)
 }
