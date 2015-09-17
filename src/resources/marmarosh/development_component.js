@@ -69,14 +69,9 @@ export default class DevComponent extends Base {
 
   IF(cond) {
     this[local.conditions] = this[local.conditions] || [];
-
     var config = this.getClientConfig();
     var option = lo.get(config, cond);
-
     this[local.conditions].push(!!option);
-
-    console.log(this[local.conditions]);
-
     return option ? '' : '<!--'
   }
 
