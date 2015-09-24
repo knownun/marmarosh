@@ -54,10 +54,11 @@ function getDefaults(src, dest) {
     'source-maps': true,
     'builder': 'webpack',
     'debug': false,
-    //'loaders.babel': [
-    //  join(src, '.+\.js$'),
-    //  resolve('tests', '.+\.js$')
-    //],
+    'loaders.babel': [
+      join(src, '.+\.js$'),
+      join(src, '.+\.jsx$')
+      resolve('tests', '.+\.js$'),
+    ],
     'loaders.yaml': [
       join(src, '.+\.yml$')
     ],
