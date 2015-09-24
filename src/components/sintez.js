@@ -56,7 +56,7 @@ function getDefaults(src, dest) {
     'debug': false,
     'loaders.babel': [
       join(src, '.+\.js$'),
-      join(src, '.+\.jsx$')
+      join(src, '.+\.jsx$'),
       resolve('tests', '.+\.js$'),
     ],
     'loaders.yaml': [
