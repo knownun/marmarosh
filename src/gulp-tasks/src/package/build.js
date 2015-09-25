@@ -66,7 +66,7 @@ export default class Task extends Base {
 
   buildStyles() {
     var start = (new Date).getTime();
-    this.cssBuildTask.run(()=> {
+    this.cssBuildTask.run(() => {
       var end = (new Date).getTime();
       this.logger.log(`Compiling styles - ${end - start}ms`);
     });
@@ -74,7 +74,7 @@ export default class Task extends Base {
 
   buildScripts() {
     var start = (new Date).getTime();
-    this.jsBuildTask.run(()=> {
+    this.jsBuildTask.run(() => {
       var end = (new Date).getTime();
       this.logger.log(`Compiling scripts - ${end - start}ms`);
     })
@@ -109,6 +109,14 @@ export default class Task extends Base {
 
     if (config.isMasterPage) {
       data.isMasterPage = config.isMasterPage
+    }
+
+    if (instance.hasIndexJS) {
+      data.hasJs = true;
+    }
+    
+    if (lo.startsWith(instance.getName(), 'react')) {
+      data.isReact = true;
     }
 
     if (lo.isObject(config.template_options)) {

@@ -39,8 +39,9 @@ export default class DevComponent extends Base {
     lo.isString(newName) && component.setPlace(newName);
 
     if (component.hasIndexJS) {
-      var scriptOpt = lo.get(component.getConfig(), 'script_options') || {};
-      this.addJSOptions(path, newName || component.getName(), scriptOpt);
+      var componentConfig = component.getConfig();
+      var scriptOpt = lo.get(componentConfig, 'script_options') || {};
+      this.addJSOptions(component, path, newName || component.getName(), scriptOpt);
     }
 
     return component.getHTML();
@@ -55,7 +56,7 @@ export default class DevComponent extends Base {
       ins = new this.constructor(lo.get(config, prop), over, this);
       ins.setTheme(this.getTheme());
       if (this._JSOptions) {
-        ins.addJSOptions(this._JSOptions);
+        ins.addJSOptions(this, this._JSOptions);
       }
     }
 

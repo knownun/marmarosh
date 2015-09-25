@@ -109,7 +109,8 @@ export default class Base {
 
   get hasIndexJS() {
     var filePath = path.resolve(path.join(this.getSrc(), 'index.js'));
-    return fs.existsSync(filePath)
+    var jsxFilePath = path.resolve(path.join(this.getSrc(), 'index.jsx'));
+    return fs.existsSync(filePath) || fs.existsSync(jsxFilePath);
   }
 
   getTemplate(theme) {
@@ -167,9 +168,9 @@ export default class Base {
     this[local.bodyInstance] = {
       instance: childInstance,
       html: childInstance.getHTML()
-    };
-    if (childInstance._JSOptions) {
-      this.addJSOptions(childInstance._JSOptions);
+    };        
+    if (childInstance._JSOptions) {      
+      this.addJSOptions(childInstance, childInstance._JSOptions);
     }
   }
 
@@ -190,15 +191,20 @@ export default class Base {
     return lo.merge(obj, {"components": this._JSOptions})
   }
 
-  addJSOptions(url, name, options) {
+  addJSOptions(instance, url, name, options) {
     this._JSOptions = this._JSOptions || [];
-    if (arguments.length == 1 && lo.isArray(url)) {
+    if (arguments.length == 2 && lo.isArray(url)) {
       this._JSOptions = lo.union(this._JSOptions, url);
     } else {
       url = url.split("/");
       var component_type = url.shift();
       var type = url.join("/");
-      this._JSOptions.push({name, type, component_type, options});
+      var model = {};            
+      if(lo.startsWith(type, 'react')){
+        component_type = "react-" + component_type;
+        model = instance.getClientConfig();
+      }
+      this._JSOptions.push({name, type, component_type, options, model});
     }
   }
 
