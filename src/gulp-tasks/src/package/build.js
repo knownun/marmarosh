@@ -54,11 +54,17 @@ export default class Task extends Base {
         }
       });
       this.createCSHTML(instance, output);
-      this.createCSHTML(instance, output, 'totaldomination');
-      this.createCSHTML(instance, output, 'pirates');
-      this.createCSHTML(instance, output, 'storamfall');
-      this.createCSHTML(instance, output, 'soldiers');
-      this.createCSHTML(instance, output, 'nords');
+
+      var themes = this.sintez.get("resources.css.themes");
+      themes.forEach((theme)=> {
+        if (lo.startsWith(theme, '?')) {
+          var name = theme.substr(1);
+          this.createCSHTML(instance, output, name);
+        } else {
+
+        }
+      });
+
       this.createJSON(instance, output);
     });
     this.logger.log("Compiling templates");
@@ -121,6 +127,10 @@ export default class Task extends Base {
 
     if (lo.isObject(config.template_options)) {
       data.template_options = getVars(config.template_options, ['default', 'values']);
+    }
+
+    if (lo.isObject(config.layout_options)) {
+      data.layout_options = getVars(config.layout_options, ['default', 'values']);
     }
 
     if (lo.isObject(config.script_options)) {

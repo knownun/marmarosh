@@ -11,6 +11,7 @@ import path from 'path'
 var local = {
   src: Symbol('src'),
   name: Symbol('name'),
+  type: Symbol('type'),
   place: Symbol('place'),
   theme: Symbol('theme'),
   config: Symbol('config'),
@@ -56,6 +57,7 @@ export default class Base {
     if (this.isValidConfig(data)) {
       this[local.src] = data.src;
       this[local.name] = data.name;
+      this[local.type] = data.type;
       this[local.config] = data.config;
       this[local.configPath] = data.configPath;
     } else {
@@ -80,6 +82,10 @@ export default class Base {
 
   getName() {
     return this[local.name]
+  }
+
+  getType() {
+    return this[local.type]
   }
 
   getConfigPath() {
@@ -168,8 +174,8 @@ export default class Base {
     this[local.bodyInstance] = {
       instance: childInstance,
       html: childInstance.getHTML()
-    };        
-    if (childInstance._JSOptions) {      
+    };
+    if (childInstance._JSOptions) {
       this.addJSOptions(childInstance, childInstance._JSOptions);
     }
   }
@@ -191,16 +197,15 @@ export default class Base {
     return lo.merge(obj, {"components": this._JSOptions})
   }
 
-  addJSOptions(instance, url, name, options) {
+  addJSOptions(instance, name, options) {
     this._JSOptions = this._JSOptions || [];
-    if (arguments.length == 2 && lo.isArray(url)) {
-      this._JSOptions = lo.union(this._JSOptions, url);
+    if (arguments.length == 2 && lo.isArray(name)) {
+      this._JSOptions = lo.union(this._JSOptions, name);
     } else {
-      url = url.split("/");
-      var component_type = url.shift();
-      var type = url.join("/");
-      var model = {};            
-      if(lo.startsWith(type, 'react')){
+      var type = instance.getName();
+      var component_type = instance.getType();
+      var model = {};
+      if (lo.startsWith(type, 'react')) {
         component_type = "react-" + component_type;
         model = instance.getClientConfig();
       }
@@ -336,21 +341,24 @@ export default class Base {
       var env = this.getEnv();
       var src = null;
       var name = null;
+      var type = null;
       var configPath = null;
       var isAbs = path.isAbsolute(url);
       var mask = env.mask;
       if (!isAbs) {
         var srcPath = env.src;
         src = path.join(srcPath, url);
+        type = path.basename(path.dirname(src));
         name = path.basename(src);
         configPath = path.resolve(path.join(src, path.basename(mask)));
       } else {
         src = path.dirname(url);
+        type = path.basename(path.dirname(src));
         name = path.basename(src);
         configPath = url;
       }
       var config = yaml.safeLoad(fs.readFileSync(configPath, 'utf8')) || {};
-      out = {name, src, config, configPath}
+      out = {name, src, config, configPath, type}
     }
     return out;
   }

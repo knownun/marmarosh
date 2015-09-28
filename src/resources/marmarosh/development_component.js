@@ -10,6 +10,11 @@ export default class DevComponent extends Base {
 
   constructor(config, overrideConfigObj, childInstance) {
     super(config, overrideConfigObj, childInstance);
+    if (this.hasIndexJS) {
+      var componentConfig = this.getConfig();
+      var scriptOpt = lo.get(componentConfig, 'script_options') || {};
+      this.addJSOptions(this, this.getName(), scriptOpt);
+    }
   }
 
   includeSet(name, widgetArrayName, template) {
@@ -41,7 +46,7 @@ export default class DevComponent extends Base {
     if (component.hasIndexJS) {
       var componentConfig = component.getConfig();
       var scriptOpt = lo.get(componentConfig, 'script_options') || {};
-      this.addJSOptions(component, path, newName || component.getName(), scriptOpt);
+      this.addJSOptions(component, newName || component.getName(), scriptOpt);
     }
 
     return component.getHTML();
@@ -51,6 +56,10 @@ export default class DevComponent extends Base {
     var ins = this;
     var prop = 'layout';
     var config = ins.getConfig();
+
+    over = lo.merge(over, {
+      template_options: this.getConfig("layout_options")
+    });
 
     if (lo.has(config, prop)) {
       ins = new this.constructor(lo.get(config, prop), over, this);
@@ -68,11 +77,15 @@ export default class DevComponent extends Base {
     this.setTemplateLocal("dev", true);
   }
 
-  IF(left, operand = '!=', right = undefined) {
-    this[local.conditions] = this[local.conditions] || [];
+  IF(left, operand, right) {
+    var result;
     var leftStr = parseSelector.bind(this)(left);
-    var rightStr = parseSelector.bind(this)(right);
-    var result = !!eval(`${leftStr}${operand}${rightStr}`);
+    if (arguments.length === 3) {
+      var rightStr = parseSelector.bind(this)(right);
+      operand = operand || '!=';
+    }
+    result = (operand && right) ? !!eval(`${leftStr}${operand}${rightStr}`) : !!eval(`${leftStr}`) || null;
+    this[local.conditions] = this[local.conditions] || [];
     this[local.conditions].push(result);
     return result ? '' : '<!--'
   }

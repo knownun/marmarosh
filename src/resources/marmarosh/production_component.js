@@ -96,6 +96,7 @@ export default class ProdComponent extends Base {
     var config = this.getConfig();
     return {
       template_options: this.getPropsFrom(config.template_options, 'placeholder'),
+      layout_options: this.getPropsFrom(config.layout_options, 'placeholder'),
       script_options: this.getPropsFrom(config.script_options, 'placeholder'),
       widgets: this.getPropsFrom(config.widgets, 'placeholder'),
       strings: this.getPropsFrom(config.strings, 'placeholder'),
@@ -138,6 +139,7 @@ function parseSelector(selector) {
       case 'images':
         out = this.getImageURL(selector.split('.')[1]);
         break;
+      case 'layout_options':
       case 'template_options':
         out = this.getOption(selector.split('.')[1]);
         break;
