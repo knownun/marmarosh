@@ -79,6 +79,12 @@ export default class ProdComponent extends Base {
     return '\n' + `@if(${leftStr} ${operand} ${rightStr})` + '{\n'
   }
 
+  IF_NOT(left, operand = '!=', right = 'null') {
+    var leftStr = parseSelector.bind(this)(left);
+    var rightStr = parseSelector.bind(this)(right);
+    return '\n' + `@if(!(${leftStr} ${operand} ${rightStr}))` + '{\n'
+  }
+
   ENDIF() {
     return '\n}\n'
   }

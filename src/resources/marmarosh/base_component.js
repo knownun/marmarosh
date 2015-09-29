@@ -162,6 +162,7 @@ export default class Base {
 
     this.setTemplateLocal("includeSet", this.includeSet.bind(this));
     this.setTemplateLocal("if", this.IF.bind(this));
+    this.setTemplateLocal("ifnot", this.IF_NOT.bind(this));
     this.setTemplateLocal("endif", this.ENDIF.bind(this));
 
   }
@@ -363,7 +364,11 @@ export default class Base {
     return out;
   }
 
-  IF(cond) {
+  IF() {
+    return ''
+  }
+
+  IF_NOT() {
     return ''
   }
 

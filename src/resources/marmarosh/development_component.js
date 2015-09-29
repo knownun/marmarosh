@@ -90,6 +90,21 @@ export default class DevComponent extends Base {
     return result ? '' : '<!--'
   }
 
+  IF_NOT(left, operand, right) {
+    var result;
+    var leftStr = parseSelector.bind(this)(left);
+    if (arguments.length === 3) {
+      var rightStr = parseSelector.bind(this)(right);
+      operand = operand || '!=';
+    }
+    result = (operand && right) ? !!eval(`${leftStr}${operand}${rightStr}`) : !!eval(`${leftStr}`) || null;
+    result = !result;
+    this[local.conditions] = this[local.conditions] || [];
+    this[local.conditions].push(result);
+    console.log("IF_NOT", result);
+    return result ? '' : '<!--'
+  }
+
   ENDIF() {
     var option = this[local.conditions].pop();
     return option ? '' : '-->'
