@@ -167,16 +167,18 @@ export default class Task extends Base {
   getVars(input, properties, map) {
     var output = {};
     lo.forOwn(input, (value, key) => {
-      if (lo.isObject(value)) {
-        var obj = null;
-        if (!lo.isUndefined(value)) {
-          obj = properties ? lo.pick(value, properties) : value;
-          if (!lo.isEmpty(obj)) {
-            output[key] = obj
+      if (!lo.startsWith(key, '$')) {
+        if (lo.isObject(value)) {
+          var obj = null;
+          if (!lo.isUndefined(value)) {
+            obj = properties ? lo.pick(value, properties) : value;
+            if (!lo.isEmpty(obj)) {
+              output[key] = obj
+            }
           }
+        } else if (!lo.isEmpty(value)) {
+          output[key] = value
         }
-      } else if (!lo.isEmpty(value)) {
-        output[key] = value
       }
     });
 
