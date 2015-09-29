@@ -101,7 +101,6 @@ export default class DevComponent extends Base {
     result = !result;
     this[local.conditions] = this[local.conditions] || [];
     this[local.conditions].push(result);
-    console.log("IF_NOT", result);
     return result ? '' : '<!--'
   }
 

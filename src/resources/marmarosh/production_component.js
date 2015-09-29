@@ -111,6 +111,18 @@ export default class ProdComponent extends Base {
     };
   }
 
+  getPropsFrom(input, propertyPath) {
+    var output = {};
+    if (lo.isObject(input)) {
+      lo.forOwn(input, (value, key) => {
+        if (!lo.startsWith(key, '$')) {
+          output[key] = (lo.isObject(value) && propertyPath) ? lo.get(value, propertyPath) : value;
+        }
+      });
+    }
+    return output;
+  }
+
   readTemplate(theme) {
     return this.readTemplateForTheme(theme, this.getName()) || null;
   }

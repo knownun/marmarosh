@@ -292,6 +292,7 @@ export default class Base {
     var output = {};
     if (lo.isObject(input)) {
       lo.forOwn(input, (value, key) => {
+        key = lo.startsWith(key, '$') ? key.substr(1) : key;
         output[key] = (lo.isObject(value) && propertyPath) ? lo.get(value, propertyPath) : value;
       });
     }
