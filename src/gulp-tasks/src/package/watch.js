@@ -29,17 +29,30 @@ export default class LessWatch extends Base {
 
     this.builder.init();
 
-    watch(mask, {verbose: 1}, (vf)=> {
-      var ext = path.extname(vf.history[0]);
-      if (ext.search(/.+(jade|yml)$/) != -1) {
-        this.builder.buildComponents();
-      }
-      if (ext.search(/.+(less|css)$/) != -1) {
-        this.builder.buildStyles();
-      }
-      if (ext.search(/.+(js|json)$/) != -1) {
-        this.builder.buildScripts()
-      }
-    });
+    var files = null;
+
+    var fn = lo.debounce(() => {
+      lo.forEach(files, (file)=> {
+        var ext = path.extname(file);
+        if (ext.search(/.+(jade|yml)$/) != -1) {
+          this.builder.buildComponents();
+        }
+        if (ext.search(/.+(less|css)$/) != -1) {
+          this.builder.buildStyles();
+        }
+        if (ext.search(/.+(js|json)$/) != -1) {
+          this.builder.buildScripts();
+        }
+      });
+      files = null;
+    }, 300);
+
+    var watchFn = (vf)=> {
+      files = files || [];
+      files.push(vf.history[0]);
+      return fn();
+    };
+
+    watch(mask, {verbose: 1}, watchFn);
   }
 }

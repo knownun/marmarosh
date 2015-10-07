@@ -120,7 +120,7 @@ export default class Task extends Base {
     if (instance.hasIndexJS) {
       data.hasJs = true;
     }
-    
+
     if (lo.startsWith(instance.getName(), 'react')) {
       data.isReact = true;
     }
