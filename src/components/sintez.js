@@ -55,21 +55,25 @@ function getDefaults(src, dest) {
     'builder': 'webpack',
     'debug': false,
     'loaders.babel': [
-      join(src, '.+\.js$'),
-      join(src, '.+\.jsx$'),
+      join(src, '.+\.(js|jsx)$'),
       resolve('tests', '.+\.js$'),
+      resolve('libs', '.+\.(js|jsx)$')
     ],
     'loaders.yaml': [
-      join(src, '.+\.yml$')
+      join(src, '.+\.yml$'),
+      resolve('libs', '.+\.yml$')
     ],
     'loaders.html': [
-      join(src, '.+\.html$')
+      join(src, '.+\.html$'),
+      resolve('libs', '.+\.html$')
     ],
     'loaders.json': [
-      join(src, '.+\.json$')
+      join(src, '.+\.json$'),
+      resolve('libs', '.+\.json$')
     ],
     'loaders.jade': [
-      join(src, '.+\.jade')
+      join(src, '.+\.jade'),
+      resolve('libs', '.+\.jade$')
     ],
     'target': 'web',
     'devtool': 'source-map',
