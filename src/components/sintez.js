@@ -55,9 +55,11 @@ function getDefaults(src, dest) {
     'builder': 'webpack',
     'debug': false,
     'loaders.babel': [
-      join(src, '.+\.(js|jsx)$'),
+      join(src, '.+\.js$'),
+      join(src, '.+\.jsx$'),
       resolve('tests', '.+\.js$'),
-      resolve('libs', '.+\.(js|jsx)$')
+      resolve('libs', '.+\.js$'),
+      resolve('libs', '.+\.jsx$')
     ],
     'loaders.yaml': [
       join(src, '.+\.yml$'),
