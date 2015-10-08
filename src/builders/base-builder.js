@@ -33,6 +33,11 @@ export default class BaseBuilder {
     this[local.events].once(event, fn);
   }
 
+  remove(event) {
+    this[local.events].removeAllListeners(event);
+    return this;
+  }
+
   emit(event, params) {
     this[local.events].emit(event, params);
   }

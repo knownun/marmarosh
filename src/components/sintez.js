@@ -182,13 +182,13 @@ export default class Sintez {
     var dest = this.getDest();
     var resourcesConfig = this.get('resources');
 
-    var config = Object.assign({} , resourcesConfig, customOptions);
+    var config = Object.assign({}, resourcesConfig, customOptions);
     return new Resources(src, dest, config);
   }
 
   getResources() {
     if (!this[local.resources]) {
-      this[local.resources] =  this.createResources();
+      this[local.resources] = this.createResources();
     }
 
     return this[local.resources];
