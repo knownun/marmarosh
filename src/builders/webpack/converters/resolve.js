@@ -7,7 +7,7 @@ import BaseConverter from '../base-converter';
 
 export default class ResolveCoverter extends BaseConverter {
 
-  getConfig(alias, resolve) {
+  getConfig(alias, resolve, extensions) {
     var config = null;
 
     if (!isEmpty(alias) && isObject(alias)) {
@@ -18,6 +18,11 @@ export default class ResolveCoverter extends BaseConverter {
     if (!isEmpty(resolve) && isArray(resolve)) {
       config = config || {};
       config.modulesDirectories = resolve;
+    }
+
+    if (!isEmpty(extensions) && isArray(extensions)) {
+      config = config || {};
+      config.extensions = [""].concat(extensions);
     }
 
     return config;

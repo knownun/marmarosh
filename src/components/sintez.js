@@ -206,7 +206,8 @@ export default class Sintez {
       loaders: this.get('loaders'),
       devtool: this.get('devtool'),
       alias: this.get('alias'),
-      resolve: this.get('resolve')
+      resolve: this.get('resolve'),
+      extensions: this.get('extensions')
     };
 
     var options = Object.assign({}, configOptions, customOptions);
