@@ -28,6 +28,28 @@ export default class Task extends Base {
 
     var applicationBuilder = this.builder.getApplicationBuilder();
 
+    applicationBuilder.remove('build.end').on('build.end', (params) => {
+      var message = `%#${params.counter}% application was packed. Elapsed time %${params.time}%s. `;
+      message += `Number of scripts %${params.scripts.length}%`;
+      this.logger.log(message);
+      var warnings = params.warnings;
+      if (warnings && !!warnings.length) {
+        this.logger.log('------------------');
+        this.logger.log('*** %WARNINGS% ***');
+        for (var warning of warnings) {
+          this.logger.log(`at %${warning.module.issuer}%`);
+          this.logger.log(`requested %"${warning.module.rawRequest}"% ("${warning.module.userRequest}")`);
+          this.logger.log(warning.message.replace(/(\r\n|\n|\r)/gm, ' '));
+        }
+        this.logger.log('------------------');
+      }
+    });
+    applicationBuilder.remove('build.error').on('build.error', ({errors}) => {
+      for (var error of errors) {
+        this.logger.error(`- ${error.message}`);
+      }
+    });
+
     var options = {
       builder: applicationBuilder,
       server: sintez.get('server'),
