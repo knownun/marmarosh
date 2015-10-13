@@ -53,15 +53,25 @@ export default class Task extends Base {
           serverReplace: this.sintez.get("serverReplace")
         }
       });
+
       this.createCSHTML(instance, output);
 
       var themes = this.sintez.get("resources.css.themes");
       themes.forEach((theme)=> {
         if (lo.startsWith(theme, '?')) {
           var name = theme.substr(1);
-          this.createCSHTML(instance, output, name);
-        } else {
-
+          if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
+            var themeInstance = new Constructor(path.normalize(filePath), {
+              route: {
+                theme: name
+              },
+              builder: {
+                serverReplace: this.sintez.get("serverReplace")
+              }
+            });
+            this.createCSHTML(themeInstance, output, name);
+            this.createJSON(themeInstance, output, name);
+          }
         }
       });
 
@@ -90,6 +100,7 @@ export default class Task extends Base {
     var folder = path.join(dir, path.dirname(fileName));
     mkdirp.sync(folder);
     fs.writeFileSync(path.join(dir, fileName), data, 'utf8');
+    return true;
   }
 
   getNewFilename(instance, ext, theme) {
@@ -105,8 +116,8 @@ export default class Task extends Base {
     return data ? this.createFile(output, name, data) : false;
   }
 
-  createJSON(instance, output) {
-    var name = this.getNewFilename(instance, "json");
+  createJSON(instance, output, theme) {
+    var name = this.getNewFilename(instance, "json", theme);
     var config = instance.getConfig();
 
     var getVars = this.getVars;
@@ -150,6 +161,10 @@ export default class Task extends Base {
     }
 
     data.widgets = instance.widgets || {};
+
+    if (theme) {
+      JSON.stringify(instance.widgets)
+    }
 
     if (lo.isObject(config.widgets)) {
       data.widgets = lo.merge(data.widgets, config.widgets);

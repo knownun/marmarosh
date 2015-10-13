@@ -23,7 +23,7 @@ var local = {
 
 export default class Base {
   constructor(config, overrideConfigObj, childInstance) {
-    this.saveConfig(config);
+    this.saveConfig(config, overrideConfigObj);
     if (overrideConfigObj) this.updateConfig(overrideConfigObj);
     if (childInstance) this.setBodyInstance(childInstance);
     this.initTemplateLocals();
@@ -52,8 +52,8 @@ export default class Base {
     return this;
   }
 
-  saveConfig(configPath) {
-    var data = this.readConfig(configPath);
+  saveConfig(configPath, overrideObj) {
+    var data = this.readConfig(configPath, overrideObj);
     if (this.isValidConfig(data)) {
       this[local.src] = data.src;
       this[local.name] = data.name;
@@ -106,17 +106,34 @@ export default class Base {
       pretty: true,
       self: true
     };
-    var mask = path.resolve(path.join(this.getSrc(), '**', theme + '.jade'));
-    var files = globSync(mask);
-    var filePath = (files.length) ? files[0] : null;
-    var out = filePath ? compilerFn(filePath, compileOptions) : null;
-    return out;
+    var filePath = this.getTemplatePathForTheme(theme);
+    return filePath ? compilerFn(filePath, compileOptions) : null;
   }
 
   get hasIndexJS() {
     var filePath = path.resolve(path.join(this.getSrc(), 'index.js'));
     var jsxFilePath = path.resolve(path.join(this.getSrc(), 'index.jsx'));
     return fs.existsSync(filePath) || fs.existsSync(jsxFilePath);
+  }
+
+  getTemplatePathForTheme(theme) {
+    var mask = path.resolve(path.join(this.getSrc(), '**', theme + '.jade'));
+    var files = globSync(mask);
+    return (files.length) ? files[0] : null;
+  }
+
+  hasTemplateForTheme(theme) {
+    return this.getTemplatePathForTheme(theme) ? true : false;
+  }
+
+  getConfigPathForTheme(theme) {
+    var mask = path.resolve(path.join(this.getSrc(), '**', theme + '.yml'));
+    var files = globSync(mask);
+    return (files.length) ? files[0] : null;
+  }
+
+  hasConfigForTheme(theme) {
+    return this.getConfigPathForTheme(theme) ? true : false;
   }
 
   getTemplate(theme) {
@@ -337,8 +354,9 @@ export default class Base {
     return `<script>window['serverConfigurations'] = ${data}</script>`
   }
 
-  readConfig(url) {
+  readConfig(url, overrideObj) {
     var out = null;
+    var theme = lo.get(overrideObj, 'route.theme');
     if (lo.isString(url)) {
       var env = this.getEnv();
       var src = null;
@@ -358,6 +376,11 @@ export default class Base {
         type = path.basename(path.dirname(src));
         name = path.basename(src);
         configPath = url;
+      }
+      if (theme) {
+        var theme_mask = path.resolve(path.join(src, '**', theme + '.yml'));
+        var theme_files = globSync(theme_mask);
+        configPath = (theme_files.length) ? theme_files[0] : configPath;
       }
       var config = yaml.safeLoad(fs.readFileSync(configPath, 'utf8')) || {};
       out = {name, src, config, configPath, type}

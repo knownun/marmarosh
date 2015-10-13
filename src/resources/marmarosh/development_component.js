@@ -20,10 +20,12 @@ export default class DevComponent extends Base {
   includeSet(name, widgetArrayName, template) {
     var out = '', template = template || '{body}';
     var theme = this.getTheme();
+    var over = {};
+    lo.set(over, "route.theme", this.getTheme());
     var widgetsObj = this.getConfig(widgetArrayName);
     if (lo.isObject(Array)) {
       lo.forOwn(widgetsObj, (options)=> {
-        var instance = new this.constructor(name);
+        var instance = new this.constructor(name,over);
         instance.updateConfig(options);
         instance.setTheme(theme);
         out += instance.getHTML();
@@ -34,10 +36,12 @@ export default class DevComponent extends Base {
   }
 
   include(path, newName) {
-    var component = new this.constructor(path);
+    var theme = this.getTheme();
+    var over = {};
+    lo.set(over, "route.theme", this.getTheme());
+    var component = new this.constructor(path, over);
     var name = newName || component.getName();
     var extendOptions = this.getConfig(`widgets.${name}`);
-    var theme = this.getTheme();
 
     lo.isObject(extendOptions) && component.updateConfig(extendOptions);
     lo.isString(theme) && component.setTheme(theme);
@@ -62,6 +66,7 @@ export default class DevComponent extends Base {
     });
 
     if (lo.has(config, prop)) {
+      lo.set(over, "route.theme", this.getTheme());
       ins = new this.constructor(lo.get(config, prop), over, this);
       ins.setTheme(this.getTheme());
       if (this._JSOptions) {
@@ -87,7 +92,7 @@ export default class DevComponent extends Base {
     result = (operand && right) ? !!eval(`${leftStr}${operand}${rightStr}`) : !!eval(`${leftStr}`) || null;
     this[local.conditions] = this[local.conditions] || [];
     this[local.conditions].push(result);
-    return result ? '' : '<!--'
+    return result ? '' : '<div style="display:none">'
   }
 
   IF_NOT(left, operand, right) {
@@ -101,12 +106,12 @@ export default class DevComponent extends Base {
     result = !result;
     this[local.conditions] = this[local.conditions] || [];
     this[local.conditions].push(result);
-    return result ? '' : '<!--'
+    return result ? '' : '<div style="display:none">'
   }
 
   ENDIF() {
     var option = this[local.conditions].pop();
-    return option ? '' : '-->'
+    return option ? '' : '</div>'
   }
 
 }
