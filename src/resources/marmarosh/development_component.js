@@ -12,7 +12,7 @@ export default class DevComponent extends Base {
     super(config, overrideConfigObj, childInstance);
     if (this.hasIndexJS) {
       var componentConfig = this.getConfig();
-      var scriptOpt = lo.get(componentConfig, 'script_options') || {};
+      var scriptOpt = this.getPropsFrom(componentConfig.script_options, 'default')|| {};
       this.addJSOptions(this, this.getName(), scriptOpt);
     }
   }

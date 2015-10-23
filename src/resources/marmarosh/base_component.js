@@ -225,7 +225,7 @@ export default class Base {
       var model = {};
       if (lo.startsWith(type, 'react')) {
         component_type = "react-" + component_type;
-        model = instance.getClientConfig();
+        model = lo.pick(instance.getClientConfig(), "template_options", "strings", "images", "links");
       }
       this._JSOptions.push({name, type, component_type, options, model});
     }
@@ -301,7 +301,6 @@ export default class Base {
         links: this.getPropsFrom(config.links, 'default')
       }
     }
-
     return cache;
   }
 
