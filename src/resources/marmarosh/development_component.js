@@ -49,7 +49,7 @@ export default class DevComponent extends Base {
 
     if (component.hasIndexJS) {
       var componentConfig = component.getConfig();
-      var scriptOpt = lo.get(componentConfig, 'script_options') || {};
+      var scriptOpt = this.getPropsFrom(componentConfig.script_options, 'default')|| {};
       this.addJSOptions(component, newName || component.getName(), scriptOpt);
     }
 
