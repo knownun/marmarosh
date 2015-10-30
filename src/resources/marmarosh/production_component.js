@@ -60,7 +60,7 @@ export default class ProdComponent extends Base {
 
   getHtmlClass() {
     var template = this.getConfig("builder.serverReplace.getHtmlClass");
-    return (lo.isString(template) ? template : '@getHtmlClass()') + '\n'
+    return (lo.isString(template) ? template : '@getHtmlClass()')
   }
 
   includeCSS() {
