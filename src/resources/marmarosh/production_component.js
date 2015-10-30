@@ -58,6 +58,11 @@ export default class ProdComponent extends Base {
     return (lo.isString(template) ? template : '@Meta()') + '\n'
   }
 
+  getHtmlClass() {
+    var template = this.getConfig("builder.serverReplace.getHtmlClass");
+    return (lo.isString(template) ? template : '@getHtmlClass()') + '\n'
+  }
+
   includeCSS() {
     var template = this.getConfig("builder.serverReplace.includeCSS");
     return (lo.isString(template) ? template : '@CssReferences()') + '\n'

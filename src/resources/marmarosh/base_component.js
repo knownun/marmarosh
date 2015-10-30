@@ -174,6 +174,7 @@ export default class Base {
     this.setTemplateLocal('includeCSS', this.includeCSS.bind(this));
     this.setTemplateLocal('includeJS', this.includeJS.bind(this));
     this.setTemplateLocal('includeJSOptions', this.includeJSOptions.bind(this));
+    this.setTemplateLocal('getHtmlClass', this.getHtmlClass.bind(this));
 
     this.setTemplateLocal("render", this.renderString.bind(this));
 
@@ -182,6 +183,10 @@ export default class Base {
     this.setTemplateLocal("ifnot", this.IF_NOT.bind(this));
     this.setTemplateLocal("endif", this.ENDIF.bind(this));
 
+  }
+
+  getHtmlClass() {
+    return ""
   }
 
   include() {
