@@ -51,7 +51,7 @@ export default class WebpackBuilder extends BaseBuilder {
 
     // plugins
     var optimizeConverter = new OptimizeConverter(src, dest);
-    var optimize = optimizeConverter.getConfig(this.config.optimize || false);
+    var optimize = optimizeConverter.getConfig(!this.config.debug);
 
     var config = {
       bail,
