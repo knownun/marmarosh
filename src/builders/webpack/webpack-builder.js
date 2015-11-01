@@ -28,7 +28,7 @@ export default class WebpackBuilder extends BaseBuilder {
     var dest = this.config.dest;
 
     var debug = !!this.config.debug;
-    var bail = debug;
+    var bail = !debug;
     var devtool = this.config.devtool;
     var target = this.config.target;
 
