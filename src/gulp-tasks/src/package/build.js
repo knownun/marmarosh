@@ -112,8 +112,8 @@ export default class Task extends Base {
 
   createCSHTML(instance, output, theme) {
     var name = this.getNewFilename(instance, "cshtml", theme);
-    var data = instance.getHTML(theme || 'main');
-    return data ? this.createFile(output, name, data) : false;
+    var data = instance.getHTML(theme || 'main') || "";
+    return this.createFile(output, name, data);
   }
 
   createJSON(instance, output, theme) {
