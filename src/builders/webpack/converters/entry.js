@@ -7,10 +7,6 @@ export default class EntryConverter extends BaseConverter {
     var bundle = output.split('.')[0];
     out[bundle] = src;
 
-    out["scripts/start"] = [
-      "app/start"
-    ];
-
     return out;
   }
 }
