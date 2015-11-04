@@ -34,13 +34,29 @@ export default class Task extends Base {
   }
 
   run() {
-    this.buildComponents();
     this.buildScripts();
     this.buildStyles();
+    this.buildComponents();
+    this.copyVendors();
   }
 
   init() {
     this.run()
+  }
+
+  copyVendors() {
+    var arr = this.sintez.get("vendors.js");
+    var output = path.dirname(this.sintez.getResources().get('js').getDest());
+
+    if (arr) {
+      arr.forEach((item)=> {
+        fs.readFile(item, 'utf8', (err, data) => {
+          if (err) throw err;
+          this.createFile(output, path.basename(item), data);
+        });
+      });
+    }
+
   }
 
   buildComponents() {
