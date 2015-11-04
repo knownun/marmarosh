@@ -345,11 +345,18 @@ export default class Base {
 
   includeJS() {
     var out = '', scripts = this.getConfig('route.scripts');
-    if (lo.isArray(scripts)) {
-      scripts.forEach((url)=> {
-        out += `<script src=/webpack${url}></script>\n`;
-      })
-    }
+
+    out += `<script src="/webpack/scripts/vendor.js"></script>\n`;
+    out += `<script src="/webpack/scripts/polyfill.js"></script>\n`;
+    out += `<script src="/webpack/scripts/start.js"></script>\n`;
+    out += `<script src="/webpack/scripts/templates.js"></script>\n`;
+    out += `<script src="/webpack/scripts/app.js"></script>\n`;
+
+    //if (lo.isArray(scripts)) {
+    //  scripts.forEach((url)=> {
+    //    out += `<script src=/webpack${url}></script>\n`;
+    //  })
+    //}
     return out
   }
 
