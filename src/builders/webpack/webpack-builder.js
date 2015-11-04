@@ -53,8 +53,6 @@ export default class WebpackBuilder extends BaseBuilder {
     var optimizeConverter = new OptimizeConverter(src, dest);
     var optimize = optimizeConverter.getConfig(!this.config.debug);
 
-    console.log(entry);
-
     var config = {
       bail,
       devtool,
