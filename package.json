@@ -16,6 +16,8 @@
   "license": "ISC",
   "homepage": "https://github.com/marmarosh/marmarosh#readme",
   "dependencies": {
+    "babel": "^5.4.2",
+    "babel-core": "^5.4.2",
     "body-parser": "^1.13.3",
     "express": "^4.13.3",
     "glob": "^5.0.14",
@@ -36,14 +38,12 @@
     "map-stream": "0.0.6",
     "merge-stream": "^1.0.0",
     "mkdirp": "^0.5.1",
-    "rimraf": "^2.4.2",
-    "serve-favicon": "^2.3.0",
-    "webpack": "^1.11.0",
-    "webpack-dev-middleware": "^1.2.0",
-    "babel": "^5.4.2",
-    "babel-core": "^5.4.2",
     "object-description": "0.0.2",
     "prettyjson": "^1.1.2",
-    "run-sequence": "^1.1.0"
+    "rimraf": "^2.4.2",
+    "run-sequence": "^1.1.0",
+    "serve-favicon": "^2.3.0",
+    "webpack": "^1.11.0",
+    "webpack-dev-middleware": "^1.2.0"
   }
 }
