@@ -12,7 +12,7 @@ export default class DevComponent extends Base {
     super(config, overrideConfigObj, childInstance);
     if (this.hasIndexJS) {
       var componentConfig = this.getConfig();
-      var scriptOpt = this.getPropsFrom(componentConfig.script_options, 'default')|| {};
+      var scriptOpt = this.getPropsFrom(componentConfig.script_options, 'default') || {};
       this.addJSOptions(this, this.getName(), scriptOpt);
     }
   }
@@ -21,14 +21,17 @@ export default class DevComponent extends Base {
     var out = '', template = template || '{body}';
     var theme = this.getTheme();
     var over = {};
+    var i = 1;
     lo.set(over, "route.theme", this.getTheme());
     var widgetsObj = this.getConfig(widgetArrayName);
     if (lo.isObject(Array)) {
       lo.forOwn(widgetsObj, (options)=> {
-        var instance = new this.constructor(name,over);
+        var instance = new this.constructor(name, over);
         instance.updateConfig(options);
         instance.setTheme(theme);
+        instance.__repeaterIndex = i;
         out += instance.getHTML();
+        i++;
       });
       out = out.length > 0 ? template.replace('{body}', out) : out;
     }
@@ -49,7 +52,7 @@ export default class DevComponent extends Base {
 
     if (component.hasIndexJS) {
       var componentConfig = component.getConfig();
-      var scriptOpt = this.getPropsFrom(componentConfig.script_options, 'default')|| {};
+      var scriptOpt = this.getPropsFrom(componentConfig.script_options, 'default') || {};
       this.addJSOptions(component, newName || component.getName(), scriptOpt);
     }
 
@@ -112,6 +115,10 @@ export default class DevComponent extends Base {
   ENDIF() {
     var option = this[local.conditions].pop();
     return option ? '' : '</div>'
+  }
+
+  itemIndex() {
+    return this.__repeaterIndex || 1;
   }
 
 }

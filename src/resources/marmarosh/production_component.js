@@ -147,6 +147,10 @@ export default class ProdComponent extends Base {
     lo.set(this.widgets, name, {'default': name});
     return '\n' + `@RepeatWidget("${name}", ${models})` + '\n';
   }
+
+  itemIndex() {
+    return "@Viewbag.index"
+  }
 }
 
 function parseSelector(selector) {

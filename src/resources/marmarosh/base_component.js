@@ -183,6 +183,9 @@ export default class Base {
     this.setTemplateLocal("ifnot", this.IF_NOT.bind(this));
     this.setTemplateLocal("endif", this.ENDIF.bind(this));
 
+    this.setTemplateLocal("itemIndex", this.itemIndex.bind(this));
+
+
   }
 
   getHtmlClass() {
@@ -403,6 +406,10 @@ export default class Base {
 
   ENDIF() {
     return ''
+  }
+
+  itemIndex() {
+    return 1
   }
 
 }
