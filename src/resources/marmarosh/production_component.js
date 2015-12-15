@@ -149,7 +149,7 @@ export default class ProdComponent extends Base {
   }
 
   itemIndex() {
-    return "@Viewbag.index"
+    return "@ViewBag.index"
   }
 }
 
