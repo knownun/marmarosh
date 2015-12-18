@@ -27,7 +27,7 @@ export default class WebpackBuilder extends BaseBuilder {
     var src = this.config.src;
     var dest = this.config.dest;
 
-    var debug = (process.env.NODE_ENV == "development");
+    var debug = !(process.env.NODE_ENV == "production");
     var bail = !debug;
     var devtool = this.config.devtool;
     var target = this.config.target;
