@@ -27,7 +27,7 @@ export default class WebpackBuilder extends BaseBuilder {
     var src = this.config.src;
     var dest = this.config.dest;
 
-    var debug = !!this.config.debug;
+    var debug = (process.env.NODE_ENV == "development");
     var bail = !debug;
     var devtool = this.config.devtool;
     var target = this.config.target;
@@ -51,7 +51,7 @@ export default class WebpackBuilder extends BaseBuilder {
 
     // plugins
     var optimizeConverter = new OptimizeConverter(src, dest);
-    var optimize = optimizeConverter.getConfig(!this.config.debug);
+    var optimize = optimizeConverter.getConfig(!debug);
 
     var config = {
       bail,
@@ -86,6 +86,10 @@ export default class WebpackBuilder extends BaseBuilder {
       this.emit(event, params);
     });
     config.plugins.push(logPlugin);
+
+    config.plugins.push(new Webpack.DefinePlugin({
+      DEBUG: debug
+    }));
 
     var split = js.getOptions('split');
 
