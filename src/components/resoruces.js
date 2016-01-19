@@ -5,7 +5,7 @@ import { toUnifiedPath } from '../utils/helpers';
 
 import Resource from '../resources/base-resource';
 import JsResource from '../resources/js-resource';
-import MarmaroshResource from '../resources/marmarosh-resource';
+//import MarmaroshResource from '../resources/marmarosh-resource';
 
 var local = {
   resources: Symbol('resources'),
@@ -15,7 +15,7 @@ var local = {
 
 var resourcesMap = new Map();
 resourcesMap.set('js', JsResource);
-resourcesMap.set('components', MarmaroshResource);
+//resourcesMap.set('components', MarmaroshResource);
 
 export default class Resources {
   constructor(src, dest, resources) {

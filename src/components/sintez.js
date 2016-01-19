@@ -1,37 +1,42 @@
-import '../utils/polyfills';
+import { load as JSONfromYml } from "js-yaml";
+import { readFileSync, existsSync } from "fs";
+import { resolve, join, dirname } from "../utils/path";
 
-import { load as JSONfromYml } from 'js-yaml';
-import { readFileSync, existsSync } from 'fs';
-import { resolve, join, dirname } from '../utils/path';
+import ObjectDescription from "object-description";
 
-import ObjectDescription from 'object-description';
+import getter from "lodash/object/get";
+import merge from "lodash/object/merge";
+import isArray from "lodash/lang/isArray";
+import isObject from "lodash/lang/isObject";
+import cloneDeep from "lodash/lang/cloneDeep";
 
-import getter from 'lodash/object/get';
-import merge from 'lodash/object/merge';
-import isArray from 'lodash/lang/isArray';
-import isObject from 'lodash/lang/isObject';
-import cloneDeep from 'lodash/lang/cloneDeep';
+import Resources from "./resoruces";
+import Builder from "./builder";
 
-import Resources from './resoruces';
-import Builder from './builder';
-import Server from './server';
+//import Server from "./server";
+
+var local = {
+  config: Symbol("config"),
+  resources: Symbol("resources"),
+  builder: Symbol("builder"),
+  tests: Symbol("tests")
+};
 
 function getOrderedUrls(original, resources) {
   var urls = [];
   var originalResource = resources.get(original);
-  var order = originalResource.getOptions('order');
+  var order = originalResource.getOptions("order");
 
   if (order) {
     for (var item of order) {
       var url = null;
-      if (item[0] == '^') {
+      if (item[0] == "^") {
         var dependency = item.slice(1);
         var resource = resources.get(dependency);
         url = resource.getUrl();
       } else {
         url = item;
       }
-
       if (isArray(url)) {
         urls = urls.concat(url);
       } else {
@@ -45,44 +50,35 @@ function getOrderedUrls(original, resources) {
   return urls;
 }
 
-
 function getDefaults(src, dest) {
   return ObjectDescription.create({
-    'src': src,
-    'dest': dest,
-    'experimental': false,
-    'source-maps': true,
-    'builder': 'webpack',
-    'debug': false,
-    'loaders.babel': [
-      join(src, '.+\.js$'),
-      join(src, '.+\.jsx$'),
-      resolve('tests', '.+\.js$'),
-      resolve('libs', '.+\.js$'),
-      resolve('libs', '.+\.jsx$')
+    "src": src,
+    "dest": dest,
+    "experimental": false,
+    "source-maps": true,
+    //"builder": "webpack",
+    "loaders.babel": [
+      join(src, ".+\.js$"),
+      join(src, ".+\.jsx$")
     ],
-    'loaders.yaml': [
-      join(src, '.+\.yml$'),
-      resolve('libs', '.+\.yml$')
+    "loaders.yaml": [
+      join(src, ".+\.yml$")
     ],
-    'loaders.html': [
-      join(src, '.+\.html$'),
-      resolve('libs', '.+\.html$')
+    "loaders.html": [
+      join(src, ".+\.html$")
     ],
-    'loaders.json': [
-      join(src, '.+\.json$'),
-      resolve('libs', '.+\.json$')
+    "loaders.json": [
+      join(src, ".+\.json$")
     ],
-    'loaders.jade': [
-      join(src, '.+\.jade'),
-      resolve('libs', '.+\.jade$')
+    "loaders.jade": [
+      join(src, ".+\.jade")
     ],
-    'target': 'web',
-    'devtool': 'source-map',
-    'server': 'webpack',
-    'host': 'localhost',
-    'port': 9001,
-    'livereload': 35729
+    "target": "web",
+    "devtool": "source-map"
+    //"server": "webpack",
+    //"host": "localhost",
+    //"port": 9001,
+    //"livereload": 35729
   });
 }
 
@@ -105,41 +101,32 @@ function normalizeConfig(config) {
   return normalized;
 }
 
-var local = {
-  config: Symbol('config'),
-  resources: Symbol('resources'),
-  builder: Symbol('builder'),
-  tests: Symbol('tests')
-};
+export default class Marmarosh {
 
-export default class Sintez {
   constructor(config) {
-    var validation = this.validate(config);
+    let validation = this.validate(config);
 
     if (!validation.isValid) {
-      throw new Error(`Invalid sintez config. ${validation.errors.join(', ')}`);
+      throw new Error(`Invalid Marmarosh config. ${validation.errors.join(", ")}`);
     }
 
-    var defaultConfig = getDefaults(config.src, config.dest);
+    let defaultConfig = getDefaults(config.src, config.dest);
     this[local.config] = merge(defaultConfig, config);
   }
 
   static loadYml(configPath) {
     if (!existsSync(configPath)) {
-      throw new Error(`Sintez config "${configPath}" does not exist"`);
+      throw new Error(`Marmarosh config "${configPath}" does not exist"`);
     }
 
-    var configYml = readFileSync(configPath);
-
-    var config = JSONfromYml(configYml);
-    var normalized = normalizeConfig(config);
+    let configYml = readFileSync(configPath);
+    let config = JSONfromYml(configYml);
+    let normalized = normalizeConfig(config);
 
     if (normalized.extend) {
-      var currentDir = dirname(configPath);
-      var parentConfigPath = join(currentDir, normalized.extend);
-
-      var parentConfig = Sintez.loadYml(parentConfigPath);
-
+      let currentDir = dirname(configPath);
+      let parentConfigPath = join(currentDir, normalized.extend);
+      let parentConfig = Marmarosh.loadYml(parentConfigPath);
       normalized = merge(parentConfig, normalized);
     }
 
@@ -147,22 +134,18 @@ export default class Sintez {
   }
 
   static fromPath(configPath) {
-
-    var config = Sintez.loadYml(configPath);
-
-    return new Sintez(config);
+    let config = Marmarosh.loadYml(configPath);
+    return new Marmarosh(config);
   }
 
   validate(config) {
-    var errors = [];
+    let errors = [];
     if (!config.src) {
-      errors.push('"src" is not defined');
+      errors.push(`"src" is not defined`);
     }
-
     if (!config.dest) {
-      errors.push('"dest" is not defined');
+      errors.push(`"dest" is not defined`);
     }
-
     return {
       isValid: !errors.length,
       errors: errors
@@ -173,16 +156,11 @@ export default class Sintez {
     return this[local.config];
   }
 
-  addResource(key, resource) {
-
-  }
-
   createResources(customOptions = {}) {
-    var src = this.getSrc();
-    var dest = this.getDest();
-    var resourcesConfig = this.get('resources');
-
-    var config = Object.assign({}, resourcesConfig, customOptions);
+    let src = this.getSrc();
+    let dest = this.getDest();
+    let resourcesConfig = this.get("resources");
+    let config = Object.assign({}, resourcesConfig, customOptions);
     return new Resources(src, dest, config);
   }
 
@@ -190,27 +168,26 @@ export default class Sintez {
     if (!this[local.resources]) {
       this[local.resources] = this.createResources();
     }
-
     return this[local.resources];
   }
 
   createBuilder(customOptions = {}) {
 
-    var configOptions = {
-      builder: this.get('builder'),
+    let configOptions = {
+      builder: this.get("builder"),
       src: this.getSrc(),
       dest: this.getDest(),
       experimental: false,
-      js: this.getResources().get('js'),
-      debug: this.get('debug'),
-      loaders: this.get('loaders'),
-      devtool: this.get('devtool'),
-      alias: this.get('alias'),
-      resolve: this.get('resolve'),
-      extensions: this.get('extensions')
+      js: this.getResources().get("js"),
+      debug: this.get("debug"),
+      loaders: this.get("loaders"),
+      devtool: this.get("devtool"),
+      alias: this.get("alias"),
+      resolve: this.get("resolve"),
+      extensions: this.get("extensions")
     };
 
-    var options = Object.assign({}, configOptions, customOptions);
+    let options = Object.assign({}, configOptions, customOptions);
 
     return new Builder(options);
   }
@@ -219,39 +196,38 @@ export default class Sintez {
     if (!this[local.builder]) {
       this[local.builder] = this.createBuilder();
     }
-
     return this[local.builder];
   }
 
-  createServer(customOptions = {}) {
-    var resources = this.getResources();
-    var index = resources.get('index');
+  //createServer(customOptions = {}) {
+  //  var resources = this.getResources();
+  //  var index = resources.get("index");
+  //
+  //  var configOptions = {
+  //    builder: this.getBuilder(),
+  //    server: this.get("server"),
+  //
+  //    src: this.getSrc(),
+  //    dest: this.getDest(),
+  //
+  //    host: this.get("host"),
+  //    port: this.get("port"),
+  //
+  //    index: index.getDest()
+  //  };
+  //
+  //  var options = Object.assign({}, configOptions, customOptions);
+  //
+  //  return new Server(options);
+  //}
 
-    var configOptions = {
-      builder: this.getBuilder(),
-      server: this.get('server'),
-
-      src: this.getSrc(),
-      dest: this.getDest(),
-
-      host: this.get('host'),
-      port: this.get('port'),
-
-      index: index.getDest()
-    };
-
-    var options = Object.assign({}, configOptions, customOptions);
-
-    return new Server(options);
-  }
-
-  getServer() {
-    if (!this[local.server]) {
-      this[local.server] = this.createServer();
-    }
-
-    return this[local.server];
-  }
+  //getServer() {
+  //  if (!this[local.server]) {
+  //    this[local.server] = this.createServer();
+  //  }
+  //
+  //  return this[local.server];
+  //}
 
   // --------------------------------
 
@@ -264,11 +240,11 @@ export default class Sintez {
   }
 
   getDest() {
-    return this.get('dest');
+    return this.get("dest");
   }
 
   getSrc() {
-    return this.get('src');
+    return this.get("src");
   }
 
   // ------------ OUTPUT --------------
@@ -277,8 +253,8 @@ export default class Sintez {
     var resources = this.getResources();
     var output = null;
 
-    if (resources.has('js')) {
-      output = getOrderedUrls('js', resources);
+    if (resources.has("js")) {
+      output = getOrderedUrls("js", resources);
     }
 
 
@@ -289,8 +265,8 @@ export default class Sintez {
     var resources = this.getResources();
     var output = null;
 
-    if (resources.has('css')) {
-      output = getOrderedUrls('css', resources);
+    if (resources.has("css")) {
+      output = getOrderedUrls("css", resources);
     }
 
     return isArray(output) ? output : [output];
