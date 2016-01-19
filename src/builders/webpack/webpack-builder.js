@@ -87,7 +87,7 @@ export default class WebpackBuilder extends BaseBuilder {
     });
     config.plugins.push(logPlugin);
 
-    config.plugins.push(new webpack.optimize.DedupePlugin());
+    config.plugins.push(new Webpack.optimize.DedupePlugin());
 
     config.plugins.push(new Webpack.DefinePlugin({
       DEBUG: debug
