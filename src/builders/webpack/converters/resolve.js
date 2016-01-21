@@ -1,6 +1,7 @@
 import isEmpty from 'lodash/lang/isEmpty';
 import isObject from 'lodash/lang/isObject';
 import isArray from 'lodash/lang/isArray';
+import path from '../../../utils/path';
 
 import BaseConverter from '../base-converter';
 
@@ -24,6 +25,8 @@ export default class ResolveCoverter extends BaseConverter {
       config = config || {};
       config.extensions = [""].concat(extensions);
     }
+
+    config.fallback = path.join(__dirname, "node_modules");
 
     return config;
   }
