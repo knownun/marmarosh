@@ -1,5 +1,5 @@
 import Log from './gulp-logger';
-import isFunction from 'lodash/lang/isFunction';
+import isFunction from 'lodash/isFunction';
 
 var logger = new Log('tasks');
 

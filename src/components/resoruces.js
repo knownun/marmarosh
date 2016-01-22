@@ -1,5 +1,5 @@
-import { resolve, join } from '../utils/path';
-import cloneDeep from 'lodash/lang/cloneDeep';
+import { resolve, join } from 'path';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { toUnifiedPath } from '../utils/helpers';
 
@@ -19,7 +19,6 @@ resourcesMap.set('js', JsResource);
 
 export default class Resources {
   constructor(src, dest, resources) {
-    // TODO: check resources type
     this[local.src] = src;
     this[local.dest] = dest;
     this[local.resources] = resources;

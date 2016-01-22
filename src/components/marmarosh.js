@@ -1,14 +1,12 @@
 import { load as JSONfromYml } from "js-yaml";
 import { readFileSync, existsSync } from "fs";
-import { resolve, join, dirname } from "../utils/path";
+import { resolve, join, dirname } from "path";
 
-import ObjectDescription from "object-description";
-
-import getter from "lodash/object/get";
-import merge from "lodash/object/merge";
-import isArray from "lodash/lang/isArray";
-import isObject from "lodash/lang/isObject";
-import cloneDeep from "lodash/lang/cloneDeep";
+import getter from "lodash/get";
+import merge from "lodash/merge";
+import isArray from "lodash/isArray";
+import isObject from "lodash/isObject";
+import cloneDeep from "lodash/cloneDeep";
 
 import Resources from "./resoruces";
 import Builder from "./builder";
@@ -51,35 +49,31 @@ function getOrderedUrls(original, resources) {
 }
 
 function getDefaults(src, dest) {
-  return ObjectDescription.create({
+  return {
     "src": src,
     "dest": dest,
-    "experimental": false,
     "source-maps": true,
-    //"builder": "webpack",
-    "loaders.babel": [
-      join(src, ".+\.js$"),
-      join(src, ".+\.jsx$")
-    ],
-    "loaders.yaml": [
-      join(src, ".+\.yml$")
-    ],
-    "loaders.html": [
-      join(src, ".+\.html$")
-    ],
-    "loaders.json": [
-      join(src, ".+\.json$")
-    ],
-    "loaders.jade": [
-      join(src, ".+\.jade")
-    ],
+    "loaders": {
+      "babel": [
+        join(src, ".+\.js$"),
+        join(src, ".+\.jsx$")
+      ],
+      "yaml": [
+        join(src, ".+\.yml$")
+      ],
+      "html": [
+        join(src, ".+\.html$")
+      ],
+      "json": [
+        join(src, ".+\.json$")
+      ],
+      "jade": [
+        join(src, ".+\.jade")
+      ]
+    },
     "target": "web",
     "devtool": "source-map"
-    //"server": "webpack",
-    //"host": "localhost",
-    //"port": 9001,
-    //"livereload": 35729
-  });
+  };
 }
 
 function normalizeConfig(config) {
@@ -94,16 +88,14 @@ function normalizeConfig(config) {
         normalizedLoaders[loader] = loaders[loader];
       }
     }
-
     normalized.loaders = normalizedLoaders;
   }
-
   return normalized;
 }
 
 export default class Marmarosh {
 
-  constructor(config) {
+  constructor(config = {}) {
     let validation = this.validate(config);
 
     if (!validation.isValid) {
@@ -157,8 +149,8 @@ export default class Marmarosh {
   }
 
   createResources(customOptions = {}) {
-    let src = this.getSrc();
-    let dest = this.getDest();
+    let src = this.get("src");
+    let dest = this.get("dest");
     let resourcesConfig = this.get("resources");
     let config = Object.assign({}, resourcesConfig, customOptions);
     return new Resources(src, dest, config);

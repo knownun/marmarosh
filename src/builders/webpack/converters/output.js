@@ -1,9 +1,9 @@
-import isObject from 'lodash/lang/isObject';
-import isString from 'lodash/lang/isString';
-import assign from 'lodash/object/assign';
+import isObject from 'lodash/isObject';
+import isString from 'lodash/isString';
+import assign from 'lodash/assign';
 
 
-import { resolve } from '../../../utils/path';
+import { resolve } from 'path';
 
 import BaseConverter from '../base-converter';
 

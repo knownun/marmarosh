@@ -1,6 +1,6 @@
-import { join, resolve as res } from '../../utils/path';
+import { join, resolve as res } from 'path';
 
-import isArray from 'lodash/lang/isArray';
+import isArray from 'lodash/isArray';
 import Webpack from 'webpack';
 import WebpackLogPlugin from './plugins/webpack-log-plugin';
 import WebpackSplitByPathPlugin from './plugins/webpack-split-plugin';
@@ -36,7 +36,7 @@ export default class WebpackBuilder extends BaseBuilder {
 
     var js = this.config.js;
     var jsSource = js.getSrc();
-    var jsOutput = js.getOriginalDest();
+    var jsOutput = js.getRelativeDest();
 
     var entryConverter = new EntryConverter(src, dest);
     var entry = entryConverter.getConfig(jsSource, jsOutput);

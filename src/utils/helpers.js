@@ -1,9 +1,6 @@
 import path  from 'path';
+import url  from 'url';
 
-export var toUnifiedPath = path => path.replace(/[\\\/]+/g, '/');
-export var sep = path.sep === '/' ? '\\x2f' : '\\x5c';
-export var joinUrl = (...agrs) => agrs.join('/')
-  .replace(/[\/]+/g, '/')
-  .replace(/\/\?/g, '?')
-  .replace(/\/\#/g, '#')
-  .replace(/\:\//g, '://');
+export let toUnifiedPath = path => path.replace(/[\\\/]+/g, '/');
+export let joinUrl = (...agrs) => url.resolve(agrs);
+export let sep = path.sep === '/' ? '\\x2f' : '\\x5c';

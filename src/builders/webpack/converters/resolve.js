@@ -1,7 +1,7 @@
-import isEmpty from 'lodash/lang/isEmpty';
-import isObject from 'lodash/lang/isObject';
-import isArray from 'lodash/lang/isArray';
-import path from '../../../utils/path';
+import isEmpty from 'lodash/isEmpty';
+import isObject from 'lodash/isObject';
+import isArray from 'lodash/isArray';
+import path from 'path';
 
 import BaseConverter from '../base-converter';
 

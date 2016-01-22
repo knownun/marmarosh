@@ -1,5 +1,5 @@
-import isArray from 'lodash/lang/isArray';
-import isFunction from 'lodash/lang/isFunction';
+import isArray from 'lodash/isArray';
+import isFunction from 'lodash/isFunction';
 
 import { sep } from '../../../utils/helpers';
 
