@@ -1,59 +1,83 @@
-import { join, resolve as res } from 'path';
+import { join, resolve as res } from "path";
 
-import isArray from 'lodash/isArray';
-import Webpack from 'webpack';
-import WebpackLogPlugin from './plugins/webpack-log-plugin';
-import WebpackSplitByPathPlugin from './plugins/webpack-split-plugin';
+import isArray from "lodash/isArray";
+import Webpack from "webpack";
+import WebpackLogPlugin from "./plugins/webpack-log-plugin";
+import WebpackSplitByPathPlugin from "./plugins/webpack-split-plugin";
 
-import CommonsChunkPlugin from 'webpack/lib/optimize/CommonsChunkPlugin';
+import CommonsChunkPlugin from "webpack/lib/optimize/CommonsChunkPlugin";
 
-import BaseBuilder from '../base-builder';
+import BaseBuilder from "../base-builder";
 
-import LoadersConverter from './converters/loaders';
-import OutputConverter from './converters/output';
-import ResolveConverter from './converters/resolve';
-import OptimizeConverter from './converters/optimize';
+import LoadersConverter from "./converters/loaders";
+import PreloadersConverter from "./converters/preloaders";
+import OutputConverter from "./converters/output";
+import ResolveConverter from "./converters/resolve";
+import OptimizeConverter from "./converters/optimize";
 
-import EntryConverter from './converters/entry';
+import EntryConverter from "./converters/entry";
 
-var local = {
-  processedConfig: Symbol('processed'),
-  instance: Symbol('instance')
+import webpackScriptsPreset from "./presets/webpack-scripts";
+import webpackStylesPreset from "./presets/webpack-styles";
+
+let webpackPresets = new Map;
+
+webpackPresets.set("webpack-scripts", webpackScriptsPreset);
+webpackPresets.set("webpack-styles", webpackStylesPreset);
+
+let local = {
+  processedConfig: Symbol("processed"),
+  instance: Symbol("instance")
 };
 
 export default class WebpackBuilder extends BaseBuilder {
-  createConfig(customConfig) {
-    customConfig = customConfig || {};
-    var src = this.config.src;
-    var dest = this.config.dest;
 
-    var debug = !(process.env.NODE_ENV == "production");
-    var bail = !debug;
-    var devtool = this.config.devtool;
-    var target = this.config.target;
+  createConfig() {
+    let config = this.config;
 
-    var experimental = this.config.experimental;
+    if (!isArray(config.resources)) {
+      config.resources = [config.resources];
+    }
 
-    var js = this.config.js;
-    var jsSource = js.getSrc();
-    var jsOutput = js.getRelativeDest();
+    return config.resources.map(this.createChildConfig.bind(this));
+  }
 
-    var entryConverter = new EntryConverter(src, dest);
-    var entry = entryConverter.getConfig(jsSource, jsOutput);
-    var loadersConverter = new LoadersConverter(src, dest);
-    var loaders = loadersConverter.getConfig(this.config.loaders, experimental);
+  createChildConfig(resource) {
 
-    var outputConverter = new OutputConverter(src, dest);
-    var output = outputConverter.getConfig(customConfig.output);
+    let preset = webpackPresets.get(resource.preset);
 
-    var resolveConverter = new ResolveConverter(src, dest);
-    var resolve = resolveConverter.getConfig(this.config.alias, this.config.resolve, this.config.extensions);
+    let src = this.config.src;
+    let dest = this.config.dest;
+
+    let debug = !this.isProduction;
+    let bail = this.isProduction;
+    let devtool = resource.devtool;
+    let target = resource.target;
+
+    let resourceSrc = resource.src;
+    let resourceRelativeDest = resource.relativeDest;
+
+    let entryConverter = new EntryConverter(src, dest);
+    let entry = entryConverter.getConfig(resourceSrc, resourceRelativeDest);
+
+    let loadersConverter = new LoadersConverter(src, dest);
+    let loaders = loadersConverter.getConfig(preset.loaders);
+    let loadersPlugins = loadersConverter.getPlugins();
+
+    let preloadersConverter = new PreloadersConverter(src, dest);
+    let preloaders = preloadersConverter.getConfig(preset.preloaders);
+
+    let outputConverter = new OutputConverter(src, dest);
+    let output = outputConverter.getConfig(resource.output);
+
+    let resolveConverter = new ResolveConverter(src, dest);
+    let resolve = resolveConverter.getConfig(resource.alias, resource.resolve, resource.extensions);
 
     // plugins
-    var optimizeConverter = new OptimizeConverter(src, dest);
-    var optimize = optimizeConverter.getConfig(!debug);
+    let optimizeConverter = new OptimizeConverter(src, dest);
+    let optimize = optimizeConverter.getConfig(!debug);
 
-    var config = {
+    let config = {
       bail,
       devtool,
       target,
@@ -75,6 +99,14 @@ export default class WebpackBuilder extends BaseBuilder {
       config.module.loaders = loaders;
     }
 
+    if (loadersPlugins) {
+      config.plugins = config.plugins.concat(loadersPlugins);
+    }
+
+    if (preloaders) {
+      config.module.preLoaders = preloaders;
+    }
+
     if (optimize) {
       config.plugins.push(optimize);
     }
@@ -82,29 +114,34 @@ export default class WebpackBuilder extends BaseBuilder {
     /**
      * console log Plugin. apply "done" and "invalid"
      */
-    var logPlugin = new WebpackLogPlugin((event, params) => {
+    let logPlugin = new WebpackLogPlugin((event, params) => {
       this.emit(event, params);
-    });
+    }, {key: resource.getKey(), extendedFormat: resource.stats});
+
     config.plugins.push(logPlugin);
 
     config.plugins.push(new Webpack.optimize.DedupePlugin());
+
+    config.plugins.push(new Webpack.ProgressPlugin((percentage, msg) => {
+      this.emit("build.waiting", {key: resource.getKey(), percentage, msg});
+    }));
 
     config.plugins.push(new Webpack.DefinePlugin({
       DEBUG: debug
     }));
 
-    var split = js.getOptions('split');
+    let split = resource.getOptions("split");
 
     if (split) {
-      var relativeTarget = js.getRelativeTarget();
-      var splitConfig = [];
-      for (var name of Object.keys(split)) {
+      let relativeTarget = resource.getRelativeTarget();
+      let splitConfig = [];
+      for (let name of Object.keys(split)) {
         splitConfig.push({
           name: join(relativeTarget, name),
           path: split[name]
         });
       }
-      var splitPlugin = new WebpackSplitByPathPlugin(splitConfig);
+      let splitPlugin = new WebpackSplitByPathPlugin(splitConfig);
       config.plugins.push(splitPlugin);
     }
 
@@ -112,30 +149,26 @@ export default class WebpackBuilder extends BaseBuilder {
   }
 
   createInstance() {
-    var config = this.createConfig();
+    let config = this.createConfig();
     return Webpack(config);
   }
 
-  getConfig(customConfig) {
+  getConfig() {
     if (!this[local.processedConfig]) {
-      this[local.processedConfig] = this.createConfig(customConfig);
+      this[local.processedConfig] = this.createConfig();
     }
-
     return this[local.processedConfig];
   }
 
-  getWebpackInstance(customConfig) {
+  getWebpackInstance() {
     if (!this[local.instance]) {
-      var config = this.getConfig(customConfig);
-      this[local.instance] = Webpack(config);
+      this[local.instance] = this.createInstance();
     }
-
     return this[local.instance];
   }
 
   run(cb) {
-    var instance = this.getWebpackInstance();
-    instance.run(cb);
+    this.getWebpackInstance().run(cb);
   }
 }
 

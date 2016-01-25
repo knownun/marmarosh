@@ -1,6 +1,13 @@
-import Sintez from '../components/sintez';
+import Sintez from '../components/marmarosh';
 import WrongSintezInstance from '../utils/exceptions/wrong-sintez-instance';
 import GulpLogger from './gulp-logger';
+
+import multimeter from "multimeter";
+import process from "process";
+
+let local = {
+  multimeter: Symbol("multimeter")
+};
 
 export default class TaskBase {
   constructor(gulp, sintez) {
@@ -11,19 +18,31 @@ export default class TaskBase {
     this.sintez = sintez;
     this.gulp = gulp;
 
-    var taskName = this.getDefaultTaskName();
+    var taskName = this.name;
     this.logger = new GulpLogger(taskName);
   }
 
-  getResources() {
+  get resources() {
     return this.sintez.getResources();
+  }
+
+  get name() {
+    throw new Error('@get name() method should be implemented');
   }
 
   run() {
     throw new Error('@run method should be implemented');
   }
 
-  getDefaultTaskName() {
-    throw new Error('@getDefaultTaskName method should be implemented');
+  get multimeter() {
+    if (!this[local.multimeter]) {
+      this[local.multimeter] = multimeter(process);
+    }
+    return this[local.multimeter];
   }
+
+  multimeterEnd() {
+    if (this[local.multimeter]) this[local.multimeter].charm.end();
+  }
+
 }

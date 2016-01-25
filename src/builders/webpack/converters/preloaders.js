@@ -1,9 +1,7 @@
 import isArray from "lodash/isArray";
 import isFunction from "lodash/isFunction";
 import merge from "lodash/merge";
-import {join, resolve} from "path"
-
-import ExtractTextPlugin from "extract-text-webpack-plugin";
+import {join,resolve} from "path"
 
 import { sep } from "../../../utils/helpers";
 
@@ -11,17 +9,12 @@ import BaseConverter from "../base-converter";
 
 let webpackLoaders = new Map;
 
-webpackLoaders.set("babel", "babel");
-webpackLoaders.set("traceur", "traceur-loader");
-webpackLoaders.set("yaml", "json-loader!yaml-loader");
-webpackLoaders.set("html", "html-loader");
-webpackLoaders.set("json", "json-loader");
-webpackLoaders.set("jade", "jade-loader");
-webpackLoaders.set("less", "css-loader?sourceMap!less-loader?sourceMap");
+webpackLoaders.set("eslint", "eslint-loader");
+webpackLoaders.set("less", "less-loader");
 
-export default class LoadersConverter extends BaseConverter {
+export default class PreloadersConverter extends BaseConverter {
 
-  static getLoaderMethodName(loader) {
+  static getPreLoaderMethodName(loader) {
     return `get${ loader.charAt(0).toUpperCase() + loader.substr(1).toLowerCase() }Loader`;
   }
 
@@ -45,29 +38,22 @@ export default class LoadersConverter extends BaseConverter {
     return converted;
   }
 
-  static getBabelLoader(pattern, loader) {
-    let originalConfig = LoadersConverter.getLoader(pattern, loader);
+  static getEslintLoader(pattern, loader) {
+    let originalConfig = PreloadersConverter.getLoader(pattern, loader);
     originalConfig.exclude = /(node_modules|bower_components)/;
     return originalConfig;
   }
 
   static getLessLoader(pattern, loader) {
-    let originalConfig = LoadersConverter.getLoader(pattern, loader);
-
-    let plugin = new ExtractTextPlugin("[name].css", {allChunks: true});
-    this.addPlugin(plugin);
-    originalConfig.loader = plugin.extract("style-loader", originalConfig.loader);
-
+    let originalConfig = PreloadersConverter.getLoader(pattern, loader);
+    originalConfig.query = {
+      paths: [
+        join(resolve(this.src), "../"),
+        join(resolve(this.src), "../libs"),
+        join(resolve(this.src))
+      ]
+    };
     return originalConfig;
-  }
-
-  addPlugin(plugin) {
-    let plugins = this.plugins = this.plugins || [];
-    plugins.push(plugin);
-  }
-
-  getPlugins() {
-    return this.plugins || [];
   }
 
   getConfig(loaders) {
@@ -76,7 +62,7 @@ export default class LoadersConverter extends BaseConverter {
     if (loaders) {
       for (let loader of Object.keys(loaders)) {
         if (!webpackLoaders.has(loader)) {
-          throw new Error(`Loader "${loader}" doest not exist`);
+          throw new Error(`Preloader "${loader}" doest not exist`);
         }
 
         let loaderPattern = loaders[loader];
@@ -87,9 +73,9 @@ export default class LoadersConverter extends BaseConverter {
           patterns = [loaderPattern];
         }
 
-        let customLoaderMethodName = LoadersConverter.getLoaderMethodName(loader);
-        let customLoaderMethod = LoadersConverter[customLoaderMethodName] || null;
-        let loaderMethod = isFunction(customLoaderMethod) ? customLoaderMethod.bind(this) : LoadersConverter.getLoader.bind(this);
+        let customLoaderMethodName = PreloadersConverter.getPreLoaderMethodName(loader);
+        let customLoaderMethod = PreloadersConverter[customLoaderMethodName] || null;
+        let loaderMethod = isFunction(customLoaderMethod) ? customLoaderMethod.bind(this) : PreloadersConverter.getLoader.bind(this);
 
         for (let pattern of patterns) {
           let loaderConfig = loaderMethod(pattern, loader);

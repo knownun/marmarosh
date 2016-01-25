@@ -8,7 +8,7 @@ import uniq from "lodash/uniq";
 
 import BaseResource from "./base-resource";
 
-export default class JsResoruce extends BaseResource {
+export default class LessResource extends BaseResource {
 
   static collectScripts(src, paths) {
     paths = isArray(paths) ? paths : [paths];
@@ -16,20 +16,21 @@ export default class JsResoruce extends BaseResource {
 
     for (let path of paths) {
       let modulePath = join(src, path);
-      let collected = globSync(modulePath, {nosort: true});
+      let collected = globSync(modulePath, {nosort: false});
       if (collected.length) {
         let processedScripts = collected.map((script) => "./" + script);
         scripts = scripts.concat(processedScripts);
-      } else {
-        scripts.push(path); // Workaround for dev. step when using npm link this package
       }
     }
-
     return scripts;
   }
 
+  get themes() {
+    return this.getConfig().themes;
+  }
+
   get extensions() {
-    return this.getConfig().extensions || [".js"];
+    return this.getConfig().extensions || [".less"];
   }
 
   getSrc() {
@@ -39,7 +40,7 @@ export default class JsResoruce extends BaseResource {
     let output = [];
 
     for (let path of resourceSrc) {
-      let collected = JsResoruce.collectScripts(src, path);
+      let collected = LessResource.collectScripts(src, path);
       output = output.concat(collected);
     }
 
@@ -54,7 +55,7 @@ export default class JsResoruce extends BaseResource {
     if (split) {
       let target = this.getRelativeTarget();
       for (let name of Object.keys(split)) {
-        output.push(joinUrl("/", target, name + ".js"));
+        output.push(joinUrl("/", target, name + ".css"));
       }
     }
 

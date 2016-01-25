@@ -8,28 +8,31 @@ import uniq from "lodash/uniq";
 
 import BaseResource from "./base-resource";
 
-export default class JsResoruce extends BaseResource {
+export default class TemplatesResource extends BaseResource {
 
-  static collectScripts(src, paths) {
+  static collect(src, paths) {
     paths = isArray(paths) ? paths : [paths];
-    let scripts = [];
+    let templates = [];
 
     for (let path of paths) {
       let modulePath = join(src, path);
       let collected = globSync(modulePath, {nosort: true});
       if (collected.length) {
         let processedScripts = collected.map((script) => "./" + script);
-        scripts = scripts.concat(processedScripts);
+        templates = templates.concat(processedScripts);
       } else {
-        scripts.push(path); // Workaround for dev. step when using npm link this package
+        templates.push(path);
       }
     }
 
-    return scripts;
+    return templates;
   }
 
-  get extensions() {
-    return this.getConfig().extensions || [".js"];
+  normalize(key, config, options) {
+    let normalized = super.normalize(key, config, options);
+    normalized.serverReplaceVars = options.globals.serverReplaceVars;
+    normalized.themes = config.themes;
+    return normalized;
   }
 
   getSrc() {
@@ -39,27 +42,15 @@ export default class JsResoruce extends BaseResource {
     let output = [];
 
     for (let path of resourceSrc) {
-      let collected = JsResoruce.collectScripts(src, path);
+      let collected = TemplatesResource.collect(src, path);
       output = output.concat(collected);
     }
 
     return uniq(output);
   }
 
-  getUrl() {
-    let url = super.getUrl();
-    let split = this.getOptions("split");
-    let output = [];
-
-    if (split) {
-      let target = this.getRelativeTarget();
-      for (let name of Object.keys(split)) {
-        output.push(joinUrl("/", target, name + ".js"));
-      }
-    }
-
-    output.push(url);
-
-    return output;
+  get extensions() {
+    return this.getConfig().extensions || [".yml"];
   }
+
 }

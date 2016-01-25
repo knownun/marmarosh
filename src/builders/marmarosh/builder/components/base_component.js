@@ -366,25 +366,25 @@ export default class Base {
     var out = null;
     var theme = lo.get(overrideObj, 'route.theme');
     if (lo.isString(url)) {
-      var env = this.getEnv();
       var src = null;
       var name = null;
       var type = null;
       var configPath = null;
       var isAbs = path.isAbsolute(url);
-      var mask = env.mask;
-      if (!isAbs) {
-        var srcPath = env.src;
-        src = path.join(srcPath, url);
-        type = path.basename(path.dirname(src));
-        name = path.basename(src);
-        configPath = path.resolve(path.join(src, path.basename(mask)));
-      } else {
-        src = path.dirname(url);
-        type = path.basename(path.dirname(src));
-        name = path.basename(src);
-        configPath = url;
-      }
+
+      configPath = path.resolve(url);
+      src = path.dirname(url);
+      type = path.basename(path.dirname(src));
+      name = path.basename(src);
+
+      //console.dir({
+      //  url,
+      //  src,
+      //  type,
+      //  name,
+      //  configPath
+      //},{depth: null, colors: 1});
+
       if (theme) {
         var theme_mask = path.resolve(path.join(src, '**', theme + '.yml'));
         var theme_files = globSync(theme_mask);

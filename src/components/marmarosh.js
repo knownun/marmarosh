@@ -2,7 +2,9 @@ import { load as JSONfromYml } from "js-yaml";
 import { readFileSync, existsSync } from "fs";
 import { resolve, join, dirname } from "path";
 
+import has from "lodash/has";
 import getter from "lodash/get";
+import setter from "lodash/set";
 import merge from "lodash/merge";
 import isArray from "lodash/isArray";
 import isObject from "lodash/isObject";
@@ -10,8 +12,6 @@ import cloneDeep from "lodash/cloneDeep";
 
 import Resources from "./resoruces";
 import Builder from "./builder";
-
-//import Server from "./server";
 
 var local = {
   config: Symbol("config"),
@@ -53,24 +53,24 @@ function getDefaults(src, dest) {
     "src": src,
     "dest": dest,
     "source-maps": true,
-    "loaders": {
-      "babel": [
-        join(src, ".+\.js$"),
-        join(src, ".+\.jsx$")
-      ],
-      "yaml": [
-        join(src, ".+\.yml$")
-      ],
-      "html": [
-        join(src, ".+\.html$")
-      ],
-      "json": [
-        join(src, ".+\.json$")
-      ],
-      "jade": [
-        join(src, ".+\.jade")
-      ]
-    },
+    //"loaders": {
+    //  "babel": [
+    //    join(src, ".+\.js$"),
+    //    join(src, ".+\.jsx$")
+    //  ],
+    //  "yaml": [
+    //    join(src, ".+\.yml$")
+    //  ],
+    //  "html": [
+    //    join(src, ".+\.html$")
+    //  ],
+    //  "json": [
+    //    join(src, ".+\.json$")
+    //  ],
+    //  "jade": [
+    //    join(src, ".+\.jade")
+    //  ]
+    //},
     "target": "web",
     "devtool": "source-map"
   };
@@ -96,14 +96,16 @@ function normalizeConfig(config) {
 export default class Marmarosh {
 
   constructor(config = {}) {
-    let validation = this.validate(config);
+    let validation = Marmarosh.validate(config);
 
     if (!validation.isValid) {
       throw new Error(`Invalid Marmarosh config. ${validation.errors.join(", ")}`);
     }
 
     let defaultConfig = getDefaults(config.src, config.dest);
+
     this[local.config] = merge(defaultConfig, config);
+    this[local.builder] = this[local.builder] || {};
   }
 
   static loadYml(configPath) {
@@ -130,7 +132,7 @@ export default class Marmarosh {
     return new Marmarosh(config);
   }
 
-  validate(config) {
+  static validate(config) {
     let errors = [];
     if (!config.src) {
       errors.push(`"src" is not defined`);
@@ -144,16 +146,28 @@ export default class Marmarosh {
     }
   }
 
-  getConfig() {
-    return this[local.config];
+  createResources(customOptions = {}) {
+    let src = this.getSrc();
+    let dest = this.getDest();
+    let resourcesConfig = this.get("resources");
+    let options = {
+      stats: this.get("stats"),
+      alias: this.get("alias"),
+      resolve: this.get("resolve"),
+      globals: this.get("globals")
+    };
+    let config = Object.assign({}, resourcesConfig, customOptions);
+    return new Resources(src, dest, config, options);
   }
 
-  createResources(customOptions = {}) {
-    let src = this.get("src");
-    let dest = this.get("dest");
-    let resourcesConfig = this.get("resources");
-    let config = Object.assign({}, resourcesConfig, customOptions);
-    return new Resources(src, dest, config);
+  createBuilder(name, resources = []) {
+    let src = this.getSrc();
+    let dest = this.getDest();
+    return new Builder(name, {src, dest, resources});
+  }
+
+  getConfig() {
+    return this[local.config];
   }
 
   getResources() {
@@ -163,32 +177,15 @@ export default class Marmarosh {
     return this[local.resources];
   }
 
-  createBuilder(customOptions = {}) {
+  getBuilder(name, resources) {
+    return this.createBuilder(name, resources);
 
-    let configOptions = {
-      builder: this.get("builder"),
-      src: this.getSrc(),
-      dest: this.getDest(),
-      experimental: false,
-      js: this.getResources().get("js"),
-      debug: this.get("debug"),
-      loaders: this.get("loaders"),
-      devtool: this.get("devtool"),
-      alias: this.get("alias"),
-      resolve: this.get("resolve"),
-      extensions: this.get("extensions")
-    };
-
-    let options = Object.assign({}, configOptions, customOptions);
-
-    return new Builder(options);
-  }
-
-  getBuilder() {
-    if (!this[local.builder]) {
-      this[local.builder] = this.createBuilder();
-    }
-    return this[local.builder];
+    //if (!has(this[local.builder], name)) {
+    //  let builder = this.createBuilder(name, resources);
+    //  setter(this[local.builder], name, builder);
+    //}
+    //
+    //return getter(this[local.builder], name);
   }
 
   //createServer(customOptions = {}) {

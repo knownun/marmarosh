@@ -13,15 +13,7 @@ export default class TaskManager {
   }
 
   add(task, name) {
-    var taskName = name;
-
-    if (!taskName) {
-      if (isFunction(task.getDefaultTaskName)) {
-        taskName = task.getDefaultTaskName();
-      } else {
-        throw new Error('Task should implement @getDefaultTaskName method');
-      }
-    }
+    var taskName = name || task.name;
 
     this[local.gulp].task(taskName, (done) => {
       if (task.run.length == 1) {
@@ -31,7 +23,7 @@ export default class TaskManager {
       }
     });
 
-    logger.log(`+ ${taskName}`);
+    //logger.log(`+ ${taskName}`);
 
     return () => {
       this.start(taskName);

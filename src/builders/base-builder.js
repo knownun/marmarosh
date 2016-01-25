@@ -1,5 +1,7 @@
 import events from 'events';
 
+import isFunction from "lodash/isFunction";
+
 var local = {
   events: Symbol('events'),
   available: ['build.start', 'build.end', 'build.error']
@@ -8,7 +10,6 @@ var local = {
 export default class BaseBuilder {
   constructor(builderConfig) {
     this.config = builderConfig;
-
     this[local.events] = new events.EventEmitter();
   }
 
@@ -21,16 +22,13 @@ export default class BaseBuilder {
   }
 
   on(event, fn) {
-
     this[local.events].on(event, fn);
-
-    return () => {
-      this[local.events].removeListener(event, fn);
-    };
+    return this;
   }
 
   once(event, fn) {
     this[local.events].once(event, fn);
+    return this;
   }
 
   remove(event) {
@@ -40,5 +38,18 @@ export default class BaseBuilder {
 
   emit(event, params) {
     this[local.events].emit(event, params);
+    return this;
+  }
+
+  get env() {
+    return process.env.NODE_ENV;
+  }
+
+  get isProduction() {
+    return process.env.NODE_ENV == "production";
+  }
+
+  get isDevelopment() {
+    return process.env.NODE_ENV == "development";
   }
 }

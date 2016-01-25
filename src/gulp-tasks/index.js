@@ -1,15 +1,17 @@
-import Build from './src/package/build';
-import Clear from './src/package/clear';
-import Watch from './src/package/watch';
+import defaultTask from "./src/default";
+import CleanTask from "./src/clean";
+import JSTask from "./src/javascript";
+import LessTask from "./src/styles";
+import TemplatesTask from "./src/templates";
 
-import Dev from './src/dev';
-
-import TaskManager from './gulp-task-manager';
+import TaskManager from "./gulp-task-manager";
 
 export default (gulp, sintez) => {
   var taskManager = new TaskManager(gulp);
-  taskManager.add(new Build(gulp, sintez));
-  taskManager.add(new Clear(gulp, sintez));
-  taskManager.add(new Watch(gulp, sintez));
-  taskManager.add(new Dev(gulp, sintez));
+
+  taskManager.add(new defaultTask(gulp, sintez));
+  taskManager.add(new CleanTask(gulp, sintez));
+  taskManager.add(new JSTask(gulp, sintez));
+  taskManager.add(new LessTask(gulp, sintez));
+  taskManager.add(new TemplatesTask(gulp, sintez));
 };

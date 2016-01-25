@@ -5,7 +5,6 @@ import path from 'path';
 
 import BaseConverter from '../base-converter';
 
-
 export default class ResolveCoverter extends BaseConverter {
 
   getConfig(alias, resolve, extensions) {
@@ -26,7 +25,13 @@ export default class ResolveCoverter extends BaseConverter {
       config.extensions = [""].concat(extensions);
     }
 
-    config.fallback = path.join(__dirname, "node_modules");
+    //config.fallback = [
+    //  path.resolve("."), //project modules
+    //  path.resolve("./libs"), //project modules
+    //  path.resolve("./src"), //project modules
+    //  path.resolve("./node_modules"), //project modules
+    //  path.resolve(__dirname, "../../../../node_modules") // marmarosh modules
+    //];
 
     return config;
   }

@@ -3,6 +3,7 @@ import { resolve as resolveUrl } from "url";
 import { sync as globSync } from "glob";
 
 import cloneDeep from "lodash/cloneDeep";
+import merge from "lodash/merge";
 import getter from "lodash/get";
 import isArray from "lodash/isArray";
 import isString from "lodash/isString";
@@ -17,14 +18,14 @@ let local = {
 
 export default class Resource {
 
-  constructor(src, dest, key, config) {
+  constructor(src, dest, key, config, options) {
     this[local.src] = src;
     this[local.dest] = dest;
     this[local.key] = key;
-    this[local.normalized] = Resource.normalize(key, config);
+    this[local.normalized] = this.normalize(key, config, options);
   }
 
-  static normalize(key, config) {
+  normalize(key, config, options) {
 
     let normalized = {
       originalSourceIsArray: false
@@ -54,7 +55,7 @@ export default class Resource {
       }
     }
 
-    normalized.target = dirname(normalized.dest);
+    normalized.destDirName = dirname(normalized.dest);
     normalized.destName = basename(normalized.dest) || (!normalized.originalSourceIsArray) ? basename(config.src) : null;
 
     normalized.names = normalized.src.map(path => basename(path));
@@ -69,6 +70,20 @@ export default class Resource {
     }
 
     normalized.options = config.options || {};
+
+    normalized.preset = config.preset || null;
+
+    normalized.alias = merge({}, config.alias, options.alias) || null;
+
+    normalized.resolve = merge([], config.resolve, options.resolve);
+
+    normalized.extensions = config.extensions || null;
+
+    normalized.target = config.target || null;
+
+    normalized.devtool = config.devtool || null;
+
+    normalized.stats = config.stats || options.stats || null;
 
     return normalized;
   }
@@ -185,7 +200,6 @@ export default class Resource {
   getDest() {
     let relativeDest = this.getRelativeDest();
     let dest = this[local.dest];
-
     return join(dest, relativeDest);
   }
 
@@ -217,7 +231,7 @@ export default class Resource {
   }
 
   getRelativeTarget() {
-    return this[local.normalized].target;
+    return this[local.normalized].destDirName;
   }
 
   getTarget() {
@@ -259,6 +273,54 @@ export default class Resource {
       url = resolveUrl("/", target, destName);
     }
     return url;
+  }
+
+  getPresetName() {
+    return this[local.normalized].preset;
+  }
+
+  getBuilderName() {
+    return this[local.normalized].builder;
+  }
+
+  get devtool() {
+    return this.getConfig().devtool || "source-map";
+  }
+
+  get target() {
+    return this.getConfig().target || "web";
+  }
+
+  get src() {
+    return this.getSrc();
+  }
+
+  get dest() {
+    return this.getDest();
+  }
+
+  get relativeDest() {
+    return this.getRelativeDest();
+  }
+
+  get extentions() {
+    return this.getConfig().extentions;
+  }
+
+  get alias() {
+    return this.getConfig().alias;
+  }
+
+  get resolve() {
+    return this.getConfig().resolve;
+  }
+
+  get preset() {
+    return this.getConfig().preset;
+  }
+
+  get stats() {
+    return this.getConfig().stats;
   }
 
 }
