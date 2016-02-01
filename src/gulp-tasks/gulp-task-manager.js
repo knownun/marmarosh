@@ -23,7 +23,7 @@ export default class TaskManager {
       }
     });
 
-    //logger.log(`+ ${taskName}`);
+    logger.log(`+ ${taskName}`);
 
     return () => {
       this.start(taskName);

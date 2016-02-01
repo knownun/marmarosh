@@ -1,6 +1,6 @@
 import Base from "../base-task";
 
-export default class TemplatesTask extends Base {
+export default class extends Base {
 
   get name() {
     return "templates";
@@ -33,8 +33,10 @@ export default class TemplatesTask extends Base {
       .on("build.waiting", ({key, percentage, msg}) => {
         bar[key].percent(Math.round(percentage * 100), `Building ${key} - ${msg}`);
       })
-      .on("build.error", ({key}) => {
-        console.log(key + " error");
+      .on("build.error", ({key, errors, extendedFormat}) => {
+        appBuilder.remove("build.waiting");
+        let message = this.getErrorMessage({key, errors, extendedFormat});
+        this.logger.error(message);
       });
 
     builder.run((err)=> {

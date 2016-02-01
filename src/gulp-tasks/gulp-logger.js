@@ -47,7 +47,11 @@ export default class Log {
     if (isEnabled) {
       var coloring = this.errorColoring;
       var completeMessage = coloring(message);
-      gutil.log(`${coloring(this.task)} ${completeMessage}`);
+      if (!this.isProduction) {
+        throw new Error(message)
+      } else {
+        gutil.log(`${coloring(this.task)} ${completeMessage}`);
+      }
     }
   }
 
@@ -70,5 +74,9 @@ export default class Log {
 
   static disable() {
     isEnabled = false;
+  }
+
+  get isProduction() {
+    return process.env.NODE_ENV == "production";
   }
 }

@@ -2,7 +2,7 @@ import rimraf from 'rimraf';
 
 import Base from '../base-task';
 
-export default class Clean extends Base {
+export default class extends Base {
 
   constructor(gulp, sintez) {
     super(gulp, sintez);

@@ -10,7 +10,7 @@ import Scipts from './javascript';
 import Templates from './templates';
 import Clean from './clean';
 
-export default class Build extends Base {
+export default class extends Base {
 
   constructor(gulp, sintez) {
     super(gulp, sintez);

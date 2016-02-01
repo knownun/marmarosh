@@ -5,7 +5,7 @@ import forOwn from "lodash/forOwn";
 
 import Base from '../base-task';
 
-export default class Build extends Base {
+export default class extends Base {
 
   constructor(gulp, sintez) {
     super(gulp, sintez);
@@ -56,13 +56,9 @@ export default class Build extends Base {
       })
       .remove('build.error')
       .on('build.error', ({key,errors,extendedFormat}) => {
-        console.log(key + " error");
-        this.logger.error(`- Build has ${errors.length} errors`);
-        if (!extendedFormat) {
-          for (var error of errors) {
-            this.logger.error(`- ${error.message}`);
-          }
-        }
+        appBuilder.remove("build.waiting");
+        let message = this.getErrorMessage({key, errors, extendedFormat});
+        this.logger.error(message);
       }).remove('build.waiting')
       .on('build.waiting', ({key, percentage, msg}) => {
         bar[key].percent(Math.round(percentage * 100), `Building ${key} - ${msg}`);

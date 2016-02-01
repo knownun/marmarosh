@@ -1,24 +1,39 @@
-import fs from 'fs'
-import jade from 'jade'
-import yaml from 'js-yaml'
-import {sync as globSync} from 'glob'
+import fs from "fs"
+import jade from "jade"
+import yaml from "js-yaml"
+import {sync as globSync} from "glob"
 
-import { log } from 'gulp-util'
-import lo from 'lodash'
+import { log } from "gulp-util"
 
-import path from 'path'
+import has from "lodash/has"
+import getter from "lodash/get"
+import setter from "lodash/set"
+import isObject from "lodash/isObject"
+import isNumber from "lodash/isNumber"
+import isFunction from "lodash/isFunction"
+import isUndefined from "lodash/isUndefined"
+import isArray from "lodash/isArray"
+import isString from "lodash/isString"
+import cloneDeep from "lodash/cloneDeep"
+import startsWith from "lodash/startsWith"
+import forOwn from "lodash/forOwn"
+import merge from "lodash/merge"
+import union from "lodash/union"
+import pick from "lodash/pick"
+
+import path from "path"
 
 var local = {
-  src: Symbol('src'),
-  name: Symbol('name'),
-  type: Symbol('type'),
-  place: Symbol('place'),
-  theme: Symbol('theme'),
-  config: Symbol('config'),
-  configPath: Symbol('configPath'),
-  clientConfig: Symbol('clientConfig'),
-  bodyInstance: Symbol('bodyInstance'),
-  templateLocals: Symbol('templateLocals')
+  src: Symbol("src"),
+  name: Symbol("name"),
+  type: Symbol("type"),
+  place: Symbol("place"),
+  theme: Symbol("theme"),
+  config: Symbol("config"),
+  configPath: Symbol("configPath"),
+  clientConfig: Symbol("clientConfig"),
+  bodyInstance: Symbol("bodyInstance"),
+  templateLocals: Symbol("templateLocals")
 };
 
 export default class Base {
@@ -32,10 +47,10 @@ export default class Base {
   isValidConfig(input) {
     var output = false;
     if (
-      lo.has(input, "name") &&
-      lo.has(input, "src") &&
-      lo.has(input, "config") &&
-      lo.has(input, "configPath")
+      has(input, "name") &&
+      has(input, "src") &&
+      has(input, "config") &&
+      has(input, "configPath")
     ) {
       output = true;
     }
@@ -47,7 +62,7 @@ export default class Base {
       var config = this.getConfig();
       config = this.merge(config, sources);
       this.setConfig(config);
-      this.setTheme(lo.get(config, 'route.theme'));
+      this.setTheme(getter(config, "route.theme"));
     }
     return this;
   }
@@ -67,13 +82,13 @@ export default class Base {
   }
 
   merge(input, sources) {
-    var output = lo.cloneDeep(input);
-    return lo.merge(output, sources);
+    var output = cloneDeep(input);
+    return merge(output, sources);
   }
 
   getConfig(path) {
     var cfg = this[local.config];
-    return path ? lo.get(cfg, path) : cfg
+    return path ? getter(cfg, path) : cfg
   }
 
   setConfig(obj) {
@@ -97,7 +112,7 @@ export default class Base {
   }
 
   readTemplate(theme) {
-    return this.readTemplateForTheme(theme) || this.readTemplateForTheme('main') || null;
+    return this.readTemplateForTheme(theme) || this.readTemplateForTheme("main") || null;
   }
 
   readTemplateForTheme(theme, name) {
@@ -111,13 +126,13 @@ export default class Base {
   }
 
   get hasIndexJS() {
-    var filePath = path.resolve(path.join(this.getSrc(), 'index.js'));
-    var jsxFilePath = path.resolve(path.join(this.getSrc(), 'index.jsx'));
+    var filePath = path.resolve(path.join(this.getSrc(), "index.js"));
+    var jsxFilePath = path.resolve(path.join(this.getSrc(), "index.jsx"));
     return fs.existsSync(filePath) || fs.existsSync(jsxFilePath);
   }
 
   getTemplatePathForTheme(theme) {
-    var mask = path.resolve(path.join(this.getSrc(), '**', theme + '.jade'));
+    var mask = path.resolve(path.join(this.getSrc(), "**", theme + ".jade"));
     var files = globSync(mask);
     return (files.length) ? files[0] : null;
   }
@@ -127,7 +142,7 @@ export default class Base {
   }
 
   getConfigPathForTheme(theme) {
-    var mask = path.resolve(path.join(this.getSrc(), '**', theme + '.yml'));
+    var mask = path.resolve(path.join(this.getSrc(), "**", theme + ".yml"));
     var files = globSync(mask);
     return (files.length) ? files[0] : null;
   }
@@ -137,27 +152,27 @@ export default class Base {
   }
 
   getTemplate(theme) {
-    var html = '';
+    var html = "";
     if (!this.templateFn) {
       this.templateFn = this.readTemplate(theme);
     }
-    if (lo.isFunction(this.templateFn)) {
+    if (isFunction(this.templateFn)) {
       html = this.templateFn(this.getTemplateLocals());
     }
     return html;
   }
 
   getTemplateLocals(path) {
-    return lo.isUndefined(path) ? this[local.templateLocals] : lo.get(this[local.templateLocals], path)
+    return isUndefined(path) ? this[local.templateLocals] : getter(this[local.templateLocals], path)
   }
 
   setTemplateLocal(path, obj) {
     if (!this[local.templateLocals]) this[local.templateLocals] = {};
-    lo.set(this[local.templateLocals], path, obj);
+    setter(this[local.templateLocals], path, obj);
   }
 
   renderString(prod, dev) {
-    return dev || ''
+    return dev || ""
   }
 
   initTemplateLocals() {
@@ -170,11 +185,11 @@ export default class Base {
     this.setTemplateLocal("includeBody", this.includeBody.bind(this));
 
     // for layout
-    this.setTemplateLocal('includeMeta', this.includeMeta.bind(this));
-    this.setTemplateLocal('includeCSS', this.includeCSS.bind(this));
-    this.setTemplateLocal('includeJS', this.includeJS.bind(this));
-    this.setTemplateLocal('includeJSOptions', this.includeJSOptions.bind(this));
-    this.setTemplateLocal('getHtmlClass', this.getHtmlClass.bind(this));
+    this.setTemplateLocal("includeMeta", this.includeMeta.bind(this));
+    this.setTemplateLocal("includeCSS", this.includeCSS.bind(this));
+    this.setTemplateLocal("includeJS", this.includeJS.bind(this));
+    this.setTemplateLocal("includeJSOptions", this.includeJSOptions.bind(this));
+    this.setTemplateLocal("getHtmlClass", this.getHtmlClass.bind(this));
 
     this.setTemplateLocal("render", this.renderString.bind(this));
 
@@ -215,44 +230,44 @@ export default class Base {
   }
 
   setTheme(value) {
-    if (lo.isString(value)) this[local.theme] = value
+    if (isString(value)) this[local.theme] = value
   }
 
   get serverConfigurations() {
-    var obj = this.getConfig('route.serverConfigurations');
-    return lo.merge(obj, {"components": this._JSOptions})
+    var obj = this.getConfig("route.serverConfigurations");
+    return merge(obj, {"components": this._JSOptions})
   }
 
   addJSOptions(instance, name, options) {
     this._JSOptions = this._JSOptions || [];
-    if (arguments.length == 2 && lo.isArray(name)) {
-      this._JSOptions = lo.union(this._JSOptions, name);
+    if (arguments.length == 2 && isArray(name)) {
+      this._JSOptions = union(this._JSOptions, name);
     } else {
       var type = instance.getName();
       var component_type = instance.getType();
       var model = {};
-      if (lo.startsWith(type, 'react')) {
+      if (startsWith(type, "react")) {
         component_type = "react-" + component_type;
-        model = lo.pick(instance.getClientConfig(), "template_options", "strings", "images", "links");
+        model = pick(instance.getClientConfig(), "template_options", "strings", "images", "links");
       }
       this._JSOptions.push({name, type, component_type, options, model});
     }
   }
 
-  parseAttributes(obj, type = 'attr') {
-    var output = '';
-    if (lo.isString(obj)) {
+  parseAttributes(obj, type = "attr") {
+    var output = "";
+    if (isString(obj)) {
       output = obj
-    } else if (lo.isObject(obj)) {
-      lo.forOwn(obj, (value, key) => {
-        if (lo.isString(value) || lo.isNumber(value)) {
-          if (type == 'attr') {
-            output += ` ${key}='${value}'`;
-          } else if (type == 'props') {
+    } else if (isObject(obj)) {
+      forOwn(obj, (value, key) => {
+        if (isString(value) || isNumber(value)) {
+          if (type == "attr") {
+            output += ` ${key}="${value}"`;
+          } else if (type == "props") {
             output += `${key}:${value};`;
           }
-        } else if (lo.isObject(value)) {
-          output += this.parseAttributes(value, 'props');
+        } else if (isObject(value)) {
+          output += this.parseAttributes(value, "props");
         }
       });
     }
@@ -269,27 +284,27 @@ export default class Base {
 
   includeBody() {
     var ins = this.getBodyInstance();
-    return (ins && ins.html) ? ins.html : '$BODY$';
+    return (ins && ins.html) ? ins.html : "$BODY$";
   }
 
   getString(name) {
     var config = this.getClientConfig();
-    return lo.get(config, `strings.${name}`)
+    return getter(config, `strings.${name}`)
   }
 
   getLink(name) {
     var config = this.getClientConfig();
-    return lo.get(config, `links.${name}`)
+    return getter(config, `links.${name}`)
   }
 
   getImageURL(name) {
     var config = this.getClientConfig();
-    return lo.get(config, `images.${name}`)
+    return getter(config, `images.${name}`)
   }
 
   getOption(name) {
     var config = this.getClientConfig();
-    return lo.get(config, `template_options.${name}`)
+    return getter(config, `template_options.${name}`)
   }
 
   getHTML(theme) {
@@ -302,11 +317,11 @@ export default class Base {
 
     if (!cache) {
       cache = {
-        template_options: this.getPropsFrom(config.template_options, 'default'),
-        script_options: this.getPropsFrom(config.script_options, 'default'),
-        strings: this.getPropsFrom(config.strings, 'default'),
-        images: this.getPropsFrom(config.images, 'default'),
-        links: this.getPropsFrom(config.links, 'default')
+        template_options: this.getPropsFrom(config.template_options, "default"),
+        script_options: this.getPropsFrom(config.script_options, "default"),
+        strings: this.getPropsFrom(config.strings, "default"),
+        images: this.getPropsFrom(config.images, "default"),
+        links: this.getPropsFrom(config.links, "default")
       }
     }
     return cache;
@@ -314,22 +329,22 @@ export default class Base {
 
   getPropsFrom(input, propertyPath) {
     var output = {};
-    if (lo.isObject(input)) {
-      lo.forOwn(input, (value, key) => {
-        key = lo.startsWith(key, '$') ? key.substr(1) : key;
-        output[key] = (lo.isObject(value) && propertyPath) ? lo.get(value, propertyPath) : value;
+    if (isObject(input)) {
+      forOwn(input, (value, key) => {
+        key = startsWith(key, "$") ? key.substr(1) : key;
+        output[key] = (isObject(value) && propertyPath) ? getter(value, propertyPath) : value;
       });
     }
     return output;
   }
 
   includeCSS() {
-    var out = '';
+    var out = "";
     var themes = this.getConfig("route.themes");
     var activeTheme = this.getConfig("route.theme");
 
     themes.forEach((theme)=> {
-      if (lo.startsWith(theme, '?')) {
+      if (startsWith(theme, "?")) {
         var name = theme.substr(1);
         if (name == activeTheme) {
           out += `<link rel=stylesheet href=/styles/${name}.css />\n`;
@@ -343,13 +358,13 @@ export default class Base {
   }
 
   includeMeta() {
-    return ''
+    return ""
   }
 
   includeJS() {
-    var out = '', scripts = this.getConfig('route.scripts');
+    var out = "", scripts = this.getConfig("route.scripts");
 
-    if (lo.isArray(scripts)) {
+    if (isArray(scripts)) {
       scripts.forEach((url)=> {
         out += `<script src=/webpack${url}></script>\n`;
       })
@@ -359,53 +374,39 @@ export default class Base {
 
   includeJSOptions() {
     var data = JSON.stringify(this.serverConfigurations, null, 4);
-    return `<script>window['serverConfigurations'] = ${data}</script>`
+    return `<script>window["serverConfigurations"] = ${data}</script>`
   }
 
   readConfig(url, overrideObj) {
     var out = null;
-    var theme = lo.get(overrideObj, 'route.theme');
-    if (lo.isString(url)) {
-      var src = null;
-      var name = null;
-      var type = null;
-      var configPath = null;
-      var isAbs = path.isAbsolute(url);
-
-      configPath = path.resolve(url);
-      src = path.dirname(url);
-      type = path.basename(path.dirname(src));
-      name = path.basename(src);
-
-      //console.dir({
-      //  url,
-      //  src,
-      //  type,
-      //  name,
-      //  configPath
-      //},{depth: null, colors: 1});
+    var theme = getter(overrideObj, "route.theme");
+    if (isString(url)) {
+      let configPath = path.resolve(url);
+      let src = path.dirname(url);
+      let type = path.basename(path.dirname(src));
+      let name = path.basename(src);
 
       if (theme) {
-        var theme_mask = path.resolve(path.join(src, '**', theme + '.yml'));
+        var theme_mask = path.resolve(path.join(src, "**", theme + ".yml"));
         var theme_files = globSync(theme_mask);
         configPath = (theme_files.length) ? theme_files[0] : configPath;
       }
-      var config = yaml.safeLoad(fs.readFileSync(configPath, 'utf8')) || {};
+      var config = yaml.safeLoad(fs.readFileSync(configPath, "utf8")) || {};
       out = {name, src, config, configPath, type}
     }
     return out;
   }
 
   IF() {
-    return ''
+    return ""
   }
 
   IF_NOT() {
-    return ''
+    return ""
   }
 
   ENDIF() {
-    return ''
+    return ""
   }
 
   itemIndex() {

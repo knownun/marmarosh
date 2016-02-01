@@ -29,7 +29,6 @@ export default (options) => {
       bodyPath = path.join('layout');
     }
 
-    params = lo.merge(params, options);
     component = new options.component(bodyPath, {route: params}, child);
     html = component.getHTML();
 

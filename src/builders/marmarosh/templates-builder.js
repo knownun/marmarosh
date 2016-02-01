@@ -27,8 +27,8 @@ export default class TemplatesBuilder extends BaseBuilder {
     let src = resource.src;
     let dest = resource.dest;
 
-    let debug = this.isDevelopment;
-    let bail = this.isProduction;
+    let debug = !this.isProduction;
+    let bail = !!debug;
     let serverReplace = resource.getConfig().serverReplaceVars;
     let themes = resource.getConfig().themes;
 

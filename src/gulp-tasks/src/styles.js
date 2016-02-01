@@ -10,7 +10,7 @@ import uniq from 'lodash/uniq';
 
 import Base from '../base-task';
 
-export default class Build extends Base {
+export default class extends Base {
 
   get name() {
     return 'styles';
@@ -22,17 +22,7 @@ export default class Build extends Base {
     let builder = this.sintez.getBuilder("webpack", styles);
     let appBuilder = builder.getApplicationBuilder();
 
-    let multi = this.multimeter;
-    let bar = {};
-    styles.forEach((res, i)=> {
-      let key = res.getKey();
-      bar[key] = multi.rel(0, i + 1, {
-        width: 8,
-        solid: {background: null, foreground: 'white', text: '|'},
-        empty: {background: null, foreground: null, text: ' '}
-      });
-      multi.charm.write("\n");
-    });
+    this.initMultimeterBars(styles);
 
     appBuilder
       .remove('build.end')
@@ -40,7 +30,9 @@ export default class Build extends Base {
         appBuilder.remove("build.waiting");
         let message = `#${params.counter} ${params.chunks.join(" & ")} was packed. Elapsed time ${params.time}s. Number of files ${params.scripts.length}`;
         let warnings = params.warnings;
-        bar[params.key].percent(100, message);
+
+        this.updateBar(params.key, 100, message);
+
         if (warnings && !!warnings.length) {
           this.logger.log('------------------');
           this.logger.log('*** %WARNINGS% ***');
@@ -54,16 +46,13 @@ export default class Build extends Base {
       })
       .remove('build.error')
       .on('build.error', ({key, errors, extendedFormat}) => {
-        this.logger.error(`- Build has ${errors.length} errors`);
-        if (!extendedFormat) {
-          for (var error of errors) {
-            this.logger.error(`- ${error.message}`);
-          }
-        }
+        appBuilder.remove("build.waiting");
+        let message = this.getErrorMessage({key, errors, extendedFormat});
+        this.logger.error(message);
       })
       .remove('build.waiting')
       .on('build.waiting', ({key, percentage, msg}) => {
-        bar[key].percent(Math.round(percentage * 100), `Building ${key} - ${msg}`);
+        this.updateBar(key, Math.round(percentage * 100), `Building ${key} - ${msg}`);
       });
 
     builder.run((err)=> {

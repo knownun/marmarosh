@@ -1,6 +1,12 @@
-import lo from 'lodash'
+import setter from 'lodash/set';
+import isObject from 'lodash/isObject';
+import forOwn from 'lodash/forOwn';
+import isString from 'lodash/isString';
+import merge from 'lodash/merge';
+import has from 'lodash/has';
+import getter from 'lodash/get';
 
-import Base from './base_component'
+import Base from './base_component';
 
 var local = {
   conditions: Symbol('template_conditions')
@@ -22,10 +28,10 @@ export default class DevComponent extends Base {
     var theme = this.getTheme();
     var over = {};
     var i = 1;
-    lo.set(over, "route.theme", this.getTheme());
+    setter(over, "route.theme", this.getTheme());
     var widgetsObj = this.getConfig(widgetArrayName);
-    if (lo.isObject(Array)) {
-      lo.forOwn(widgetsObj, (options)=> {
+    if (isObject(Array)) {
+      forOwn(widgetsObj, (options)=> {
         var instance = new this.constructor(name, over);
         instance.updateConfig(options);
         instance.setTheme(theme);
@@ -41,14 +47,14 @@ export default class DevComponent extends Base {
   include(path, newName) {
     var theme = this.getTheme();
     var over = {};
-    lo.set(over, "route.theme", this.getTheme());
+    setter(over, "route.theme", this.getTheme());
     var component = new this.constructor(path, over);
     var name = newName || component.getName();
     var extendOptions = this.getConfig(`widgets.${name}`);
 
-    lo.isObject(extendOptions) && component.updateConfig(extendOptions);
-    lo.isString(theme) && component.setTheme(theme);
-    lo.isString(newName) && component.setPlace(newName);
+    isObject(extendOptions) && component.updateConfig(extendOptions);
+    isString(theme) && component.setTheme(theme);
+    isString(newName) && component.setPlace(newName);
 
     if (component.hasIndexJS) {
       var componentConfig = component.getConfig();
@@ -64,13 +70,13 @@ export default class DevComponent extends Base {
     var prop = 'layout';
     var config = ins.getConfig();
 
-    over = lo.merge(over, {
+    over = merge(over, {
       template_options: this.getConfig("layout_options")
     });
 
-    if (lo.has(config, prop)) {
-      lo.set(over, "route.theme", this.getTheme());
-      ins = new this.constructor(lo.get(config, prop), over, this);
+    if (has(config, prop)) {
+      setter(over, "route.theme", this.getTheme());
+      ins = new this.constructor(getter(config, prop), over, this);
       ins.setTheme(this.getTheme());
       if (this._JSOptions) {
         ins.addJSOptions(this, this._JSOptions);
@@ -131,7 +137,7 @@ function parseSelector(selector) {
       case 'links':
       case 'images':
       case 'template_options':
-        out = lo.get(this.getClientConfig(), selector);
+        out = getter(this.getClientConfig(), selector);
         break;
     }
   }

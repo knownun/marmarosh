@@ -13,7 +13,7 @@ import cloneDeep from "lodash/cloneDeep";
 import Resources from "./resoruces";
 import Builder from "./builder";
 
-var local = {
+let local = {
   config: Symbol("config"),
   resources: Symbol("resources"),
   builder: Symbol("builder"),
@@ -21,16 +21,16 @@ var local = {
 };
 
 function getOrderedUrls(original, resources) {
-  var urls = [];
-  var originalResource = resources.get(original);
-  var order = originalResource.getOptions("order");
+  let urls = [];
+  let originalResource = resources.get(original);
+  let order = originalResource.getOptions("order");
 
   if (order) {
-    for (var item of order) {
-      var url = null;
+    for (let item of order) {
+      let url = null;
       if (item[0] == "^") {
-        var dependency = item.slice(1);
-        var resource = resources.get(dependency);
+        let dependency = item.slice(1);
+        let resource = resources.get(dependency);
         url = resource.getUrl();
       } else {
         url = item;
@@ -53,35 +53,17 @@ function getDefaults(src, dest) {
     "src": src,
     "dest": dest,
     "source-maps": true,
-    //"loaders": {
-    //  "babel": [
-    //    join(src, ".+\.js$"),
-    //    join(src, ".+\.jsx$")
-    //  ],
-    //  "yaml": [
-    //    join(src, ".+\.yml$")
-    //  ],
-    //  "html": [
-    //    join(src, ".+\.html$")
-    //  ],
-    //  "json": [
-    //    join(src, ".+\.json$")
-    //  ],
-    //  "jade": [
-    //    join(src, ".+\.jade")
-    //  ]
-    //},
     "target": "web",
     "devtool": "source-map"
   };
 }
 
 function normalizeConfig(config) {
-  var normalized = cloneDeep(config);
-  var loaders = normalized.loaders;
+  let normalized = cloneDeep(config);
+  let loaders = normalized.loaders;
   if (loaders) {
-    var normalizedLoaders = {};
-    for (var loader of Object.keys(loaders)) {
+    let normalizedLoaders = {};
+    for (let loader of Object.keys(loaders)) {
       if (!isArray(loaders[loader])) {
         normalizedLoaders[loader] = [loaders[loader]];
       } else {
@@ -188,35 +170,25 @@ export default class Marmarosh {
     //return getter(this[local.builder], name);
   }
 
-  //createServer(customOptions = {}) {
-  //  var resources = this.getResources();
-  //  var index = resources.get("index");
-  //
-  //  var configOptions = {
-  //    builder: this.getBuilder(),
-  //    server: this.get("server"),
-  //
-  //    src: this.getSrc(),
-  //    dest: this.getDest(),
-  //
-  //    host: this.get("host"),
-  //    port: this.get("port"),
-  //
-  //    index: index.getDest()
-  //  };
-  //
-  //  var options = Object.assign({}, configOptions, customOptions);
-  //
-  //  return new Server(options);
-  //}
+  createServer(ServerConstructor, customOptions = {}) {
 
-  //getServer() {
-  //  if (!this[local.server]) {
-  //    this[local.server] = this.createServer();
-  //  }
-  //
-  //  return this[local.server];
-  //}
+    let configOptions = {
+      src: this.getSrc(),
+      dest: this.getDest(),
+      host: this.get("host") || "localhost",
+      port: this.get("port") || "3000",
+      globals: this.get("globals")
+    };
+
+    let options = Object.assign({}, configOptions, customOptions);
+
+    return new ServerConstructor(options);
+  }
+
+
+  getServer(ServerConstructor, options) {
+    return this.createServer(ServerConstructor, options);
+  }
 
   // --------------------------------
 
@@ -236,28 +208,8 @@ export default class Marmarosh {
     return this.get("src");
   }
 
-  // ------------ OUTPUT --------------
-
-  getOutputScripts() {
-    var resources = this.getResources();
-    var output = null;
-
-    if (resources.has("js")) {
-      output = getOrderedUrls("js", resources);
-    }
-
-
-    return isArray(output) ? output : [output];
+  get isProduction() {
+    return process.env.NODE_ENV == "production";
   }
 
-  getOutputStyles() {
-    var resources = this.getResources();
-    var output = null;
-
-    if (resources.has("css")) {
-      output = getOrderedUrls("css", resources);
-    }
-
-    return isArray(output) ? output : [output];
-  }
 }

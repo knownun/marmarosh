@@ -12,7 +12,6 @@ import forOwn from "lodash/forOwn";
 import startsWith from "lodash/startsWith";
 import mapValues from "lodash/mapValues";
 
-
 //import DevComponentClass from "./components/development_component"
 import ProdComponentClass from "./components/production_component"
 
@@ -228,7 +227,6 @@ export default class Builder {
 
         });
       }
-
     });
 
     cb();
