@@ -29,6 +29,7 @@ var BaseBuilder = function () {
 
     this.config = builderConfig;
     this[local.events] = new _events2.default.EventEmitter();
+    this[local.events].setMaxListeners(0);
   }
 
   _createClass(BaseBuilder, [{

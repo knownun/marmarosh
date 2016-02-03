@@ -11,6 +11,7 @@ export default class BaseBuilder {
   constructor(builderConfig) {
     this.config = builderConfig;
     this[local.events] = new events.EventEmitter();
+    this[local.events].setMaxListeners(0);
   }
 
   run(cb) {
