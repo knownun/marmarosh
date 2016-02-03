@@ -20,34 +20,6 @@ let local = {
   tests: Symbol("tests")
 };
 
-function getOrderedUrls(original, resources) {
-  let urls = [];
-  let originalResource = resources.get(original);
-  let order = originalResource.getOptions("order");
-
-  if (order) {
-    for (let item of order) {
-      let url = null;
-      if (item[0] == "^") {
-        let dependency = item.slice(1);
-        let resource = resources.get(dependency);
-        url = resource.getUrl();
-      } else {
-        url = item;
-      }
-      if (isArray(url)) {
-        urls = urls.concat(url);
-      } else {
-        urls.push(url);
-      }
-    }
-  } else {
-    urls = originalResource.getUrl();
-  }
-
-  return urls;
-}
-
 function getDefaults(src, dest) {
   return {
     "src": src,
@@ -161,13 +133,6 @@ export default class Marmarosh {
 
   getBuilder(name, resources) {
     return this.createBuilder(name, resources);
-
-    //if (!has(this[local.builder], name)) {
-    //  let builder = this.createBuilder(name, resources);
-    //  setter(this[local.builder], name, builder);
-    //}
-    //
-    //return getter(this[local.builder], name);
   }
 
   createServer(ServerConstructor, customOptions = {}) {
@@ -184,7 +149,6 @@ export default class Marmarosh {
 
     return new ServerConstructor(options);
   }
-
 
   getServer(ServerConstructor, options) {
     return this.createServer(ServerConstructor, options);

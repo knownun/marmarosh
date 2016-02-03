@@ -23,7 +23,7 @@ import pick from "lodash/pick"
 
 import path from "path"
 
-var local = {
+let local = {
   src: Symbol("src"),
   name: Symbol("name"),
   type: Symbol("type"),
@@ -45,7 +45,7 @@ export default class Base {
   }
 
   isValidConfig(input) {
-    var output = false;
+    let output = false;
     if (
       has(input, "name") &&
       has(input, "src") &&
@@ -59,7 +59,7 @@ export default class Base {
 
   updateConfig(sources) {
     if (sources) {
-      var config = this.getConfig();
+      let config = this.getConfig();
       config = this.merge(config, sources);
       this.setConfig(config);
       this.setTheme(getter(config, "route.theme"));
@@ -68,7 +68,7 @@ export default class Base {
   }
 
   saveConfig(configPath, overrideObj) {
-    var data = this.readConfig(configPath, overrideObj);
+    let data = this.readConfig(configPath, overrideObj);
     if (this.isValidConfig(data)) {
       this[local.src] = data.src;
       this[local.name] = data.name;
@@ -82,12 +82,12 @@ export default class Base {
   }
 
   merge(input, sources) {
-    var output = cloneDeep(input);
+    let output = cloneDeep(input);
     return merge(output, sources);
   }
 
   getConfig(path) {
-    var cfg = this[local.config];
+    let cfg = this[local.config];
     return path ? getter(cfg, path) : cfg
   }
 
@@ -116,24 +116,24 @@ export default class Base {
   }
 
   readTemplateForTheme(theme, name) {
-    var compilerFn = jade.compileFile;
-    var compileOptions = {
+    let compilerFn = jade.compileFile;
+    let compileOptions = {
       pretty: true,
       self: true
     };
-    var filePath = this.getTemplatePathForTheme(theme);
+    let filePath = this.getTemplatePathForTheme(theme);
     return filePath ? compilerFn(filePath, compileOptions) : null;
   }
 
   get hasIndexJS() {
-    var filePath = path.resolve(path.join(this.getSrc(), "index.js"));
-    var jsxFilePath = path.resolve(path.join(this.getSrc(), "index.jsx"));
+    let filePath = path.resolve(path.join(this.getSrc(), "index.js"));
+    let jsxFilePath = path.resolve(path.join(this.getSrc(), "index.jsx"));
     return fs.existsSync(filePath) || fs.existsSync(jsxFilePath);
   }
 
   getTemplatePathForTheme(theme) {
-    var mask = path.resolve(path.join(this.getSrc(), "**", theme + ".jade"));
-    var files = globSync(mask);
+    let mask = path.resolve(path.join(this.getSrc(), "**", theme + ".jade"));
+    let files = globSync(mask);
     return (files.length) ? files[0] : null;
   }
 
@@ -142,8 +142,8 @@ export default class Base {
   }
 
   getConfigPathForTheme(theme) {
-    var mask = path.resolve(path.join(this.getSrc(), "**", theme + ".yml"));
-    var files = globSync(mask);
+    let mask = path.resolve(path.join(this.getSrc(), "**", theme + ".yml"));
+    let files = globSync(mask);
     return (files.length) ? files[0] : null;
   }
 
@@ -152,7 +152,7 @@ export default class Base {
   }
 
   getTemplate(theme) {
-    var html = "";
+    let html = "";
     if (!this.templateFn) {
       this.templateFn = this.readTemplate(theme);
     }
@@ -234,7 +234,7 @@ export default class Base {
   }
 
   get serverConfigurations() {
-    var obj = this.getConfig("route.serverConfigurations");
+    let obj = this.getConfig("route.serverConfigurations");
     return merge(obj, {"components": this._JSOptions})
   }
 
@@ -243,9 +243,9 @@ export default class Base {
     if (arguments.length == 2 && isArray(name)) {
       this._JSOptions = union(this._JSOptions, name);
     } else {
-      var type = instance.getName();
-      var component_type = instance.getType();
-      var model = {};
+      let type = instance.getName();
+      let component_type = instance.getType();
+      let model = {};
       if (startsWith(type, "react")) {
         component_type = "react-" + component_type;
         model = pick(instance.getClientConfig(), "template_options", "strings", "images", "links");
@@ -255,7 +255,7 @@ export default class Base {
   }
 
   parseAttributes(obj, type = "attr") {
-    var output = "";
+    let output = "";
     if (isString(obj)) {
       output = obj
     } else if (isObject(obj)) {
@@ -283,27 +283,27 @@ export default class Base {
   }
 
   includeBody() {
-    var ins = this.getBodyInstance();
+    let ins = this.getBodyInstance();
     return (ins && ins.html) ? ins.html : "$BODY$";
   }
 
   getString(name) {
-    var config = this.getClientConfig();
+    let config = this.getClientConfig();
     return getter(config, `strings.${name}`)
   }
 
   getLink(name) {
-    var config = this.getClientConfig();
+    let config = this.getClientConfig();
     return getter(config, `links.${name}`)
   }
 
   getImageURL(name) {
-    var config = this.getClientConfig();
+    let config = this.getClientConfig();
     return getter(config, `images.${name}`)
   }
 
   getOption(name) {
-    var config = this.getClientConfig();
+    let config = this.getClientConfig();
     return getter(config, `template_options.${name}`)
   }
 
@@ -312,8 +312,8 @@ export default class Base {
   }
 
   getClientConfig() {
-    var config = this.getConfig();
-    var cache = this[local.clientConfig];
+    let config = this.getConfig();
+    let cache = this[local.clientConfig];
 
     if (!cache) {
       cache = {
@@ -328,7 +328,7 @@ export default class Base {
   }
 
   getPropsFrom(input, propertyPath) {
-    var output = {};
+    let output = {};
     if (isObject(input)) {
       forOwn(input, (value, key) => {
         key = startsWith(key, "$") ? key.substr(1) : key;
@@ -339,19 +339,11 @@ export default class Base {
   }
 
   includeCSS() {
-    var out = "";
-    var themes = this.getConfig("route.themes");
-    var activeTheme = this.getConfig("route.theme");
+    let out = "";
+    let themes = this.getConfig("route.themes");
 
     themes.forEach((theme)=> {
-      if (startsWith(theme, "?")) {
-        var name = theme.substr(1);
-        if (name == activeTheme) {
-          out += `<link rel=stylesheet href=/styles/${name}.css />\n`;
-        }
-      } else {
-        out += `<link rel=stylesheet href=/styles/${theme}.css />\n`;
-      }
+      out += `<link rel=stylesheet href=/webpack/styles/${theme}.css />\n`;
     });
 
     return out
@@ -362,24 +354,17 @@ export default class Base {
   }
 
   includeJS() {
-    var out = "", scripts = this.getConfig("route.scripts");
-
-    if (isArray(scripts)) {
-      scripts.forEach((url)=> {
-        out += `<script src=/webpack${url}></script>\n`;
-      })
-    }
-    return out
+    return ""
   }
 
   includeJSOptions() {
-    var data = JSON.stringify(this.serverConfigurations, null, 4);
+    let data = JSON.stringify(this.serverConfigurations, null, 4);
     return `<script>window["serverConfigurations"] = ${data}</script>`
   }
 
   readConfig(url, overrideObj) {
-    var out = null;
-    var theme = getter(overrideObj, "route.theme");
+    let out = null;
+    let theme = getter(overrideObj, "route.theme");
     if (isString(url)) {
       let configPath = path.resolve(url);
       let src = path.dirname(url);
@@ -387,11 +372,12 @@ export default class Base {
       let name = path.basename(src);
 
       if (theme) {
-        var theme_mask = path.resolve(path.join(src, "**", theme + ".yml"));
-        var theme_files = globSync(theme_mask);
+        let theme_mask = path.resolve(path.join(src, "**", theme + ".yml"));
+        let theme_files = globSync(theme_mask);
         configPath = (theme_files.length) ? theme_files[0] : configPath;
       }
-      var config = yaml.safeLoad(fs.readFileSync(configPath, "utf8")) || {};
+
+      let config = yaml.safeLoad(fs.readFileSync(configPath, "utf8")) || {};
       out = {name, src, config, configPath, type}
     }
     return out;

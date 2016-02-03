@@ -28,7 +28,6 @@ export default class extends Base {
       .remove("build.error")
       .remove("build.error")
       .on("build.end", ({key}) => {
-        console.log(key + " end");
       })
       .on("build.waiting", ({key, percentage, msg}) => {
         bar[key].percent(Math.round(percentage * 100), `Building ${key} - ${msg}`);
