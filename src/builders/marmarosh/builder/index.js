@@ -83,8 +83,7 @@ export default class Builder {
 
   getNewFilename(instance, ext, theme) {
     var name = instance.getName();
-    var src = this.config[0].root;
-    var dir = new RegExp(`(.*)${src}(.*)`).exec(instance.getSrc())[2];
+    var dir = `${instance.getType()}/${instance.getName()}`;
     return theme ? `${dir}/themes/${theme}/${name}.${ext}` : `${dir}/${name}.${ext}`
   }
 

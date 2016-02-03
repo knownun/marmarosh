@@ -26,7 +26,7 @@ export default class extends Base {
   }
 
   get name() {
-    return 'default';
+    return 'build';
   }
 
   run(done) {

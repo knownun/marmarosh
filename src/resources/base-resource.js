@@ -8,6 +8,7 @@ import getter from "lodash/get";
 import isArray from "lodash/isArray";
 import isString from "lodash/isString";
 import uniq from "lodash/uniq";
+import concat from "lodash/concat";
 
 let local = {
   src: Symbol("src"),
@@ -75,7 +76,7 @@ export default class Resource {
 
     normalized.alias = merge({}, config.alias, options.alias) || null;
 
-    normalized.resolve = merge([], config.resolve, options.resolve);
+    normalized.resolve = concat([], config.resolve, options.resolve);
 
     normalized.extensions = config.extensions || null;
 
