@@ -37,6 +37,7 @@ export default class TaskBase {
   get multimeter() {
     if (!this[local.multimeter]) {
       this[local.multimeter] = multimeter(process);
+      this[local.multimeter].charm.setMaxListeners(0);
     }
     return this[local.multimeter];
   }
@@ -48,9 +49,10 @@ export default class TaskBase {
   initMultimeterBars(resources) {
     let multi = this.multimeter;
     this.bar = {};
-    resources.forEach((res, i)=> {
+    resources.forEach((res, index)=> {
       let key = res.getKey();
-      this.bar[key] = multi.rel(0, i + 1, {
+      let position = resources.length - index;
+      this.bar[key] = multi.rel(0, position, {
         width: 8,
         solid: {background: null, foreground: 'white', text: '|'},
         empty: {background: null, foreground: null, text: ' '}

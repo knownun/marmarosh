@@ -66,9 +66,10 @@ var TaskBase = function () {
 
       var multi = this.multimeter;
       this.bar = {};
-      resources.forEach(function (res, i) {
+      resources.forEach(function (res, index) {
         var key = res.getKey();
-        _this.bar[key] = multi.rel(0, i + 1, {
+        var position = resources.length - index;
+        _this.bar[key] = multi.rel(0, position, {
           width: 8,
           solid: { background: null, foreground: 'white', text: '|' },
           empty: { background: null, foreground: null, text: ' ' }
@@ -126,6 +127,7 @@ var TaskBase = function () {
     get: function get() {
       if (!this[local.multimeter]) {
         this[local.multimeter] = (0, _multimeter2.default)(_process2.default);
+        this[local.multimeter].charm.setMaxListeners(0);
       }
       return this[local.multimeter];
     }
