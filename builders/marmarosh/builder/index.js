@@ -56,6 +56,10 @@ var _mapValues = require("lodash/mapValues");
 
 var _mapValues2 = _interopRequireDefault(_mapValues);
 
+var _merge = require("lodash/merge");
+
+var _merge2 = _interopRequireDefault(_merge);
+
 var _production_component = require("./components/production_component");
 
 var _production_component2 = _interopRequireDefault(_production_component);
@@ -231,7 +235,7 @@ var Builder = function () {
       }
 
       if ((0, _isObject2.default)(config.widgets)) {
-        data.widgets = merge(data.widgets, config.widgets);
+        data.widgets = (0, _merge2.default)(data.widgets, config.widgets);
       }
 
       return this.createFile(output, name, JSON.stringify(data, null, 2));
