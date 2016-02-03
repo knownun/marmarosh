@@ -41,6 +41,7 @@
     "jade-loader": "0.8.0",
     "json-loader": "0.5.4",
     "less-loader": "2.2.2",
+    "marmarosh-dev-server": "git+ssh://git@github.com/marmarosh/marmarosh-dev-server.git",
     "style-loader": "0.13.0",
     "traceur-loader": "0.6.3",
     "yaml-loader": "0.1.0"
