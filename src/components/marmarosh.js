@@ -1,6 +1,8 @@
-import { load as JSONfromYml } from "js-yaml";
+import { platform } from "process"
 import { readFileSync, existsSync } from "fs";
 import { resolve, join, dirname } from "path";
+import { load as JSONfromYml } from "js-yaml";
+
 
 import has from "lodash/has";
 import getter from "lodash/get";
@@ -140,8 +142,8 @@ export default class Marmarosh {
     let configOptions = {
       src: this.getSrc(),
       dest: this.getDest(),
-      host: this.get("host") || "localhost",
-      port: this.get("port") || "3000",
+      host: this.get("host") || Marmarosh.defaultHost,
+      port: this.get("port") || Marmarosh.defaultPort,
       globals: this.get("globals")
     };
 
@@ -152,6 +154,14 @@ export default class Marmarosh {
 
   getServer(ServerConstructor, options) {
     return this.createServer(ServerConstructor, options);
+  }
+
+  static get defaultPort() {
+    return platform == "darwin" ? 8080 : 80;
+  }
+
+  static get defaultHost() {
+    return "localhost";
   }
 
   // --------------------------------
