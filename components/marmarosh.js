@@ -6,11 +6,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _jsYaml = require("js-yaml");
+var _process = require("process");
 
 var _fs = require("fs");
 
 var _path = require("path");
+
+var _jsYaml = require("js-yaml");
 
 var _has = require("lodash/has");
 
@@ -178,8 +180,8 @@ var Marmarosh = function () {
       var configOptions = {
         src: this.getSrc(),
         dest: this.getDest(),
-        host: this.get("host") || "localhost",
-        port: this.get("port") || "3000",
+        host: this.get("host") || Marmarosh.defaultHost,
+        port: this.get("port") || Marmarosh.defaultPort,
         globals: this.get("globals")
       };
 
@@ -192,11 +194,11 @@ var Marmarosh = function () {
     value: function getServer(ServerConstructor, options) {
       return this.createServer(ServerConstructor, options);
     }
+  }, {
+    key: "get",
 
     // --------------------------------
 
-  }, {
-    key: "get",
     value: function get(key) {
       return (0, _get2.default)(this[local.config], key);
     }
@@ -260,6 +262,16 @@ var Marmarosh = function () {
         isValid: !errors.length,
         errors: errors
       };
+    }
+  }, {
+    key: "defaultPort",
+    get: function get() {
+      return _process.platform == "darwin" ? 8080 : 80;
+    }
+  }, {
+    key: "defaultHost",
+    get: function get() {
+      return "localhost";
     }
   }]);
 
