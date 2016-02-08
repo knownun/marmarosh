@@ -67,69 +67,86 @@ var _class = function (_Base) {
       var _this2 = this;
 
       var resources = this.resources.getArray("styles");
-      var builder = this.sintez.getBuilder("webpack", resources);
-      var appBuilder = builder.getApplicationBuilder();
-
-      appBuilder.remove("build.error").remove("build.end").on("build.end", function (params) {
-        var message = "#" + params.counter + " %" + params.key + "% was packed. Elapsed time %" + params.time + "s%. Number of files %" + params.scripts.length + "%";
-        var warnings = params.warnings;
-
-        _this2.logger.log(message);
-
-        if (warnings && !!warnings.length) {
-          _this2.logger.log("------------------");
-          _this2.logger.log("*** %WARNINGS% ***");
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = warnings[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var warning = _step.value;
-
-              _this2.logger.log("at %" + warning.module.issuer + "%");
-              _this2.logger.log("requested %\"" + warning.module.rawRequest + "\"% (\"" + warning.module.userRequest + "\")");
-              _this2.logger.log(warning.message.replace(/(\r\n|\n|\r)/gm, " "));
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-
-          _this2.logger.log("------------------");
-        }
-      }).on("build.error", function (_ref) {
-        var key = _ref.key;
-        var errors = _ref.errors;
-        var extendedFormat = _ref.extendedFormat;
-
-        var message = _this2.getErrorMessage({ key: key, errors: errors, extendedFormat: extendedFormat });
-        _this2.logger.error(message);
+      var builders = (0, _map2.default)(resources, function (res) {
+        return _this2.sintez.getBuilder("webpack", res);
+      });
+      var appBuilders = (0, _map2.default)(builders, function (builder) {
+        return builder.getApplicationBuilder();
       });
 
-      builder.run(function (err) {
+      (0, _map2.default)(appBuilders, function (appBuilder) {
+        appBuilder.remove("build.error").remove("build.end").remove("build.waiting").on("build.end", function (params) {
+          var message = "#" + params.counter + " %" + params.key + "% was packed. Elapsed time %" + params.time + "s%. Number of files %" + params.scripts.length + "%";
+          var warnings = params.warnings;
+
+          _this2.logger.log(message);
+
+          if (warnings && !!warnings.length) {
+            _this2.logger.log("------------------");
+            _this2.logger.log("*** %WARNINGS% ***");
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = warnings[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var warning = _step.value;
+
+                _this2.logger.log("at %" + warning.module.issuer + "%");
+                _this2.logger.log("requested %\"" + warning.module.rawRequest + "\"% (\"" + warning.module.userRequest + "\")");
+                _this2.logger.log(warning.message.replace(/(\r\n|\n|\r)/gm, " "));
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                  _iterator.return();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+
+            _this2.logger.log("------------------");
+          }
+        }).on("build.waiting", function (_ref) {
+          var key = _ref.key;
+          var msg = _ref.msg;
+
+          _this2.logger.logProcess("Packing %" + key + "% - " + msg);
+        }).on("build.error", function (_ref2) {
+          var key = _ref2.key;
+          var errors = _ref2.errors;
+          var extendedFormat = _ref2.extendedFormat;
+
+          var message = _this2.getErrorMessage({ key: key, errors: errors, extendedFormat: extendedFormat });
+          _this2.logger.error(message);
+        });
+      });
+
+      _async2.default.series((0, _map2.default)(builders, function (builder) {
+        return builder.run.bind(builder);
+      }), function (err) {
         if (err) throw new Error("Error in style task");
 
         var filesToDelete = (0, _uniq2.default)((0, _flattenDeep2.default)(resources.map(function (res) {
           return _glob2.default.sync((0, _helpers.resolve)(res.getTarget(), "**.?(js|js.map)"));
         })));
 
-        _async2.default.waterfall(filesToDelete.map(function (file) {
+        _async2.default.series(filesToDelete.map(function (file) {
           return function (callback) {
             return (0, _rimraf2.default)(file, {}, callback);
           };
         }), done);
       });
+
+      //builder.run((err)=> {
+
+      //});
     }
   }, {
     key: "name",
