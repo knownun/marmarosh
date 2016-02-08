@@ -33,7 +33,7 @@
     "js-yaml": "3.5.2",
     "lodash": "4.3.0",
     "rimraf": "2.5.1",
-    "webpack": "1.12.13"
+    "webpack": "https://github.com/marmarosh/webpack.git#v1.12.14"
   },
   "devDependencies": {
     "babel": "6.3.26",
