@@ -2,18 +2,13 @@ import Base from "../base-task";
 
 export default class extends Base {
 
-  constructor(gulp, sintez) {
-    super(gulp, sintez);
-    this.disable = this.sintez.isProduction;
-  }
-
   get name() {
     return "dev";
   }
 
   run(done) {
 
-    if (this.disable) {
+    if (this.sintez.isProduction) {
       return this.logger.error("task is available only on Development environment");
     }
 

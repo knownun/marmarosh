@@ -1,4 +1,5 @@
 import Base from "../base-task";
+import map from "lodash/map";
 
 export default class extends Base {
 
@@ -10,36 +11,26 @@ export default class extends Base {
     let resources = this.resources.getArray("templates");
     let builder = this.sintez.getBuilder("marmarosh-templates", resources);
     let appBuilder = builder.getApplicationBuilder();
-
-    let multi = this.multimeter;
-    let bar = {};
-    resources.forEach((res, i)=> {
-      let key = res.getKey();
-      bar[key] = multi.rel(0, i + 1, {
-        width: 8,
-        solid: {background: null, foreground: 'white', text: '|'},
-        empty: {background: null, foreground: null, text: ' '}
-      });
-      multi.charm.write("\n");
-    });
+    let resourceKeys = map(resources, (res) => res.getKey());
 
     appBuilder
       .remove("build.end")
       .remove("build.error")
-      .remove("build.error")
-      .on("build.end", ({key}) => {
+      .remove("build.waiting")
+      .on("build.end", ({key, files}) => {
+        appBuilder.remove("build.waiting");
+        let message = `%${key}% was packed. Number of templates ${files}.`;
+        this.logger.log(message);
       })
       .on("build.waiting", ({key, percentage, msg}) => {
-        bar[key].percent(Math.round(percentage * 100), `Building ${key} - ${msg}`);
+        this.logger.logProcess(`Packing - %${key}% ${msg}`);
       })
-      .on("build.error", ({key, errors, extendedFormat}) => {
+      .on("build.error", ({key, message}) => {
         appBuilder.remove("build.waiting");
-        let message = this.getErrorMessage({key, errors, extendedFormat});
         this.logger.error(message);
       });
 
     builder.run((err)=> {
-      !this.multimeterOff && this.multimeterEnd();
       done(err);
     });
   }

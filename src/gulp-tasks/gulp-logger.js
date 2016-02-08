@@ -1,19 +1,25 @@
-import isArray from 'lodash/isArray';
+import process from "process";
 
-import gutil from 'gulp-util';
+import gutil from "gulp-util";
+import isArray from "lodash/isArray";
+import throttle from "lodash/throttle";
 
-var colorsMap = new Map();
+let colorsMap = new Map();
 
-colorsMap.set('magenta', gutil.colors.magenta);
-colorsMap.set('cyan', gutil.colors.cyan);
-colorsMap.set('blue', gutil.colors.blue);
-colorsMap.set('yellow', gutil.colors.yellow);
-colorsMap.set('green', gutil.colors.green);
+colorsMap.set("magenta", gutil.colors.magenta);
+colorsMap.set("cyan", gutil.colors.cyan);
+colorsMap.set("blue", gutil.colors.blue);
+colorsMap.set("yellow", gutil.colors.yellow);
+colorsMap.set("green", gutil.colors.green);
 
-var colors = colorsMap.values();
+let colors = colorsMap.values();
 
-var getNextColoring = () => {
-  var color = colors.next();
+let local = {
+  throttled: Symbol("throttle")
+};
+
+let getNextColoring = () => {
+  let color = colors.next();
   if (color.done) {
     colors = colorsMap.values();
     color = colors.next();
@@ -21,13 +27,13 @@ var getNextColoring = () => {
   return color.value;
 };
 
-var isEnabled = true;
-
-export default class Log {
-  constructor(task, color) {
-    this.task = task;
+export default class {
+  constructor(taskName, logLevel = 2, color) {
+    this.task = taskName;
     this.errorColoring = gutil.colors.red;
-
+    this.isErrorsOn = logLevel >= 0;
+    this.isLogsOn = logLevel > 0;
+    this.isProcessOn = logLevel > 1;
     if (color && colors.has(color)) {
       this.coloring = colors.get(color);
     } else {
@@ -36,44 +42,50 @@ export default class Log {
   }
 
   log(message) {
-    if (isEnabled) {
-      var coloring = this.coloring;
-      var completeMessage = message.replace(/((%)([^%]+)(%))/g, coloring('$3'));
+    if (this.isLogsOn) {
+      let coloring = this.coloring;
+      let completeMessage = message.replace(/((%)([^%]+)(%))/g, coloring("$3"));
       gutil.log(`${coloring(this.task)} ${completeMessage}`);
     }
+    return this;
   }
 
   error(message) {
-    if (isEnabled) {
-      var coloring = this.errorColoring;
-      var completeMessage = coloring(message);
+    if (this.isErrorsOn) {
+      let coloring = this.errorColoring;
+      let completeMessage = coloring(message);
       if (!this.isProduction) {
         throw new Error(message)
       } else {
         gutil.log(`${coloring(this.task)} ${completeMessage}`);
       }
     }
+    return this;
   }
 
   updated(options) {
-    var coloring = this.coloring;
+    let coloring = this.coloring;
 
     if (!isArray(options.src)) {
       options.src = [options.src];
     }
 
-    for (var src of options.src) {
-      var info = `${coloring(src)} -> ${coloring(options.dest)}`;
+    for (let src of options.src) {
+      let info = `${coloring(src)} -> ${coloring(options.dest)}`;
       this.log(`fired. ${info}`);
     }
   }
 
-  static enable() {
-    isEnabled = true;
-  }
-
-  static disable() {
-    isEnabled = false;
+  logProcess(message, wait = 300) {
+    if (this.isProcessOn) {
+      if (!this[local.throttled]) {
+        this[local.throttled] = throttle(this.log, wait, {
+          leading: 1, trailing: 0
+        });
+      }
+      this[local.throttled](message);
+    }
+    return this;
   }
 
   get isProduction() {

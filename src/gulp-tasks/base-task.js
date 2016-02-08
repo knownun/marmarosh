@@ -2,14 +2,7 @@ import Sintez from '../components/marmarosh';
 import WrongSintezInstance from '../utils/exceptions/wrong-sintez-instance';
 import GulpLogger from './gulp-logger';
 
-import multimeter from "multimeter";
-import process from "process";
-
-let local = {
-  multimeter: Symbol("multimeter")
-};
-
-export default class TaskBase {
+export default class {
   constructor(gulp, sintez) {
     if (!(sintez instanceof Sintez)) {
       throw new WrongSintezInstance();
@@ -18,8 +11,7 @@ export default class TaskBase {
     this.sintez = sintez;
     this.gulp = gulp;
 
-    var taskName = this.name;
-    this.logger = new GulpLogger(taskName);
+    this.logger = new GulpLogger(this.name, 2);
   }
 
   get resources() {
@@ -32,43 +24,6 @@ export default class TaskBase {
 
   run() {
     throw new Error('@run method should be implemented');
-  }
-
-  get multimeter() {
-    if (!this[local.multimeter]) {
-      this[local.multimeter] = multimeter(process);
-      this[local.multimeter].charm.setMaxListeners(0);
-    }
-    return this[local.multimeter];
-  }
-
-  multimeterEnd() {
-    if (this[local.multimeter]) this[local.multimeter].charm.end();
-  }
-
-  initMultimeterBars(resources) {
-    let multi = this.multimeter;
-    this.bar = {};
-    resources.forEach((res, index)=> {
-      let key = res.getKey();
-      let position = resources.length - index;
-      this.bar[key] = multi.rel(0, position, {
-        width: 8,
-        solid: {background: null, foreground: 'white', text: '|'},
-        empty: {background: null, foreground: null, text: ' '}
-      });
-      multi.charm.write("\n");
-    });
-  }
-
-  updateBar(resKey, percent, message) {
-    percent = (percent < 1) ? Math.round(percent * 100) : percent;
-    this.bar[resKey].percent(percent, message);
-    return this;
-  }
-
-  clearBar(resKey) {
-    this.bar[resKey].percent(0, "");
   }
 
   getErrorMessage({key, errors = [], extendedFormat = false}) {
@@ -85,6 +40,14 @@ export default class TaskBase {
     }
 
     return message;
+  }
+
+  get logLevel() {
+    return process.env.BUILDER_LOGGING || null;
+  }
+
+  get isProduction() {
+    return process.env.NODE_ENV == "production";
   }
 
 }

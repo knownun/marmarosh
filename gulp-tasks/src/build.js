@@ -53,21 +53,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var _class = function (_Base) {
   _inherits(_class, _Base);
 
-  function _class(gulp, sintez) {
+  function _class() {
     _classCallCheck(this, _class);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this, gulp, sintez));
-
-    _this.gulp = gulp;
-    _this.sintez = sintez;
-
-    _this.styles = new _styles2.default(gulp, sintez);
-    _this.scipts = new _javascript2.default(gulp, sintez);
-    _this.templates = new _templates2.default(gulp, sintez);
-
-    _this.clean = new _clean2.default(gulp, sintez);
-    _this.multimeterOff = true;
-    return _this;
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(_class).apply(this, arguments));
   }
 
   _createClass(_class, [{
@@ -75,11 +64,16 @@ var _class = function (_Base) {
     value: function run(done) {
       var _this2 = this;
 
+      this.styles = new _styles2.default(this.gulp, this.sintez);
+      this.scipts = new _javascript2.default(this.gulp, this.sintez);
+      this.templates = new _templates2.default(this.gulp, this.sintez);
+
+      this.clean = new _clean2.default(this.gulp, this.sintez);
+
       this.clean.run(function (err) {
         if (err) throw new Error("Error in clean task");
 
         _async2.default.waterfall([_this2.templates.run.bind(_this2), _this2.styles.run.bind(_this2), _this2.scipts.run.bind(_this2)], function (err) {
-          _this2.multimeterEnd();
           done(err);
         });
       });

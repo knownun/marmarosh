@@ -18,25 +18,13 @@ var _gulpLogger = require('./gulp-logger');
 
 var _gulpLogger2 = _interopRequireDefault(_gulpLogger);
 
-var _multimeter = require('multimeter');
-
-var _multimeter2 = _interopRequireDefault(_multimeter);
-
-var _process = require('process');
-
-var _process2 = _interopRequireDefault(_process);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var local = {
-  multimeter: Symbol("multimeter")
-};
-
-var TaskBase = function () {
-  function TaskBase(gulp, sintez) {
-    _classCallCheck(this, TaskBase);
+var _class = function () {
+  function _class(gulp, sintez) {
+    _classCallCheck(this, _class);
 
     if (!(sintez instanceof _marmarosh2.default)) {
       throw new _wrongSintezInstance2.default();
@@ -45,49 +33,13 @@ var TaskBase = function () {
     this.sintez = sintez;
     this.gulp = gulp;
 
-    var taskName = this.name;
-    this.logger = new _gulpLogger2.default(taskName);
+    this.logger = new _gulpLogger2.default(this.name, 2);
   }
 
-  _createClass(TaskBase, [{
+  _createClass(_class, [{
     key: 'run',
     value: function run() {
       throw new Error('@run method should be implemented');
-    }
-  }, {
-    key: 'multimeterEnd',
-    value: function multimeterEnd() {
-      if (this[local.multimeter]) this[local.multimeter].charm.end();
-    }
-  }, {
-    key: 'initMultimeterBars',
-    value: function initMultimeterBars(resources) {
-      var _this = this;
-
-      var multi = this.multimeter;
-      this.bar = {};
-      resources.forEach(function (res, index) {
-        var key = res.getKey();
-        var position = resources.length - index;
-        _this.bar[key] = multi.rel(0, position, {
-          width: 8,
-          solid: { background: null, foreground: 'white', text: '|' },
-          empty: { background: null, foreground: null, text: ' ' }
-        });
-        multi.charm.write("\n");
-      });
-    }
-  }, {
-    key: 'updateBar',
-    value: function updateBar(resKey, percent, message) {
-      percent = percent < 1 ? Math.round(percent * 100) : percent;
-      this.bar[resKey].percent(percent, message);
-      return this;
-    }
-  }, {
-    key: 'clearBar',
-    value: function clearBar(resKey) {
-      this.bar[resKey].percent(0, "");
     }
   }, {
     key: 'getErrorMessage',
@@ -123,17 +75,18 @@ var TaskBase = function () {
       throw new Error('@get name() method should be implemented');
     }
   }, {
-    key: 'multimeter',
+    key: 'logLevel',
     get: function get() {
-      if (!this[local.multimeter]) {
-        this[local.multimeter] = (0, _multimeter2.default)(_process2.default);
-        this[local.multimeter].charm.setMaxListeners(0);
-      }
-      return this[local.multimeter];
+      return process.env.BUILDER_LOGGING || null;
+    }
+  }, {
+    key: 'isProduction',
+    get: function get() {
+      return process.env.NODE_ENV == "production";
     }
   }]);
 
-  return TaskBase;
+  return _class;
 }();
 
-exports.default = TaskBase;
+exports.default = _class;

@@ -141,6 +141,7 @@ export default class WebpackBuilder extends BaseBuilder {
           path: split[name]
         });
       }
+      console.dir(splitConfig, {colors: 1});
       let splitPlugin = new WebpackSplitByPathPlugin(splitConfig);
       config.plugins.push(splitPlugin);
     }

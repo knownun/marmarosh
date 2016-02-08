@@ -38,6 +38,10 @@ var _uniq = require('lodash/uniq');
 
 var _uniq2 = _interopRequireDefault(_uniq);
 
+var _map = require('lodash/map');
+
+var _map2 = _interopRequireDefault(_map);
+
 var _baseTask = require('../base-task');
 
 var _baseTask2 = _interopRequireDefault(_baseTask);
@@ -64,18 +68,15 @@ var _class = function (_Base) {
     value: function run(done) {
       var _this2 = this;
 
-      var styles = this.resources.getArray("styles");
-      var builder = this.sintez.getBuilder("webpack", styles);
+      var resources = this.resources.getArray("styles");
+      var builder = this.sintez.getBuilder("webpack", resources);
       var appBuilder = builder.getApplicationBuilder();
 
-      this.initMultimeterBars(styles);
-
-      appBuilder.remove('build.end').on('build.end', function (params) {
-        appBuilder.remove("build.waiting");
-        var message = '#' + params.counter + ' ' + params.chunks.join(" & ") + ' was packed. Elapsed time ' + params.time + 's. Number of files ' + params.scripts.length;
+      appBuilder.remove('build.error').remove('build.end').on('build.end', function (params) {
+        var message = '#' + params.counter + ' %' + params.key + '% was packed. Elapsed time %' + params.time + 's%. Number of files %' + params.scripts.length + '%';
         var warnings = params.warnings;
 
-        _this2.updateBar(params.key, 100, message);
+        _this2.logger.log(message);
 
         if (warnings && !!warnings.length) {
           _this2.logger.log('------------------');
@@ -109,28 +110,19 @@ var _class = function (_Base) {
 
           _this2.logger.log('------------------');
         }
-      }).remove('build.error').on('build.error', function (_ref) {
+      }).on('build.error', function (_ref) {
         var key = _ref.key;
         var errors = _ref.errors;
         var extendedFormat = _ref.extendedFormat;
 
-        appBuilder.remove("build.waiting");
         var message = _this2.getErrorMessage({ key: key, errors: errors, extendedFormat: extendedFormat });
         _this2.logger.error(message);
-      }).remove('build.waiting').on('build.waiting', function (_ref2) {
-        var key = _ref2.key;
-        var percentage = _ref2.percentage;
-        var msg = _ref2.msg;
-
-        _this2.updateBar(key, Math.round(percentage * 100), 'Building ' + key + ' - ' + msg);
       });
 
       builder.run(function (err) {
         if (err) throw new Error("Error in style task");
 
-        !_this2.multimeterOff && _this2.multimeterEnd();
-
-        var filesToDelete = (0, _uniq2.default)((0, _flattenDeep2.default)(styles.map(function (res) {
+        var filesToDelete = (0, _uniq2.default)((0, _flattenDeep2.default)(resources.map(function (res) {
           return _glob2.default.sync(_path2.default.resolve(res.getTarget(), "**.?(js|js.map)"));
         })));
 

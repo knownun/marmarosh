@@ -246,45 +246,52 @@ var Builder = function () {
       var _this2 = this;
 
       this.config.forEach(function (config) {
-        var Constructor = _production_component2.default;
-        var components = config.src;
-        var output = config.dest;
-        if (components) {
-          components.forEach(function (filePath, index) {
-            var instance = new Constructor(_path2.default.normalize(filePath), {
-              builder: {
-                serverReplace: config.serverReplace
-              }
-            });
-            _this2.createCSHTML(instance, output);
-            _this2.createJSON(instance, output);
+        try {
+          (function () {
+            var Constructor = _production_component2.default;
+            var components = config.src;
+            var output = config.dest;
+            if (components) {
+              components.forEach(function (filePath, index) {
+                var instance = new Constructor(_path2.default.normalize(filePath), {
+                  builder: {
+                    serverReplace: config.serverReplace
+                  }
+                });
+                _this2.createCSHTML(instance, output);
+                _this2.createJSON(instance, output);
 
-            var themes = ["main", "?sparta", "?stormfall"];
-            themes.forEach(function (theme) {
-              if ((0, _startsWith2.default)(theme, '?')) {
-                var name = theme.substr(1);
-                if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
-                  var themeInstance = new Constructor(_path2.default.normalize(filePath), {
-                    route: {
-                      theme: name
-                    },
-                    builder: {
-                      serverReplace: config.serverReplace
+                var themes = ["main", "?sparta", "?stormfall"];
+                themes.forEach(function (theme) {
+                  if ((0, _startsWith2.default)(theme, '?')) {
+                    var name = theme.substr(1);
+                    if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
+                      var themeInstance = new Constructor(_path2.default.normalize(filePath), {
+                        route: {
+                          theme: name
+                        },
+                        builder: {
+                          serverReplace: config.serverReplace
+                        }
+                      });
+                      _this2.createCSHTML(themeInstance, output, name);
+                      _this2.createJSON(themeInstance, output, name);
                     }
-                  });
-                  _this2.createCSHTML(themeInstance, output, name);
-                  _this2.createJSON(themeInstance, output, name);
-                }
-              }
-            });
+                  }
+                });
 
-            var itemIndex = index + 1;
-            var allLength = components.length;
-            var percentage = itemIndex / allLength;
-            var msg = itemIndex + "/" + allLength + " - template built";
+                var itemIndex = index + 1;
+                var allLength = components.length;
+                var percentage = itemIndex / allLength;
+                var msg = itemIndex + "/" + allLength + " built modules";
 
-            _this2.emit("done", { percentage: percentage, msg: msg });
-          });
+                _this2.emit("done", { percentage: percentage, msg: msg });
+              });
+              _this2.emit("end", { files: components.length });
+            }
+          })();
+        } catch (e) {
+          _this2.emit("error", { message: e.message });
         }
       });
 

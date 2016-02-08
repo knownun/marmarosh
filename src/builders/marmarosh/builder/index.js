@@ -186,47 +186,53 @@ export default class Builder {
   run(cb) {
 
     this.config.forEach((config)=> {
-      let Constructor = ProdComponentClass;
-      let components = config.src;
-      let output = config.dest;
-      if (components) {
-        components.forEach((filePath, index) => {
-          let instance = new Constructor(path.normalize(filePath), {
-            builder: {
-              serverReplace: config.serverReplace
-            }
-          });
-          this.createCSHTML(instance, output);
-          this.createJSON(instance, output);
-
-          var themes = ["main", "?sparta", "?stormfall"];
-          themes.forEach((theme)=> {
-            if (startsWith(theme, '?')) {
-              var name = theme.substr(1);
-              if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
-                var themeInstance = new Constructor(path.normalize(filePath), {
-                  route: {
-                    theme: name
-                  },
-                  builder: {
-                    serverReplace: config.serverReplace
-                  }
-                });
-                this.createCSHTML(themeInstance, output, name);
-                this.createJSON(themeInstance, output, name);
+      try {
+        let Constructor = ProdComponentClass;
+        let components = config.src;
+        let output = config.dest;
+        if (components) {
+          components.forEach((filePath, index) => {
+            let instance = new Constructor(path.normalize(filePath), {
+              builder: {
+                serverReplace: config.serverReplace
               }
-            }
+            });
+            this.createCSHTML(instance, output);
+            this.createJSON(instance, output);
+
+            var themes = ["main", "?sparta", "?stormfall"];
+            themes.forEach((theme)=> {
+              if (startsWith(theme, '?')) {
+                var name = theme.substr(1);
+                if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
+                  var themeInstance = new Constructor(path.normalize(filePath), {
+                    route: {
+                      theme: name
+                    },
+                    builder: {
+                      serverReplace: config.serverReplace
+                    }
+                  });
+                  this.createCSHTML(themeInstance, output, name);
+                  this.createJSON(themeInstance, output, name);
+                }
+              }
+            });
+
+            let itemIndex = index + 1;
+            let allLength = components.length;
+            let percentage = (itemIndex / allLength);
+            let msg = `${itemIndex}/${allLength} built modules`;
+
+            this.emit("done", {percentage, msg});
+
           });
-
-          let itemIndex = index + 1;
-          let allLength = components.length;
-          let percentage = (itemIndex / allLength);
-          let msg = `${itemIndex}/${allLength} - template built`;
-
-          this.emit("done", {percentage, msg});
-
-        });
+          this.emit("end", {files: components.length});
+        }
+      } catch (e) {
+        this.emit("error", {message: e.message});
       }
+
     });
 
     cb();

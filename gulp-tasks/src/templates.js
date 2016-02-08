@@ -10,6 +10,10 @@ var _baseTask = require("../base-task");
 
 var _baseTask2 = _interopRequireDefault(_baseTask);
 
+var _map = require("lodash/map");
+
+var _map2 = _interopRequireDefault(_map);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -35,39 +39,32 @@ var _class = function (_Base) {
       var resources = this.resources.getArray("templates");
       var builder = this.sintez.getBuilder("marmarosh-templates", resources);
       var appBuilder = builder.getApplicationBuilder();
-
-      var multi = this.multimeter;
-      var bar = {};
-      resources.forEach(function (res, i) {
-        var key = res.getKey();
-        bar[key] = multi.rel(0, i + 1, {
-          width: 8,
-          solid: { background: null, foreground: 'white', text: '|' },
-          empty: { background: null, foreground: null, text: ' ' }
-        });
-        multi.charm.write("\n");
+      var resourceKeys = (0, _map2.default)(resources, function (res) {
+        return res.getKey();
       });
 
-      appBuilder.remove("build.end").remove("build.error").remove("build.error").on("build.end", function (_ref) {
+      appBuilder.remove("build.end").remove("build.error").remove("build.waiting").on("build.end", function (_ref) {
         var key = _ref.key;
+        var files = _ref.files;
+
+        appBuilder.remove("build.waiting");
+        var message = "%" + key + "% was packed. Number of templates " + files + ".";
+        _this2.logger.log(message);
       }).on("build.waiting", function (_ref2) {
         var key = _ref2.key;
         var percentage = _ref2.percentage;
         var msg = _ref2.msg;
 
-        bar[key].percent(Math.round(percentage * 100), "Building " + key + " - " + msg);
+        _this2.logger.logProcess("Packing - %" + key + "% " + msg);
       }).on("build.error", function (_ref3) {
         var key = _ref3.key;
-        var errors = _ref3.errors;
-        var extendedFormat = _ref3.extendedFormat;
+        var message = _ref3.message;
 
         appBuilder.remove("build.waiting");
-        var message = _this2.getErrorMessage({ key: key, errors: errors, extendedFormat: extendedFormat });
         _this2.logger.error(message);
       });
 
       builder.run(function (err) {
-        !_this2.multimeterOff && _this2.multimeterEnd();
         done(err);
       });
     }

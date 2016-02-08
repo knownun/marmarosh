@@ -1,7 +1,7 @@
 import Log from './gulp-logger';
 import isFunction from 'lodash/isFunction';
 
-var logger = new Log('tasks');
+var logger = new Log("tasks");
 
 var local = {
   gulp: Symbol('gulp')

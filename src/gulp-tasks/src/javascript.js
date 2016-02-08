@@ -2,14 +2,11 @@ import path from 'path';
 import util from 'gulp-util';
 
 import forOwn from "lodash/forOwn";
+import map from "lodash/map";
 
 import Base from '../base-task';
 
 export default class extends Base {
-
-  constructor(gulp, sintez) {
-    super(gulp, sintez);
-  }
 
   get name() {
     return 'scripts';
@@ -17,31 +14,20 @@ export default class extends Base {
 
   run(done) {
 
-    let scripts = this.resources.getArray("scripts");
-    let builder = this.sintez.getBuilder("webpack", scripts);
+    let resources = this.resources.getArray("scripts");
+    let builder = this.sintez.getBuilder("webpack", resources);
     let appBuilder = builder.getApplicationBuilder();
-
-    let multi = this.multimeter;
-    let bar = {};
-    scripts.forEach((res, i)=> {
-      let key = res.getKey();
-      bar[key] = multi.rel(0, i + 1, {
-        width: 8,
-        solid: {background: null, foreground: 'white', text: '|'},
-        empty: {background: null, foreground: null, text: ' '}
-      });
-      multi.charm.write("\n");
-    });
+    let resourceKeys = map(resources, (res) => res.getKey());
 
     appBuilder
       .remove('build.end')
+      .remove('build.error')
+      .remove('build.waiting')
       .on('build.end', (params) => {
-        appBuilder.remove("build.waiting");
-
-        let message = `#${params.counter} scripts was packed. Elapsed time ${params.time}s. Number of scripts ${params.scripts.length}`;
+        let message = `#${params.counter} %${params.key}% was packed. Elapsed time %${params.time}s%. Number of files %${params.scripts.length}%`;
         let warnings = params.warnings;
 
-        bar[params.key].percent(100, message);
+        this.logger.log(message);
 
         if (warnings && !!warnings.length) {
           this.logger.log('------------------');
@@ -53,19 +39,17 @@ export default class extends Base {
           }
           this.logger.log('------------------');
         }
+
       })
-      .remove('build.error')
-      .on('build.error', ({key,errors,extendedFormat}) => {
-        appBuilder.remove("build.waiting");
+      .on('build.error', ({key, errors, extendedFormat}) => {
         let message = this.getErrorMessage({key, errors, extendedFormat});
         this.logger.error(message);
-      }).remove('build.waiting')
-      .on('build.waiting', ({key, percentage, msg}) => {
-        bar[key].percent(Math.round(percentage * 100), `Building ${key} - ${msg}`);
+      })
+      .on('build.waiting', ({key, msg}) => {
+        this.logger.logProcess(`Packing %${key}% - ${msg}`, 1000);
       });
 
     builder.run((err)=> {
-      !this.multimeterOff && this.multimeterEnd();
       done(err);
     });
   }

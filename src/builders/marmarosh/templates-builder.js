@@ -42,6 +42,12 @@ export default class TemplatesBuilder extends BaseBuilder {
       events: {
         done: ({percentage, msg})=> {
           this.emit("build.waiting", {key: resource.getKey(), percentage, msg});
+        },
+        end: ({files})=> {
+          this.emit("build.end", {key: resource.getKey(), files});
+        },
+        error: ({message})=> {
+          this.emit("build.error", {key: resource.getKey(), message});
         }
       }
     };

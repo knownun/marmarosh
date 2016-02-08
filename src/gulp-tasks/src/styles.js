@@ -7,6 +7,7 @@ import async from 'async';
 import forOwn from "lodash/forOwn";
 import flatten from 'lodash/flattenDeep';
 import uniq from 'lodash/uniq';
+import map from "lodash/map";
 
 import Base from '../base-task';
 
@@ -18,20 +19,18 @@ export default class extends Base {
 
   run(done) {
 
-    let styles = this.resources.getArray("styles");
-    let builder = this.sintez.getBuilder("webpack", styles);
+    let resources = this.resources.getArray("styles");
+    let builder = this.sintez.getBuilder("webpack", resources);
     let appBuilder = builder.getApplicationBuilder();
 
-    this.initMultimeterBars(styles);
-
     appBuilder
+      .remove('build.error')
       .remove('build.end')
       .on('build.end', (params) => {
-        appBuilder.remove("build.waiting");
-        let message = `#${params.counter} ${params.chunks.join(" & ")} was packed. Elapsed time ${params.time}s. Number of files ${params.scripts.length}`;
+        let message = `#${params.counter} %${params.key}% was packed. Elapsed time %${params.time}s%. Number of files %${params.scripts.length}%`;
         let warnings = params.warnings;
 
-        this.updateBar(params.key, 100, message);
+        this.logger.log(message);
 
         if (warnings && !!warnings.length) {
           this.logger.log('------------------');
@@ -44,23 +43,15 @@ export default class extends Base {
           this.logger.log('------------------');
         }
       })
-      .remove('build.error')
       .on('build.error', ({key, errors, extendedFormat}) => {
-        appBuilder.remove("build.waiting");
         let message = this.getErrorMessage({key, errors, extendedFormat});
         this.logger.error(message);
-      })
-      .remove('build.waiting')
-      .on('build.waiting', ({key, percentage, msg}) => {
-        this.updateBar(key, Math.round(percentage * 100), `Building ${key} - ${msg}`);
       });
 
     builder.run((err)=> {
       if (err) throw new Error("Error in style task");
 
-      !this.multimeterOff && this.multimeterEnd();
-
-      let filesToDelete = uniq(flatten(styles.map((res)=> {
+      let filesToDelete = uniq(flatten(resources.map((res)=> {
         return glob.sync(path.resolve(res.getTarget(), "**.?(js|js.map)"))
       })));
 

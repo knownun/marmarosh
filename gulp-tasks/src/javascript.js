@@ -18,6 +18,10 @@ var _forOwn = require('lodash/forOwn');
 
 var _forOwn2 = _interopRequireDefault(_forOwn);
 
+var _map = require('lodash/map');
+
+var _map2 = _interopRequireDefault(_map);
+
 var _baseTask = require('../base-task');
 
 var _baseTask2 = _interopRequireDefault(_baseTask);
@@ -33,10 +37,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var _class = function (_Base) {
   _inherits(_class, _Base);
 
-  function _class(gulp, sintez) {
+  function _class() {
     _classCallCheck(this, _class);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this, gulp, sintez));
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(_class).apply(this, arguments));
   }
 
   _createClass(_class, [{
@@ -44,29 +48,18 @@ var _class = function (_Base) {
     value: function run(done) {
       var _this2 = this;
 
-      var scripts = this.resources.getArray("scripts");
-      var builder = this.sintez.getBuilder("webpack", scripts);
+      var resources = this.resources.getArray("scripts");
+      var builder = this.sintez.getBuilder("webpack", resources);
       var appBuilder = builder.getApplicationBuilder();
-
-      var multi = this.multimeter;
-      var bar = {};
-      scripts.forEach(function (res, i) {
-        var key = res.getKey();
-        bar[key] = multi.rel(0, i + 1, {
-          width: 8,
-          solid: { background: null, foreground: 'white', text: '|' },
-          empty: { background: null, foreground: null, text: ' ' }
-        });
-        multi.charm.write("\n");
+      var resourceKeys = (0, _map2.default)(resources, function (res) {
+        return res.getKey();
       });
 
-      appBuilder.remove('build.end').on('build.end', function (params) {
-        appBuilder.remove("build.waiting");
-
-        var message = '#' + params.counter + ' scripts was packed. Elapsed time ' + params.time + 's. Number of scripts ' + params.scripts.length;
+      appBuilder.remove('build.end').remove('build.error').remove('build.waiting').on('build.end', function (params) {
+        var message = '#' + params.counter + ' %' + params.key + '% was packed. Elapsed time %' + params.time + 's%. Number of files %' + params.scripts.length + '%';
         var warnings = params.warnings;
 
-        bar[params.key].percent(100, message);
+        _this2.logger.log(message);
 
         if (warnings && !!warnings.length) {
           _this2.logger.log('------------------');
@@ -100,24 +93,21 @@ var _class = function (_Base) {
 
           _this2.logger.log('------------------');
         }
-      }).remove('build.error').on('build.error', function (_ref) {
+      }).on('build.error', function (_ref) {
         var key = _ref.key;
         var errors = _ref.errors;
         var extendedFormat = _ref.extendedFormat;
 
-        appBuilder.remove("build.waiting");
         var message = _this2.getErrorMessage({ key: key, errors: errors, extendedFormat: extendedFormat });
         _this2.logger.error(message);
-      }).remove('build.waiting').on('build.waiting', function (_ref2) {
+      }).on('build.waiting', function (_ref2) {
         var key = _ref2.key;
-        var percentage = _ref2.percentage;
         var msg = _ref2.msg;
 
-        bar[key].percent(Math.round(percentage * 100), 'Building ' + key + ' - ' + msg);
+        _this2.logger.logProcess('Packing %' + key + '% - ' + msg, 1000);
       });
 
       builder.run(function (err) {
-        !_this2.multimeterOff && _this2.multimeterEnd();
         done(err);
       });
     }

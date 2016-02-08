@@ -226,6 +226,7 @@ var WebpackBuilder = function (_BaseBuilder) {
           }
         }
 
+        console.dir(splitConfig, { colors: 1 });
         var splitPlugin = new _webpackSplitPlugin2.default(splitConfig);
         config.plugins.push(splitPlugin);
       }

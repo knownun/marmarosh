@@ -83,6 +83,16 @@ var TemplatesBuilder = function (_BaseBuilder) {
             var msg = _ref.msg;
 
             _this3.emit("build.waiting", { key: resource.getKey(), percentage: percentage, msg: msg });
+          },
+          end: function end(_ref2) {
+            var files = _ref2.files;
+
+            _this3.emit("build.end", { key: resource.getKey(), files: files });
+          },
+          error: function error(_ref3) {
+            var message = _ref3.message;
+
+            _this3.emit("build.error", { key: resource.getKey(), message: message });
           }
         }
       };

@@ -21,13 +21,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var _class = function (_Base) {
   _inherits(_class, _Base);
 
-  function _class(gulp, sintez) {
+  function _class() {
     _classCallCheck(this, _class);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this, gulp, sintez));
-
-    _this.disable = _this.sintez.isProduction;
-    return _this;
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(_class).apply(this, arguments));
   }
 
   _createClass(_class, [{
@@ -35,7 +32,7 @@ var _class = function (_Base) {
     value: function run(done) {
       var _this2 = this;
 
-      if (this.disable) {
+      if (this.sintez.isProduction) {
         return this.logger.error("task is available only on Development environment");
       }
 
