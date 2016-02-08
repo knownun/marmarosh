@@ -26,7 +26,7 @@ export default class extends Base {
     this.clean.run((err)=> {
       if (err) throw new Error("Error in clean task");
 
-      async.waterfall([
+      async.series([
         this.templates.run.bind(this),
         this.styles.run.bind(this),
         this.scipts.run.bind(this)

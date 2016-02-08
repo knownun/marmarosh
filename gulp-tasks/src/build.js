@@ -69,7 +69,7 @@ var _class = function (_Base) {
       this.clean.run(function (err) {
         if (err) throw new Error("Error in clean task");
 
-        _async2.default.waterfall([_this2.templates.run.bind(_this2), _this2.styles.run.bind(_this2), _this2.scipts.run.bind(_this2)], function (err) {
+        _async2.default.series([_this2.templates.run.bind(_this2), _this2.styles.run.bind(_this2), _this2.scipts.run.bind(_this2)], function (err) {
           done(err);
         });
       });
