@@ -1,10 +1,10 @@
-import path from 'path'
+import {resolve} from "./utils/helpers"
 
-import Tasks from './gulp-tasks'
-import Sintez from './components/marmarosh'
+import Tasks from "./gulp-tasks"
+import Sintez from "./components/marmarosh"
 
 export function init(gulp) {
-  var configPath = path.resolve("config.yml");
+  var configPath = resolve("config.yml");
   var sintez = Sintez.fromPath(configPath);
   Tasks(gulp, sintez);
 }

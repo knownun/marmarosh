@@ -1,12 +1,12 @@
 import { resolve as joinUrl } from "url";
-
-import { join } from "path";
 import { sync as globSync } from "glob";
 
 import isArray from "lodash/isArray";
 import uniq from "lodash/uniq";
 
 import BaseResource from "./base-resource";
+import { join } from "../utils/helpers";
+
 
 export default class LessResource extends BaseResource {
 

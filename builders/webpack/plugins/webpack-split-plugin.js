@@ -1,10 +1,10 @@
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _isArray = require('lodash/isArray');
 
@@ -42,8 +42,8 @@ var SplitByPathPlugin = function () {
 
         this.buckets.push({
           name: bucket.name,
-          path: paths.map(function (path) {
-            return new RegExp(path.replace(/\//g, _helpers.sep));
+          path: paths.map(function (p) {
+            return new RegExp(p.replace(/\//g, _helpers.sep));
           })
         });
       }
@@ -71,8 +71,8 @@ var SplitByPathPlugin = function () {
       var match = function match(chunk) {
         var match = null;
         _this.buckets.some(function (bucket) {
-          return bucket.path.some(function (path) {
-            if (path.test(chunk.userRequest)) {
+          return bucket.filePath.some(function (path) {
+            if (filePath.test(chunk.userRequest)) {
               match = bucket;
               return true;
             }

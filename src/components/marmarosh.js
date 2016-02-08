@@ -1,6 +1,5 @@
 import { platform } from "process"
 import { readFileSync, existsSync } from "fs";
-import { resolve, join, dirname } from "path";
 import { load as JSONfromYml } from "js-yaml";
 
 
@@ -14,6 +13,8 @@ import cloneDeep from "lodash/cloneDeep";
 
 import Resources from "./resoruces";
 import Builder from "./builder";
+
+import { resolve, join, dirname } from "../utils/helpers";
 
 let local = {
   config: Symbol("config"),

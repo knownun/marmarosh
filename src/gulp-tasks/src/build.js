@@ -1,19 +1,18 @@
-import path from 'path';
-import util from 'gulp-util';
+import util from "gulp-util";
 
-import lo from 'lodash';
+import lo from "lodash";
 import async from "async";
 
-import Base from '../base-task';
-import Styles from './styles';
-import Scipts from './javascript';
-import Templates from './templates';
-import Clean from './clean';
+import Base from "../base-task";
+import Styles from "./styles";
+import Scipts from "./javascript";
+import Templates from "./templates";
+import Clean from "./clean";
 
 export default class extends Base {
 
   get name() {
-    return 'build';
+    return "build";
   }
 
   run(done) {

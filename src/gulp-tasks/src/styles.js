@@ -1,20 +1,21 @@
-import path from 'path';
-import util from 'gulp-util';
-import rimraf from 'rimraf';
-import glob from 'glob';
-import async from 'async';
+import util from "gulp-util";
+import rimraf from "rimraf";
+import glob from "glob";
+import async from "async";
 
 import forOwn from "lodash/forOwn";
-import flatten from 'lodash/flattenDeep';
-import uniq from 'lodash/uniq';
+import flatten from "lodash/flattenDeep";
+import uniq from "lodash/uniq";
 import map from "lodash/map";
 
-import Base from '../base-task';
+import Base from "../base-task";
+
+import {resolve} from "../../utils/helpers";
 
 export default class extends Base {
 
   get name() {
-    return 'styles';
+    return "styles";
   }
 
   run(done) {
@@ -24,26 +25,26 @@ export default class extends Base {
     let appBuilder = builder.getApplicationBuilder();
 
     appBuilder
-      .remove('build.error')
-      .remove('build.end')
-      .on('build.end', (params) => {
+      .remove("build.error")
+      .remove("build.end")
+      .on("build.end", (params) => {
         let message = `#${params.counter} %${params.key}% was packed. Elapsed time %${params.time}s%. Number of files %${params.scripts.length}%`;
         let warnings = params.warnings;
 
         this.logger.log(message);
 
         if (warnings && !!warnings.length) {
-          this.logger.log('------------------');
-          this.logger.log('*** %WARNINGS% ***');
+          this.logger.log("------------------");
+          this.logger.log("*** %WARNINGS% ***");
           for (var warning of warnings) {
             this.logger.log(`at %${warning.module.issuer}%`);
             this.logger.log(`requested %"${warning.module.rawRequest}"% ("${warning.module.userRequest}")`);
-            this.logger.log(warning.message.replace(/(\r\n|\n|\r)/gm, ' '));
+            this.logger.log(warning.message.replace(/(\r\n|\n|\r)/gm, " "));
           }
-          this.logger.log('------------------');
+          this.logger.log("------------------");
         }
       })
-      .on('build.error', ({key, errors, extendedFormat}) => {
+      .on("build.error", ({key, errors, extendedFormat}) => {
         let message = this.getErrorMessage({key, errors, extendedFormat});
         this.logger.error(message);
       });
@@ -52,7 +53,7 @@ export default class extends Base {
       if (err) throw new Error("Error in style task");
 
       let filesToDelete = uniq(flatten(resources.map((res)=> {
-        return glob.sync(path.resolve(res.getTarget(), "**.?(js|js.map)"))
+        return glob.sync(resolve(res.getTarget(), "**.?(js|js.map)"))
       })));
 
       async.waterfall(filesToDelete.map((file) => {

@@ -1,12 +1,10 @@
 "use strict";
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _path = require("path");
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _cloneDeep = require("lodash/cloneDeep");
 
@@ -19,8 +17,6 @@ var _startsWith2 = _interopRequireDefault(_startsWith);
 var _each = require("lodash/each");
 
 var _each2 = _interopRequireDefault(_each);
-
-var _helpers = require("../utils/helpers");
 
 var _baseResource = require("../resources/base-resource");
 
@@ -37,6 +33,8 @@ var _lessResource2 = _interopRequireDefault(_lessResource);
 var _templatesResources = require("../resources/templates-resources");
 
 var _templatesResources2 = _interopRequireDefault(_templatesResources);
+
+var _helpers = require("../utils/helpers");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

@@ -1,12 +1,10 @@
 "use strict";
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _path = require("path");
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _url = require("url");
 
@@ -39,6 +37,8 @@ var _uniq2 = _interopRequireDefault(_uniq);
 var _concat = require("lodash/concat");
 
 var _concat2 = _interopRequireDefault(_concat);
+
+var _helpers = require("../utils/helpers");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -93,15 +93,15 @@ var Resource = function () {
         }
       }
 
-      normalized.destDirName = (0, _path.dirname)(normalized.dest);
-      normalized.destName = (0, _path.basename)(normalized.dest) || !normalized.originalSourceIsArray ? (0, _path.basename)(config.src) : null;
+      normalized.destDirName = (0, _helpers.dirname)(normalized.dest);
+      normalized.destName = (0, _helpers.basename)(normalized.dest) || !normalized.originalSourceIsArray ? (0, _helpers.basename)(config.src) : null;
 
       normalized.names = normalized.src.map(function (path) {
-        return (0, _path.basename)(path);
+        return (0, _helpers.basename)(path);
       });
 
       var locations = normalized.src.map(function (path) {
-        return (0, _path.dirname)(path);
+        return (0, _helpers.dirname)(path);
       });
       normalized.locations = (0, _uniq2.default)(locations);
 
@@ -187,10 +187,10 @@ var Resource = function () {
 
           if ((0, _isArray2.default)(normalized.mask)) {
             mask = normalized.mask.map(function (path) {
-              return (0, _path.join)(src, path);
+              return (0, _helpers.join)(src, path);
             });
           } else {
-            mask = (0, _path.join)(src, normalized.mask);
+            mask = (0, _helpers.join)(src, normalized.mask);
           }
         })();
       } else {
@@ -222,10 +222,10 @@ var Resource = function () {
 
       if ((0, _isArray2.default)(relativeSrc)) {
         resourceSrc = relativeSrc.map(function (path) {
-          return (0, _path.join)(src, path);
+          return (0, _helpers.join)(src, path);
         });
       } else {
-        resourceSrc = (0, _path.join)(src, relativeSrc);
+        resourceSrc = (0, _helpers.join)(src, relativeSrc);
       }
 
       return Resource.collectScripts(resourceSrc, this[local.key]);
@@ -240,7 +240,7 @@ var Resource = function () {
     value: function getDest() {
       var relativeDest = this.getRelativeDest();
       var dest = this[local.dest];
-      return (0, _path.join)(dest, relativeDest);
+      return (0, _helpers.join)(dest, relativeDest);
     }
   }, {
     key: "getRelativeLocation",
@@ -265,10 +265,10 @@ var Resource = function () {
       var location = null;
       if ((0, _isArray2.default)(relativeLocation)) {
         location = relativeLocation.map(function (path) {
-          return (0, _path.join)(src, path);
+          return (0, _helpers.join)(src, path);
         });
       } else {
-        location = (0, _path.join)(src, relativeLocation);
+        location = (0, _helpers.join)(src, relativeLocation);
       }
 
       return location;
@@ -284,7 +284,7 @@ var Resource = function () {
       var relativeTarget = this.getRelativeTarget();
       var dest = this[local.dest];
 
-      return (0, _path.join)(dest, relativeTarget);
+      return (0, _helpers.join)(dest, relativeTarget);
     }
   }, {
     key: "getOptions",
@@ -318,7 +318,7 @@ var Resource = function () {
             for (var _iterator = src[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
               var resourcePath = _step.value;
 
-              var resourceUrl = (0, _url.resolve)("/", target, (0, _path.basename)(resourcePath));
+              var resourceUrl = (0, _url.resolve)("/", target, (0, _helpers.basename)(resourcePath));
               url.push(resourceUrl);
             }
           } catch (err) {
@@ -336,7 +336,7 @@ var Resource = function () {
             }
           }
         } else {
-          url = (0, _url.resolve)("/", target, (0, _path.basename)(src));
+          url = (0, _url.resolve)("/", target, (0, _helpers.basename)(src));
         }
       } else {
         url = (0, _url.resolve)("/", target, destName);

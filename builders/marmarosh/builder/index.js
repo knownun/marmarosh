@@ -1,20 +1,19 @@
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 //import DevComponentClass from "./components/development_component"
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _fs = require("fs");
 
 var _fs2 = _interopRequireDefault(_fs);
 
-var _path = require("path");
-
-var _path2 = _interopRequireDefault(_path);
+var _helpers = require("../../../utils/helpers");
 
 var _mkdirp = require("mkdirp");
 
@@ -144,9 +143,9 @@ var Builder = function () {
   }, {
     key: "createFile",
     value: function createFile(dir, fileName, data) {
-      var folder = _path2.default.join(dir, _path2.default.dirname(fileName));
+      var folder = (0, _helpers.join)(dir, (0, _helpers.dirname)(fileName));
       _mkdirp2.default.sync(folder);
-      _fs2.default.writeFileSync(_path2.default.join(dir, fileName), data, "utf8");
+      _fs2.default.writeFileSync((0, _helpers.join)(dir, fileName), data, "utf8");
       return true;
     }
   }, {
@@ -253,7 +252,7 @@ var Builder = function () {
             var output = config.dest;
             if (components) {
               components.forEach(function (filePath, index) {
-                var instance = new Constructor(_path2.default.normalize(filePath), {
+                var instance = new Constructor((0, _helpers.normalize)(filePath), {
                   builder: {
                     serverReplace: config.serverReplace
                   }
@@ -266,7 +265,7 @@ var Builder = function () {
                   if ((0, _startsWith2.default)(theme, '?')) {
                     var name = theme.substr(1);
                     if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
-                      var themeInstance = new Constructor(_path2.default.normalize(filePath), {
+                      var themeInstance = new Constructor((0, _helpers.normalize)(filePath), {
                         route: {
                           theme: name
                         },

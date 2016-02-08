@@ -21,7 +21,7 @@ import merge from "lodash/merge"
 import union from "lodash/union"
 import pick from "lodash/pick"
 
-import path from "path"
+import {resolve, join, dirname, basename} from "../../../../utils/helpers"
 
 let local = {
   src: Symbol("src"),
@@ -126,13 +126,13 @@ export default class Base {
   }
 
   get hasIndexJS() {
-    let filePath = path.resolve(path.join(this.getSrc(), "index.js"));
-    let jsxFilePath = path.resolve(path.join(this.getSrc(), "index.jsx"));
+    let filePath = resolve(join(this.getSrc(), "index.js"));
+    let jsxFilePath = resolve(join(this.getSrc(), "index.jsx"));
     return fs.existsSync(filePath) || fs.existsSync(jsxFilePath);
   }
 
   getTemplatePathForTheme(theme) {
-    let mask = path.resolve(path.join(this.getSrc(), "**", theme + ".jade"));
+    let mask = resolve(join(this.getSrc(), "**", theme + ".jade"));
     let files = globSync(mask);
     return (files.length) ? files[0] : null;
   }
@@ -142,7 +142,7 @@ export default class Base {
   }
 
   getConfigPathForTheme(theme) {
-    let mask = path.resolve(path.join(this.getSrc(), "**", theme + ".yml"));
+    let mask = resolve(join(this.getSrc(), "**", theme + ".yml"));
     let files = globSync(mask);
     return (files.length) ? files[0] : null;
   }
@@ -366,13 +366,13 @@ export default class Base {
     let out = null;
     let theme = getter(overrideObj, "route.theme");
     if (isString(url)) {
-      let configPath = path.resolve(url);
-      let src = path.dirname(url);
-      let type = path.basename(path.dirname(src));
-      let name = path.basename(src);
+      let configPath = resolve(url);
+      let src = dirname(url);
+      let type = basename(dirname(src));
+      let name = basename(src);
 
       if (theme) {
-        let theme_mask = path.resolve(path.join(src, "**", theme + ".yml"));
+        let theme_mask = resolve(join(src, "**", theme + ".yml"));
         let theme_files = globSync(theme_mask);
         configPath = (theme_files.length) ? theme_files[0] : configPath;
       }

@@ -1,4 +1,3 @@
-import { join, basename, dirname } from "path";
 import { resolve as resolveUrl } from "url";
 import { sync as globSync } from "glob";
 
@@ -9,6 +8,8 @@ import isArray from "lodash/isArray";
 import isString from "lodash/isString";
 import uniq from "lodash/uniq";
 import concat from "lodash/concat";
+
+import { join, basename, dirname } from "../utils/helpers";
 
 let local = {
   src: Symbol("src"),

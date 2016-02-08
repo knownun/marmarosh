@@ -1,8 +1,8 @@
-import assign from 'lodash/assign';
+import assign from "lodash/assign";
 
-import { resolve } from 'path';
+import { resolve } from "../../../utils/helpers";
 
-import BaseConverter from '../base-converter';
+import BaseConverter from "../base-converter";
 
 export default class OutputCoverter extends BaseConverter {
   getConfig(customOutputConfig) {

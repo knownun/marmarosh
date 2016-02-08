@@ -1,30 +1,28 @@
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _fs = require('fs');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _fs = require("fs");
 
 var _fs2 = _interopRequireDefault(_fs);
 
-var _jsYaml = require('js-yaml');
+var _jsYaml = require("js-yaml");
 
 var _jsYaml2 = _interopRequireDefault(_jsYaml);
 
-var _lodash = require('lodash');
+var _lodash = require("lodash");
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _path = require('path');
+var _helpers = require("../../../../utils/helpers");
 
-var _path2 = _interopRequireDefault(_path);
-
-var _base_component = require('./base_component');
+var _base_component = require("./base_component");
 
 var _base_component2 = _interopRequireDefault(_base_component);
 
@@ -46,139 +44,139 @@ var ProdComponent = function (_Base) {
   }
 
   _createClass(ProdComponent, [{
-    key: 'include',
+    key: "include",
     value: function include(componentPath, widgetName) {
-      var typeName = _path2.default.basename(componentPath);
+      var typeName = (0, _helpers.basename)(componentPath);
       var name = widgetName || typeName;
       this.widgets = this.widgets || {};
       this.widgets[name] = {
-        'default': typeName
+        "default": typeName
       };
       var template = this.getConfig("builder.serverReplace.include");
-      var placeholder = _lodash2.default.get(this.getServerConfig(), 'widgets.' + name);
-      return (placeholder || (_lodash2.default.isString(template) ? template.replace('${name}', name) : '@Widget("' + name + '")')) + '\n';
+      var placeholder = _lodash2.default.get(this.getServerConfig(), "widgets." + name);
+      return (placeholder || (_lodash2.default.isString(template) ? template.replace("${name}", name) : "@Widget(\"" + name + "\")")) + "\n";
     }
   }, {
-    key: 'includeBody',
+    key: "includeBody",
     value: function includeBody() {
       var template = this.getConfig("builder.serverReplace.includeBody");
-      return (_lodash2.default.isString(template) ? template : '@Body()') + '\n';
+      return (_lodash2.default.isString(template) ? template : "@Body()") + "\n";
     }
   }, {
-    key: 'getString',
+    key: "getString",
     value: function getString(name) {
-      var placeholder = _lodash2.default.get(this.getServerConfig(), 'strings.' + name);
+      var placeholder = _lodash2.default.get(this.getServerConfig(), "strings." + name);
       var template = this.getConfig("builder.serverReplace.getString");
-      return placeholder || _lodash2.default.isString(template) ? template.replace('${name}', name) : '@ViewBag.strings.' + name;
+      return placeholder || _lodash2.default.isString(template) ? template.replace("${name}", name) : "@ViewBag.strings." + name;
     }
   }, {
-    key: 'getLink',
+    key: "getLink",
     value: function getLink(name) {
-      var placeholder = _lodash2.default.get(this.getServerConfig(), 'links.' + name);
+      var placeholder = _lodash2.default.get(this.getServerConfig(), "links." + name);
       var template = this.getConfig("builder.serverReplace.getLink");
-      return placeholder || _lodash2.default.isString(template) ? template.replace('${name}', name) : '@ViewBag.urls.' + name;
+      return placeholder || _lodash2.default.isString(template) ? template.replace("${name}", name) : "@ViewBag.urls." + name;
     }
   }, {
-    key: 'getImageURL',
+    key: "getImageURL",
     value: function getImageURL(name) {
-      var placeholder = _lodash2.default.get(this.getServerConfig(), 'images.' + name);
+      var placeholder = _lodash2.default.get(this.getServerConfig(), "images." + name);
       var template = this.getConfig("builder.serverReplace.getImageURL");
-      return placeholder || _lodash2.default.isString(template) ? template.replace('${name}', name) : '@ViewBag.images.' + name;
+      return placeholder || _lodash2.default.isString(template) ? template.replace("${name}", name) : "@ViewBag.images." + name;
     }
   }, {
-    key: 'getOption',
+    key: "getOption",
     value: function getOption(name) {
-      var placeholder = _lodash2.default.get(this.getServerConfig(), 'template_options.' + name);
+      var placeholder = _lodash2.default.get(this.getServerConfig(), "template_options." + name);
       var template = this.getConfig("builder.serverReplace.getOption");
-      return placeholder || _lodash2.default.isString(template) ? template.replace('${name}', name) : '@ViewBag.template.' + name;
+      return placeholder || _lodash2.default.isString(template) ? template.replace("${name}", name) : "@ViewBag.template." + name;
     }
   }, {
-    key: 'includeMeta',
+    key: "includeMeta",
     value: function includeMeta() {
       var template = this.getConfig("builder.serverReplace.includeMeta");
-      return (_lodash2.default.isString(template) ? template : '@Meta()') + '\n';
+      return (_lodash2.default.isString(template) ? template : "@Meta()") + "\n";
     }
   }, {
-    key: 'getHtmlClass',
+    key: "getHtmlClass",
     value: function getHtmlClass() {
       var template = this.getConfig("builder.serverReplace.getHtmlClass");
-      return _lodash2.default.isString(template) ? template : '@getHtmlClass()';
+      return _lodash2.default.isString(template) ? template : "@getHtmlClass()";
     }
   }, {
-    key: 'includeCSS',
+    key: "includeCSS",
     value: function includeCSS() {
       var template = this.getConfig("builder.serverReplace.includeCSS");
-      return (_lodash2.default.isString(template) ? template : '@CssReferences()') + '\n';
+      return (_lodash2.default.isString(template) ? template : "@CssReferences()") + "\n";
     }
   }, {
-    key: 'includeJS',
+    key: "includeJS",
     value: function includeJS() {
       var template = this.getConfig("builder.serverReplace.includeJS");
-      return (_lodash2.default.isString(template) ? template : '@ScriptsReferences()') + '\n';
+      return (_lodash2.default.isString(template) ? template : "@ScriptsReferences()") + "\n";
     }
   }, {
-    key: 'includeJSOptions',
+    key: "includeJSOptions",
     value: function includeJSOptions() {
       var template = this.getConfig("builder.serverReplace.includeJSOptions");
-      return (_lodash2.default.isString(template) ? template : '@ServerConfigurations()') + '\n';
+      return (_lodash2.default.isString(template) ? template : "@ServerConfigurations()") + "\n";
     }
   }, {
-    key: 'IF',
+    key: "IF",
     value: function IF(left) {
-      var operand = arguments.length <= 1 || arguments[1] === undefined ? '!=' : arguments[1];
-      var right = arguments.length <= 2 || arguments[2] === undefined ? 'null' : arguments[2];
+      var operand = arguments.length <= 1 || arguments[1] === undefined ? "!=" : arguments[1];
+      var right = arguments.length <= 2 || arguments[2] === undefined ? "null" : arguments[2];
 
       var leftStr = parseSelector.bind(this)(left);
       var rightStr = parseSelector.bind(this)(right);
-      return '\n' + ('@if(' + leftStr + ' ' + operand + ' ' + rightStr + ')') + '{\n';
+      return "\n" + ("@if(" + leftStr + " " + operand + " " + rightStr + ")") + "{\n";
     }
   }, {
-    key: 'IF_NOT',
+    key: "IF_NOT",
     value: function IF_NOT(left) {
-      var operand = arguments.length <= 1 || arguments[1] === undefined ? '!=' : arguments[1];
-      var right = arguments.length <= 2 || arguments[2] === undefined ? 'null' : arguments[2];
+      var operand = arguments.length <= 1 || arguments[1] === undefined ? "!=" : arguments[1];
+      var right = arguments.length <= 2 || arguments[2] === undefined ? "null" : arguments[2];
 
       var leftStr = parseSelector.bind(this)(left);
       var rightStr = parseSelector.bind(this)(right);
-      return '\n' + ('@if(!(' + leftStr + ' ' + operand + ' ' + rightStr + '))') + '{\n';
+      return "\n" + ("@if(!(" + leftStr + " " + operand + " " + rightStr + "))") + "{\n";
     }
   }, {
-    key: 'ENDIF',
+    key: "ENDIF",
     value: function ENDIF() {
-      return '\n}\n';
+      return "\n}\n";
     }
   }, {
-    key: 'renderString',
+    key: "renderString",
     value: function renderString(prod, dev) {
-      return prod || '';
+      return prod || "";
     }
   }, {
-    key: 'initTemplateLocals',
+    key: "initTemplateLocals",
     value: function initTemplateLocals() {
-      _get(Object.getPrototypeOf(ProdComponent.prototype), 'initTemplateLocals', this).call(this);
+      _get(Object.getPrototypeOf(ProdComponent.prototype), "initTemplateLocals", this).call(this);
       this.setTemplateLocal("dev", false);
     }
   }, {
-    key: 'getServerConfig',
+    key: "getServerConfig",
     value: function getServerConfig() {
       var config = this.getConfig();
       return {
-        template_options: this.getPropsFrom(config.template_options, 'placeholder'),
-        layout_options: this.getPropsFrom(config.layout_options, 'placeholder'),
-        script_options: this.getPropsFrom(config.script_options, 'placeholder'),
-        widgets: this.getPropsFrom(config.widgets, 'placeholder'),
-        strings: this.getPropsFrom(config.strings, 'placeholder'),
-        images: this.getPropsFrom(config.images, 'placeholder'),
-        links: this.getPropsFrom(config.links, 'placeholder')
+        template_options: this.getPropsFrom(config.template_options, "placeholder"),
+        layout_options: this.getPropsFrom(config.layout_options, "placeholder"),
+        script_options: this.getPropsFrom(config.script_options, "placeholder"),
+        widgets: this.getPropsFrom(config.widgets, "placeholder"),
+        strings: this.getPropsFrom(config.strings, "placeholder"),
+        images: this.getPropsFrom(config.images, "placeholder"),
+        links: this.getPropsFrom(config.links, "placeholder")
       };
     }
   }, {
-    key: 'getPropsFrom',
+    key: "getPropsFrom",
     value: function getPropsFrom(input, propertyPath) {
       var output = {};
       if (_lodash2.default.isObject(input)) {
         _lodash2.default.forOwn(input, function (value, key) {
-          if (!_lodash2.default.startsWith(key, '$')) {
+          if (!_lodash2.default.startsWith(key, "$")) {
             output[key] = _lodash2.default.isObject(value) && propertyPath ? _lodash2.default.get(value, propertyPath) : value;
           }
         });
@@ -186,12 +184,12 @@ var ProdComponent = function (_Base) {
       return output;
     }
   }, {
-    key: 'readTemplate',
+    key: "readTemplate",
     value: function readTemplate(theme) {
       return this.readTemplateForTheme(theme, this.getName()) || null;
     }
   }, {
-    key: 'getTemplate',
+    key: "getTemplate",
     value: function getTemplate(theme) {
       var html = null;
       this.templateFn = this.readTemplate(theme);
@@ -201,15 +199,15 @@ var ProdComponent = function (_Base) {
       return html;
     }
   }, {
-    key: 'includeSet',
+    key: "includeSet",
     value: function includeSet(componentPath, models) {
-      var name = _path2.default.basename(componentPath);
+      var name = (0, _helpers.basename)(componentPath);
       this.widgets = this.widgets || {};
-      _lodash2.default.set(this.widgets, name, { 'default': name });
-      return '\n' + ('@RepeatWidget("' + name + '", ' + models + ')') + '\n';
+      _lodash2.default.set(this.widgets, name, { "default": name });
+      return "\n" + ("@RepeatWidget(\"" + name + "\", " + models + ")") + "\n";
     }
   }, {
-    key: 'itemIndex',
+    key: "itemIndex",
     value: function itemIndex() {
       return "@ViewBag.index";
     }
@@ -220,22 +218,23 @@ var ProdComponent = function (_Base) {
 
 exports.default = ProdComponent;
 
+
 function parseSelector(selector) {
-  var out = selector || 'null';
-  if (selector && selector.split && selector.split('.').length == 2) {
-    switch (selector.split('.')[0]) {
-      case 'strings':
-        out = this.getString(selector.split('.')[1]);
+  var out = selector || "null";
+  if (selector && selector.split && selector.split(".").length == 2) {
+    switch (selector.split(".")[0]) {
+      case "strings":
+        out = this.getString(selector.split(".")[1]);
         break;
-      case 'links':
-        out = this.getLink(selector.split('.')[1]);
+      case "links":
+        out = this.getLink(selector.split(".")[1]);
         break;
-      case 'images':
-        out = this.getImageURL(selector.split('.')[1]);
+      case "images":
+        out = this.getImageURL(selector.split(".")[1]);
         break;
-      case 'layout_options':
-      case 'template_options':
-        out = this.getOption(selector.split('.')[1]);
+      case "layout_options":
+      case "template_options":
+        out = this.getOption(selector.split(".")[1]);
         break;
     }
   }

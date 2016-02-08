@@ -1,11 +1,10 @@
-import isEmpty from 'lodash/isEmpty';
-import isObject from 'lodash/isObject';
-import isArray from 'lodash/isArray';
-import path from 'path';
+import isEmpty from "lodash/isEmpty";
+import isObject from "lodash/isObject";
+import isArray from "lodash/isArray";
 
-import BaseConverter from '../base-converter';
+import BaseConverter from "../base-converter";
 
-export default class ResolveCoverter extends BaseConverter {
+export default class extends BaseConverter {
 
   getConfig(alias, resolve, extensions) {
     var config = null;
@@ -24,14 +23,6 @@ export default class ResolveCoverter extends BaseConverter {
       config = config || {};
       config.extensions = [""].concat(extensions);
     }
-
-    //config.fallback = [
-    //  path.resolve("."), //project modules
-    //  path.resolve("./libs"), //project modules
-    //  path.resolve("./src"), //project modules
-    //  path.resolve("./node_modules"), //project modules
-    //  path.resolve(__dirname, "../../../../node_modules") // marmarosh modules
-    //];
 
     return config;
   }

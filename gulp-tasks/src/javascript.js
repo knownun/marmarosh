@@ -1,28 +1,24 @@
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _path = require('path');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _path2 = _interopRequireDefault(_path);
-
-var _gulpUtil = require('gulp-util');
+var _gulpUtil = require("gulp-util");
 
 var _gulpUtil2 = _interopRequireDefault(_gulpUtil);
 
-var _forOwn = require('lodash/forOwn');
+var _forOwn = require("lodash/forOwn");
 
 var _forOwn2 = _interopRequireDefault(_forOwn);
 
-var _map = require('lodash/map');
+var _map = require("lodash/map");
 
 var _map2 = _interopRequireDefault(_map);
 
-var _baseTask = require('../base-task');
+var _baseTask = require("../base-task");
 
 var _baseTask2 = _interopRequireDefault(_baseTask);
 
@@ -44,7 +40,7 @@ var _class = function (_Base) {
   }
 
   _createClass(_class, [{
-    key: 'run',
+    key: "run",
     value: function run(done) {
       var _this2 = this;
 
@@ -55,15 +51,15 @@ var _class = function (_Base) {
         return res.getKey();
       });
 
-      appBuilder.remove('build.end').remove('build.error').remove('build.waiting').on('build.end', function (params) {
-        var message = '#' + params.counter + ' %' + params.key + '% was packed. Elapsed time %' + params.time + 's%. Number of files %' + params.scripts.length + '%';
+      appBuilder.remove("build.end").remove("build.error").remove("build.waiting").on("build.end", function (params) {
+        var message = "#" + params.counter + " %" + params.key + "% was packed. Elapsed time %" + params.time + "s%. Number of files %" + params.scripts.length + "%";
         var warnings = params.warnings;
 
         _this2.logger.log(message);
 
         if (warnings && !!warnings.length) {
-          _this2.logger.log('------------------');
-          _this2.logger.log('*** %WARNINGS% ***');
+          _this2.logger.log("------------------");
+          _this2.logger.log("*** %WARNINGS% ***");
           var _iteratorNormalCompletion = true;
           var _didIteratorError = false;
           var _iteratorError = undefined;
@@ -72,9 +68,9 @@ var _class = function (_Base) {
             for (var _iterator = warnings[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
               var warning = _step.value;
 
-              _this2.logger.log('at %' + warning.module.issuer + '%');
-              _this2.logger.log('requested %"' + warning.module.rawRequest + '"% ("' + warning.module.userRequest + '")');
-              _this2.logger.log(warning.message.replace(/(\r\n|\n|\r)/gm, ' '));
+              _this2.logger.log("at %" + warning.module.issuer + "%");
+              _this2.logger.log("requested %\"" + warning.module.rawRequest + "\"% (\"" + warning.module.userRequest + "\")");
+              _this2.logger.log(warning.message.replace(/(\r\n|\n|\r)/gm, " "));
             }
           } catch (err) {
             _didIteratorError = true;
@@ -91,20 +87,20 @@ var _class = function (_Base) {
             }
           }
 
-          _this2.logger.log('------------------');
+          _this2.logger.log("------------------");
         }
-      }).on('build.error', function (_ref) {
+      }).on("build.error", function (_ref) {
         var key = _ref.key;
         var errors = _ref.errors;
         var extendedFormat = _ref.extendedFormat;
 
         var message = _this2.getErrorMessage({ key: key, errors: errors, extendedFormat: extendedFormat });
         _this2.logger.error(message);
-      }).on('build.waiting', function (_ref2) {
+      }).on("build.waiting", function (_ref2) {
         var key = _ref2.key;
         var msg = _ref2.msg;
 
-        _this2.logger.logProcess('Packing %' + key + '% - ' + msg, 1000);
+        _this2.logger.logProcess("Packing %" + key + "% - " + msg, 1000);
       });
 
       builder.run(function (err) {
@@ -112,9 +108,9 @@ var _class = function (_Base) {
       });
     }
   }, {
-    key: 'name',
+    key: "name",
     get: function get() {
-      return 'scripts';
+      return "scripts";
     }
   }]);
 

@@ -1,50 +1,48 @@
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _path = require('path');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _path2 = _interopRequireDefault(_path);
-
-var _gulpUtil = require('gulp-util');
+var _gulpUtil = require("gulp-util");
 
 var _gulpUtil2 = _interopRequireDefault(_gulpUtil);
 
-var _rimraf = require('rimraf');
+var _rimraf = require("rimraf");
 
 var _rimraf2 = _interopRequireDefault(_rimraf);
 
-var _glob = require('glob');
+var _glob = require("glob");
 
 var _glob2 = _interopRequireDefault(_glob);
 
-var _async = require('async');
+var _async = require("async");
 
 var _async2 = _interopRequireDefault(_async);
 
-var _forOwn = require('lodash/forOwn');
+var _forOwn = require("lodash/forOwn");
 
 var _forOwn2 = _interopRequireDefault(_forOwn);
 
-var _flattenDeep = require('lodash/flattenDeep');
+var _flattenDeep = require("lodash/flattenDeep");
 
 var _flattenDeep2 = _interopRequireDefault(_flattenDeep);
 
-var _uniq = require('lodash/uniq');
+var _uniq = require("lodash/uniq");
 
 var _uniq2 = _interopRequireDefault(_uniq);
 
-var _map = require('lodash/map');
+var _map = require("lodash/map");
 
 var _map2 = _interopRequireDefault(_map);
 
-var _baseTask = require('../base-task');
+var _baseTask = require("../base-task");
 
 var _baseTask2 = _interopRequireDefault(_baseTask);
+
+var _helpers = require("../../utils/helpers");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -64,7 +62,7 @@ var _class = function (_Base) {
   }
 
   _createClass(_class, [{
-    key: 'run',
+    key: "run",
     value: function run(done) {
       var _this2 = this;
 
@@ -72,15 +70,15 @@ var _class = function (_Base) {
       var builder = this.sintez.getBuilder("webpack", resources);
       var appBuilder = builder.getApplicationBuilder();
 
-      appBuilder.remove('build.error').remove('build.end').on('build.end', function (params) {
-        var message = '#' + params.counter + ' %' + params.key + '% was packed. Elapsed time %' + params.time + 's%. Number of files %' + params.scripts.length + '%';
+      appBuilder.remove("build.error").remove("build.end").on("build.end", function (params) {
+        var message = "#" + params.counter + " %" + params.key + "% was packed. Elapsed time %" + params.time + "s%. Number of files %" + params.scripts.length + "%";
         var warnings = params.warnings;
 
         _this2.logger.log(message);
 
         if (warnings && !!warnings.length) {
-          _this2.logger.log('------------------');
-          _this2.logger.log('*** %WARNINGS% ***');
+          _this2.logger.log("------------------");
+          _this2.logger.log("*** %WARNINGS% ***");
           var _iteratorNormalCompletion = true;
           var _didIteratorError = false;
           var _iteratorError = undefined;
@@ -89,9 +87,9 @@ var _class = function (_Base) {
             for (var _iterator = warnings[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
               var warning = _step.value;
 
-              _this2.logger.log('at %' + warning.module.issuer + '%');
-              _this2.logger.log('requested %"' + warning.module.rawRequest + '"% ("' + warning.module.userRequest + '")');
-              _this2.logger.log(warning.message.replace(/(\r\n|\n|\r)/gm, ' '));
+              _this2.logger.log("at %" + warning.module.issuer + "%");
+              _this2.logger.log("requested %\"" + warning.module.rawRequest + "\"% (\"" + warning.module.userRequest + "\")");
+              _this2.logger.log(warning.message.replace(/(\r\n|\n|\r)/gm, " "));
             }
           } catch (err) {
             _didIteratorError = true;
@@ -108,9 +106,9 @@ var _class = function (_Base) {
             }
           }
 
-          _this2.logger.log('------------------');
+          _this2.logger.log("------------------");
         }
-      }).on('build.error', function (_ref) {
+      }).on("build.error", function (_ref) {
         var key = _ref.key;
         var errors = _ref.errors;
         var extendedFormat = _ref.extendedFormat;
@@ -123,7 +121,7 @@ var _class = function (_Base) {
         if (err) throw new Error("Error in style task");
 
         var filesToDelete = (0, _uniq2.default)((0, _flattenDeep2.default)(resources.map(function (res) {
-          return _glob2.default.sync(_path2.default.resolve(res.getTarget(), "**.?(js|js.map)"));
+          return _glob2.default.sync((0, _helpers.resolve)(res.getTarget(), "**.?(js|js.map)"));
         })));
 
         _async2.default.waterfall(filesToDelete.map(function (file) {
@@ -134,9 +132,9 @@ var _class = function (_Base) {
       });
     }
   }, {
-    key: 'name',
+    key: "name",
     get: function get() {
-      return 'styles';
+      return "styles";
     }
   }]);
 

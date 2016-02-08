@@ -1,5 +1,5 @@
 import fs from "fs";
-import path from "path";
+import {join, normalize, dirname} from "../../../utils/helpers";
 import mkdirp from "mkdirp";
 import events from 'events';
 
@@ -89,9 +89,9 @@ export default class Builder {
   }
 
   createFile(dir, fileName, data) {
-    var folder = path.join(dir, path.dirname(fileName));
+    var folder = join(dir, dirname(fileName));
     mkdirp.sync(folder);
-    fs.writeFileSync(path.join(dir, fileName), data, "utf8");
+    fs.writeFileSync(join(dir, fileName), data, "utf8");
     return true;
   }
 
@@ -192,7 +192,7 @@ export default class Builder {
         let output = config.dest;
         if (components) {
           components.forEach((filePath, index) => {
-            let instance = new Constructor(path.normalize(filePath), {
+            let instance = new Constructor(normalize(filePath), {
               builder: {
                 serverReplace: config.serverReplace
               }
@@ -205,7 +205,7 @@ export default class Builder {
               if (startsWith(theme, '?')) {
                 var name = theme.substr(1);
                 if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
-                  var themeInstance = new Constructor(path.normalize(filePath), {
+                  var themeInstance = new Constructor(normalize(filePath), {
                     route: {
                       theme: name
                     },

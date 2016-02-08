@@ -1,4 +1,4 @@
-import { join } from "path";
+import { join } from "../utils/helpers";
 
 import WebpackBuilder from  "../builders/webpack/webpack-builder";
 import TemplatesBuilder from  "../builders/marmarosh/templates-builder";

@@ -1,9 +1,8 @@
 import isArray from "lodash/isArray";
 import isFunction from "lodash/isFunction";
 import merge from "lodash/merge";
-import {join,resolve} from "path"
 
-import { sep } from "../../../utils/helpers";
+import { sep ,join,resolve} from "../../../utils/helpers";
 
 import BaseConverter from "../base-converter";
 

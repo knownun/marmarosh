@@ -1,44 +1,40 @@
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _path = require('path');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _path2 = _interopRequireDefault(_path);
-
-var _gulpUtil = require('gulp-util');
+var _gulpUtil = require("gulp-util");
 
 var _gulpUtil2 = _interopRequireDefault(_gulpUtil);
 
-var _lodash = require('lodash');
+var _lodash = require("lodash");
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _async = require('async');
+var _async = require("async");
 
 var _async2 = _interopRequireDefault(_async);
 
-var _baseTask = require('../base-task');
+var _baseTask = require("../base-task");
 
 var _baseTask2 = _interopRequireDefault(_baseTask);
 
-var _styles = require('./styles');
+var _styles = require("./styles");
 
 var _styles2 = _interopRequireDefault(_styles);
 
-var _javascript = require('./javascript');
+var _javascript = require("./javascript");
 
 var _javascript2 = _interopRequireDefault(_javascript);
 
-var _templates = require('./templates');
+var _templates = require("./templates");
 
 var _templates2 = _interopRequireDefault(_templates);
 
-var _clean = require('./clean');
+var _clean = require("./clean");
 
 var _clean2 = _interopRequireDefault(_clean);
 
@@ -60,7 +56,7 @@ var _class = function (_Base) {
   }
 
   _createClass(_class, [{
-    key: 'run',
+    key: "run",
     value: function run(done) {
       var _this2 = this;
 
@@ -79,9 +75,9 @@ var _class = function (_Base) {
       });
     }
   }, {
-    key: 'name',
+    key: "name",
     get: function get() {
-      return 'build';
+      return "build";
     }
   }]);
 

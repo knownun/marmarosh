@@ -1,10 +1,10 @@
 "use strict";
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _fs = require("fs");
 
@@ -82,9 +82,7 @@ var _pick = require("lodash/pick");
 
 var _pick2 = _interopRequireDefault(_pick);
 
-var _path = require("path");
-
-var _path2 = _interopRequireDefault(_path);
+var _helpers = require("../../../../utils/helpers");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -203,7 +201,7 @@ var Base = function () {
   }, {
     key: "getTemplatePathForTheme",
     value: function getTemplatePathForTheme(theme) {
-      var mask = _path2.default.resolve(_path2.default.join(this.getSrc(), "**", theme + ".jade"));
+      var mask = (0, _helpers.resolve)((0, _helpers.join)(this.getSrc(), "**", theme + ".jade"));
       var files = (0, _glob.sync)(mask);
       return files.length ? files[0] : null;
     }
@@ -215,7 +213,7 @@ var Base = function () {
   }, {
     key: "getConfigPathForTheme",
     value: function getConfigPathForTheme(theme) {
-      var mask = _path2.default.resolve(_path2.default.join(this.getSrc(), "**", theme + ".yml"));
+      var mask = (0, _helpers.resolve)((0, _helpers.join)(this.getSrc(), "**", theme + ".yml"));
       var files = (0, _glob.sync)(mask);
       return files.length ? files[0] : null;
     }
@@ -465,13 +463,13 @@ var Base = function () {
       var out = null;
       var theme = (0, _get2.default)(overrideObj, "route.theme");
       if ((0, _isString2.default)(url)) {
-        var configPath = _path2.default.resolve(url);
-        var src = _path2.default.dirname(url);
-        var type = _path2.default.basename(_path2.default.dirname(src));
-        var name = _path2.default.basename(src);
+        var configPath = (0, _helpers.resolve)(url);
+        var src = (0, _helpers.dirname)(url);
+        var type = (0, _helpers.basename)((0, _helpers.dirname)(src));
+        var name = (0, _helpers.basename)(src);
 
         if (theme) {
-          var theme_mask = _path2.default.resolve(_path2.default.join(src, "**", theme + ".yml"));
+          var theme_mask = (0, _helpers.resolve)((0, _helpers.join)(src, "**", theme + ".yml"));
           var theme_files = (0, _glob.sync)(theme_mask);
           configPath = theme_files.length ? theme_files[0] : configPath;
         }
@@ -504,8 +502,8 @@ var Base = function () {
   }, {
     key: "hasIndexJS",
     get: function get() {
-      var filePath = _path2.default.resolve(_path2.default.join(this.getSrc(), "index.js"));
-      var jsxFilePath = _path2.default.resolve(_path2.default.join(this.getSrc(), "index.jsx"));
+      var filePath = (0, _helpers.resolve)((0, _helpers.join)(this.getSrc(), "index.js"));
+      var jsxFilePath = (0, _helpers.resolve)((0, _helpers.join)(this.getSrc(), "index.jsx"));
       return _fs2.default.existsSync(filePath) || _fs2.default.existsSync(jsxFilePath);
     }
   }, {

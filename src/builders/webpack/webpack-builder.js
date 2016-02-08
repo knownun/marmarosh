@@ -1,7 +1,6 @@
-import { join, resolve as res } from "path";
-
-import isArray from "lodash/isArray";
 import Webpack from "webpack";
+import isArray from "lodash/isArray";
+
 import WebpackLogPlugin from "./plugins/webpack-log-plugin";
 import WebpackSplitByPathPlugin from "./plugins/webpack-split-plugin";
 
@@ -19,6 +18,8 @@ import EntryConverter from "./converters/entry";
 
 import webpackScriptsPreset from "./presets/webpack-scripts";
 import webpackStylesPreset from "./presets/webpack-styles";
+
+import { join, resolve as res } from "../../utils/helpers";
 
 let webpackPresets = new Map;
 

@@ -1,14 +1,13 @@
-import { resolve, join } from "path";
 import cloneDeep from "lodash/cloneDeep";
 import startsWith from "lodash/startsWith";
 import each from "lodash/each";
-
-import { toUnifiedPath } from "../utils/helpers";
 
 import Resource from "../resources/base-resource";
 import JsResource from "../resources/js-resource";
 import LessResource from "../resources/less-resource";
 import TemplatesResource from "../resources/templates-resources";
+
+import { resolve, join } from "../utils/helpers";
 
 let local = {
   src: Symbol("src"),

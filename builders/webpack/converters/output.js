@@ -1,18 +1,18 @@
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _assign = require('lodash/assign');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _assign = require("lodash/assign");
 
 var _assign2 = _interopRequireDefault(_assign);
 
-var _path = require('path');
+var _helpers = require("../../../utils/helpers");
 
-var _baseConverter = require('../base-converter');
+var _baseConverter = require("../base-converter");
 
 var _baseConverter2 = _interopRequireDefault(_baseConverter);
 
@@ -34,10 +34,10 @@ var OutputCoverter = function (_BaseConverter) {
   }
 
   _createClass(OutputCoverter, [{
-    key: 'getConfig',
+    key: "getConfig",
     value: function getConfig(customOutputConfig) {
       return (0, _assign2.default)({
-        path: (0, _path.resolve)(this.dest),
+        path: (0, _helpers.resolve)(this.dest),
         filename: "[name].js",
         chunkFilename: "[name].js",
         pathinfo: true

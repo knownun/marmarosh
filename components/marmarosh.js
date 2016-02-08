@@ -1,16 +1,14 @@
 "use strict";
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _process = require("process");
 
 var _fs = require("fs");
-
-var _path = require("path");
 
 var _jsYaml = require("js-yaml");
 
@@ -49,6 +47,8 @@ var _resoruces2 = _interopRequireDefault(_resoruces);
 var _builder = require("./builder");
 
 var _builder2 = _interopRequireDefault(_builder);
+
+var _helpers = require("../utils/helpers");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -177,6 +177,7 @@ var Marmarosh = function () {
     value: function createServer(ServerConstructor) {
       var customOptions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
+
       var configOptions = {
         src: this.getSrc(),
         dest: this.getDest(),
@@ -196,6 +197,7 @@ var Marmarosh = function () {
     }
   }, {
     key: "get",
+
 
     // --------------------------------
 
@@ -234,8 +236,8 @@ var Marmarosh = function () {
       var normalized = normalizeConfig(config);
 
       if (normalized.extend) {
-        var currentDir = (0, _path.dirname)(configPath);
-        var parentConfigPath = (0, _path.join)(currentDir, normalized.extend);
+        var currentDir = (0, _helpers.dirname)(configPath);
+        var parentConfigPath = (0, _helpers.join)(currentDir, normalized.extend);
         var parentConfig = Marmarosh.loadYml(parentConfigPath);
         normalized = (0, _merge2.default)(parentConfig, normalized);
       }
