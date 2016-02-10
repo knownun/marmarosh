@@ -240,6 +240,17 @@ var Builder = function () {
       return this.createFile(output, name, JSON.stringify(data, null, 2));
     }
   }, {
+    key: "getSecondaryThemesConfig",
+    value: function getSecondaryThemesConfig(config) {
+      var normalizedSecondaryConfig = [];
+      (0, _forOwn2.default)(config, function (val, key) {
+        if ((0, _startsWith2.default)(val, "?")) {
+          normalizedSecondaryConfig.push(key);
+        }
+      });
+      return normalizedSecondaryConfig;
+    }
+  }, {
     key: "run",
     value: function run(cb) {
       var _this2 = this;
@@ -250,6 +261,7 @@ var Builder = function () {
             var Constructor = _production_component2.default;
             var components = config.src;
             var output = config.dest;
+            var themes = _this2.getSecondaryThemesConfig(config.themes);
             if (components) {
               components.forEach(function (filePath, index) {
                 var instance = new Constructor((0, _helpers.normalize)(filePath), {
@@ -260,22 +272,18 @@ var Builder = function () {
                 _this2.createCSHTML(instance, output);
                 _this2.createJSON(instance, output);
 
-                var themes = ["main", "?sparta", "?stormfall"];
-                themes.forEach(function (theme) {
-                  if ((0, _startsWith2.default)(theme, '?')) {
-                    var name = theme.substr(1);
-                    if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
-                      var themeInstance = new Constructor((0, _helpers.normalize)(filePath), {
-                        route: {
-                          theme: name
-                        },
-                        builder: {
-                          serverReplace: config.serverReplace
-                        }
-                      });
-                      _this2.createCSHTML(themeInstance, output, name);
-                      _this2.createJSON(themeInstance, output, name);
-                    }
+                themes.forEach(function (name) {
+                  if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
+                    var themeInstance = new Constructor((0, _helpers.normalize)(filePath), {
+                      route: {
+                        theme: name
+                      },
+                      builder: {
+                        serverReplace: config.serverReplace
+                      }
+                    });
+                    _this2.createCSHTML(themeInstance, output, name);
+                    _this2.createJSON(themeInstance, output, name);
                   }
                 });
 

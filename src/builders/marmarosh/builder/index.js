@@ -183,6 +183,16 @@ export default class Builder {
     return this.createFile(output, name, JSON.stringify(data, null, 2));
   }
 
+  getSecondaryThemesConfig(config) {
+    let normalizedSecondaryConfig = [];
+    forOwn(config, (val, key)=> {
+      if (startsWith(val, "?")) {
+        normalizedSecondaryConfig.push(key);
+      }
+    });
+    return normalizedSecondaryConfig;
+  }
+
   run(cb) {
 
     this.config.forEach((config)=> {
@@ -190,6 +200,7 @@ export default class Builder {
         let Constructor = ProdComponentClass;
         let components = config.src;
         let output = config.dest;
+        let themes = this.getSecondaryThemesConfig(config.themes);
         if (components) {
           components.forEach((filePath, index) => {
             let instance = new Constructor(normalize(filePath), {
@@ -200,22 +211,18 @@ export default class Builder {
             this.createCSHTML(instance, output);
             this.createJSON(instance, output);
 
-            var themes = ["main", "?sparta", "?stormfall"];
-            themes.forEach((theme)=> {
-              if (startsWith(theme, '?')) {
-                var name = theme.substr(1);
-                if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
-                  var themeInstance = new Constructor(normalize(filePath), {
-                    route: {
-                      theme: name
-                    },
-                    builder: {
-                      serverReplace: config.serverReplace
-                    }
-                  });
-                  this.createCSHTML(themeInstance, output, name);
-                  this.createJSON(themeInstance, output, name);
-                }
+            themes.forEach((name)=> {
+              if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
+                var themeInstance = new Constructor(normalize(filePath), {
+                  route: {
+                    theme: name
+                  },
+                  builder: {
+                    serverReplace: config.serverReplace
+                  }
+                });
+                this.createCSHTML(themeInstance, output, name);
+                this.createJSON(themeInstance, output, name);
               }
             });
 
