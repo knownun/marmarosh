@@ -28,9 +28,9 @@
     "babel-preset-react": "6.5.0",
     "babel-register": "6.5.1",
     "extract-text-webpack-plugin": "1.0.1",
-    "glob": "6.0.4",
+    "glob": "7.0.0",
     "gulp-util": "3.0.7",
-    "js-yaml": "3.5.2",
+    "js-yaml": "3.5.3",
     "lodash": "4.3.0",
     "rimraf": "2.5.1",
     "webpack": "https://github.com/marmarosh/webpack.git#v1.12.14"
@@ -53,8 +53,8 @@
     "yaml-loader": "0.1.0"
   },
   "peerDependencies": {
-    "gulp": "3.9.0",
-    "babel-loader": "6.2.1",
+    "gulp": "3.9.1",
+    "babel-loader": "6.2.2",
     "jade-loader": "0.8.0",
     "json-loader": "0.5.4",
     "less-loader": "2.2.2",
