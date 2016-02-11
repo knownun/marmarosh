@@ -84,7 +84,7 @@ var _class = function () {
       if (this.isErrorsOn) {
         var coloring = this.errorColoring;
         var completeMessage = coloring(message);
-        if (!this.isProduction) {
+        if (this.isProduction) {
           throw new Error(message);
         } else {
           _gulpUtil2.default.log(coloring(this.task) + " " + completeMessage);

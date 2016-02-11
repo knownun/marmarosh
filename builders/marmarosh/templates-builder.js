@@ -66,7 +66,7 @@ var TemplatesBuilder = function (_BaseBuilder) {
       var dest = resource.dest;
 
       var debug = !this.isProduction;
-      var bail = !!debug;
+      var bail = this.isProduction;
       var serverReplace = resource.getConfig().serverReplaceVars;
       var themes = resource.getConfig().themes;
 

@@ -54,7 +54,7 @@ export default class {
     if (this.isErrorsOn) {
       let coloring = this.errorColoring;
       let completeMessage = coloring(message);
-      if (!this.isProduction) {
+      if (this.isProduction) {
         throw new Error(message)
       } else {
         gutil.log(`${coloring(this.task)} ${completeMessage}`);
