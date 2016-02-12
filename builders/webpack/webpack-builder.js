@@ -183,7 +183,7 @@ var WebpackBuilder = function (_BaseBuilder) {
 
       config.plugins.push(logPlugin);
 
-      config.plugins.push(new webpack.ProvidePlugin({
+      config.plugins.push(new _webpack2.default.ProvidePlugin({
         $: "jquery"
       }));
 

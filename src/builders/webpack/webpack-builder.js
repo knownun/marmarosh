@@ -121,7 +121,7 @@ export default class WebpackBuilder extends BaseBuilder {
 
     config.plugins.push(logPlugin);
 
-    config.plugins.push(new webpack.ProvidePlugin({
+    config.plugins.push(new Webpack.ProvidePlugin({
       $: "jquery"
     }));
 
