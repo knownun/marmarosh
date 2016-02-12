@@ -8,6 +8,9 @@ export default class OptimizeConverter extends BaseConverter {
 
     if (optimize) {
       optimizePlugin = new UglifyJsPlugin({
+        mangle: {
+          except: ['$', 'exports', 'require']
+        },
         compress: {
           warnings: false
         }

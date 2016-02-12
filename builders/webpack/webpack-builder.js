@@ -183,14 +183,18 @@ var WebpackBuilder = function (_BaseBuilder) {
 
       config.plugins.push(logPlugin);
 
+      config.plugins.push(new webpack.ProvidePlugin({
+        $: "jquery"
+      }));
+
       config.plugins.push(new _webpack2.default.optimize.DedupePlugin());
 
       config.plugins.push(new _webpack2.default.ProgressPlugin(function (percentage, msg) {
         _this2.emit("build.waiting", { key: resource.getKey(), percentage: percentage, msg: msg });
       }));
 
-      config.plugins.push(new _webpack2.default.DefinePlugin({
-        DEBUG: debug
+      this.isProduction && config.plugins.push(new _webpack2.default.DefinePlugin({
+        'process.env.NODE_ENV': '"production"'
       }));
 
       var split = resource.getOptions("split");

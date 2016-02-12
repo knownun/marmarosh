@@ -121,14 +121,18 @@ export default class WebpackBuilder extends BaseBuilder {
 
     config.plugins.push(logPlugin);
 
+    config.plugins.push(new webpack.ProvidePlugin({
+      $: "jquery"
+    }));
+
     config.plugins.push(new Webpack.optimize.DedupePlugin());
 
     config.plugins.push(new Webpack.ProgressPlugin((percentage, msg) => {
       this.emit("build.waiting", {key: resource.getKey(), percentage, msg});
     }));
 
-    config.plugins.push(new Webpack.DefinePlugin({
-      DEBUG: debug
+    this.isProduction && config.plugins.push(new Webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"production"'
     }));
 
     let split = resource.getOptions("split");

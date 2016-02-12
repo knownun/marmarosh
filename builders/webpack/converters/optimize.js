@@ -38,6 +38,9 @@ var OptimizeConverter = function (_BaseConverter) {
 
       if (optimize) {
         optimizePlugin = new _UglifyJsPlugin2.default({
+          mangle: {
+            except: ['$', 'exports', 'require']
+          },
           compress: {
             warnings: false
           }
