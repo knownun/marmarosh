@@ -44,7 +44,7 @@ webpackLoaders.set("yaml", "json-loader!yaml-loader");
 webpackLoaders.set("html", "html-loader");
 webpackLoaders.set("json", "json-loader");
 webpackLoaders.set("jade", "jade-loader");
-webpackLoaders.set("less", "css-loader?sourceMap!less-loader?sourceMap");
+webpackLoaders.set("less", "css-loader?-autoprefixer&sourceMap!less-loader?sourceMap");
 
 var LoadersConverter = function (_BaseConverter) {
   _inherits(LoadersConverter, _BaseConverter);
