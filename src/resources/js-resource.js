@@ -1,81 +1,66 @@
-import { joinUrl } from '../utils/helpers';
-
-import { join } from '../utils/path';
-import { sync as globSync } from 'glob';
-
-import isArray from 'lodash/lang/isArray';
-
-import BaseResource from './base-resource';
-
-var collectScripts = (src, paths) => {
-  if (!isArray(paths)) {
-    paths = [paths];
-  }
-
-  var scripts = [];
-  for (var path of paths) {
-    var modulePath = join(src, path);
-    var collected = globSync(modulePath, {
-      nosort: true
-    });
-
-    if (collected.length) {
-      var processedScripts = collected.map((script) => './' + script);
-      scripts = scripts.concat(processedScripts);
-    } else {
-      try {
-        /**
-         * Workaround for dev. step when using npm link this package
-         */
-        scripts.push(path);
-
-        //var resolved = require.resolve(path);
-        //scripts.push(resolved);
-      } catch (e) {
-        throw new Error(e.message);
-      }
-    }
-  }
+import { resolve as joinUrl } from "url";
+import { sync as globSync } from "glob";
 
 
-  return scripts;
-};
+import isArray from "lodash/isArray";
+import uniq from "lodash/uniq";
+
+import BaseResource from "./base-resource";
+
+import { join } from "../utils/helpers";
 
 export default class JsResoruce extends BaseResource {
-  getSrc() {
-    var originalSrc = this.getOriginalSrc();
-    var src = this.getApplicationSrc();
 
-    var resourceSrc = null;
-    if (isArray(originalSrc)) {
-      resourceSrc = originalSrc;
-    } else {
-      resourceSrc = [originalSrc];
-    }
+  static collectScripts(src, paths) {
+    paths = isArray(paths) ? paths : [paths];
+    let scripts = [];
 
-    var scripts = [];
-    for (var path of resourceSrc) {
-      var collected = collectScripts(src, path);
-      scripts = scripts.concat(collected);
+    for (let path of paths) {
+      let modulePath = join(src, path);
+      let collected = globSync(modulePath, {nosort: true});
+      if (collected.length) {
+        let processedScripts = collected.map((script) => "./" + script);
+        scripts = scripts.concat(processedScripts);
+      } else {
+        scripts.push(path); // Workaround for dev. step when using npm link this package
+      }
     }
 
     return scripts;
   }
 
+  get extensions() {
+    return this.getConfig().extensions || [".js"];
+  }
+
+  getSrc() {
+    let relativeSrc = this.getRelativeSrc();
+    let src = this.getProjectSrc();
+    let resourceSrc = isArray(relativeSrc) ? relativeSrc : [relativeSrc];
+    let output = [];
+
+    for (let path of resourceSrc) {
+      let collected = JsResoruce.collectScripts(src, path);
+      output = output.concat(collected);
+    }
+
+    return uniq(output);
+  }
+
   getUrl() {
-    var url = super.getUrl();
-    var split = this.getOptions('split');
+    let url = super.getUrl();
+    let split = this.getOptions("split");
+    let output = [];
 
-    var urls = [];
     if (split) {
-      var target = this.getRelativeTarget();
-
-      for (var name of Object.keys(split)) {
-        urls.push(joinUrl('/', target, name + '.js'));
+      let target = this.getRelativeTarget();
+      for (let name of Object.keys(split)) {
+        output.push(joinUrl("/", target, name + ".js"));
       }
     }
-    urls.push(url);
 
-    return urls;
+    output.push(url);
+
+    return output;
   }
 }

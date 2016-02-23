@@ -1,176 +1,160 @@
-import { join } from '../utils/path';
+import { resolve as resolveUrl } from "url";
+import { sync as globSync } from "glob";
 
-import { joinUrl } from '../utils/helpers';
+import cloneDeep from "lodash/cloneDeep";
+import merge from "lodash/merge";
+import getter from "lodash/get";
+import isArray from "lodash/isArray";
+import isString from "lodash/isString";
+import uniq from "lodash/uniq";
+import concat from "lodash/concat";
 
-import { sync as globSync } from 'glob';
+import { join, basename, dirname } from "../utils/helpers";
 
-import cloneDeep from 'lodash/lang/cloneDeep';
-import getter from 'lodash/object/get';
-import isArray from 'lodash/lang/isArray';
-import isString from 'lodash/lang/isString';
-import uniq from 'lodash/array/uniq';
-
-var getName = (path) => {
-  return /(.+(?:\/|\\))?(.+\..+)?/.exec(path)[2] || null;
+let local = {
+  src: Symbol("src"),
+  dest: Symbol("dest"),
+  key: Symbol("key"),
+  normalized: Symbol("normalized")
 };
-
-var getLocation = (path) => {
-  return path.replace(/[^(?:\/|\\)]+$/, '');
-};
-
-
-var normalize = (key, config) => {
-  var normalized = {
-    originalArraySource: false
-  };
-
-  if (!config.src) {
-    throw new Error(`Wrong configuration for "${key}" resource: "src" is important option`);
-  }
-
-  if (!isArray(config.src)) {
-    normalized.src = [config.src];
-  } else {
-    normalized.src = config.src;
-    normalized.originalArraySource = true;
-  }
-
-  if (!config.dest) {
-    if (!isArray(config.src)) {
-      normalized.dest = config.src;
-    } else {
-      throw new Error(`Wrong configuration for "${key}" resource: "dest" is not defined and could not calculated`);
-    }
-  } else {
-    if (!isString(config.dest)) {
-      throw new Error(`Wrong configuration for "${key}" resource: "dest" should be string`);
-    }
-    normalized.dest = config.dest;
-  }
-
-  normalized.target = getLocation(normalized.dest);
-  normalized.destName = getName(normalized.dest) || null;
-
-  if (!normalized.destName && !normalized.originalArraySource) {
-    normalized.destName = getName(config.src);
-  }
-
-  normalized.names = normalized.src.map(path => getName(path));
-  var locations = normalized.src.map(path => getLocation(path));
-  normalized.locations = uniq(locations);
-
-  if (config.mask) {
-    if (isArray(config.mask)) {
-      normalized.mask = config.mask;
-    } else {
-      normalized.mask = [config.mask];
-    }
-  } else {
-    normalized.mask = null;
-  }
-
-  normalized.options = config.options || {};
-
-  return normalized;
-};
-
-
-var collectScripts = (paths, resource) => {
-  if (!isArray(paths)) {
-    paths = [paths];
-  }
-
-  var scripts = [];
-  for (var path of paths) {
-    var collected = globSync(path, {
-      nosort: true
-    });
-
-    if (collected.length) {
-      var processedScripts = collected.map((script) => './' + script);
-      scripts = scripts.concat(processedScripts);
-    } else {
-      throw new Error(`There are no scripts for "${resource}" resource by "${path}" path`);
-    }
-  }
-
-  return scripts;
-};
-
-var local = {
-  normalized: Symbol('normalized'),
-  src: 'src',
-  key: 'key',
-  dest: 'dest'
-};
-
 
 export default class Resource {
-  constructor(src, dest, key, config) {
+
+  constructor(src, dest, key, config, options) {
     this[local.src] = src;
     this[local.dest] = dest;
-
     this[local.key] = key;
-    this[local.normalized] = normalize(key, config);
+    this[local.normalized] = this.normalize(key, config, options);
+  }
+
+  normalize(key, config, options) {
+
+    let normalized = {
+      originalSourceIsArray: false
+    };
+
+    if (!config.src) {
+      config.src = ".";
+    }
+
+    if (isArray(config.src)) {
+      normalized.src = config.src;
+      normalized.originalSourceIsArray = true;
+    } else {
+      normalized.src = [config.src];
+    }
+
+    if (config.dest) {
+      if (!isString(config.dest)) {
+        throw new Error(`Wrong configuration for "${key}" resource: "dest" should be string`);
+      }
+      normalized.dest = config.dest;
+    } else {
+      if (!isString(config.src)) {
+        throw new Error(`Wrong configuration for "${key}" resource: "dest" is not defined and could not calculated`);
+      } else {
+        normalized.dest = config.src;
+      }
+    }
+
+    normalized.destDirName = dirname(normalized.dest);
+    normalized.destName = basename(normalized.dest) || (!normalized.originalSourceIsArray) ? basename(config.src) : null;
+
+    normalized.names = normalized.src.map(path => basename(path));
+
+    let locations = normalized.src.map(path => dirname(path));
+    normalized.locations = uniq(locations);
+
+    if (config.mask) {
+      normalized.mask = isArray(config.mask) ? config.mask : [config.mask];
+    } else {
+      normalized.mask = null;
+    }
+
+    normalized.options = config.options || {};
+
+    normalized.preset = config.preset || null;
+
+    normalized.alias = merge({}, config.alias, options.alias) || null;
+
+    normalized.resolve = concat([], config.resolve, options.resolve);
+
+    normalized.extensions = config.extensions || null;
+
+    normalized.target = config.target || null;
+
+    normalized.devtool = config.devtool || null;
+
+    normalized.stats = config.stats || options.stats || null;
+
+    return normalized;
+  }
+
+  static collectScripts(paths, key) {
+    if (!isArray(paths)) {
+      paths = [paths];
+    }
+
+    let scripts = [];
+    for (let path of paths) {
+      let collected = globSync(path, {
+        nosort: true
+      });
+
+      if (collected.length) {
+        let processedScripts = collected.map((script) => "./" + script);
+        scripts = scripts.concat(processedScripts);
+      } else {
+        throw new Error(`There are no scripts for "${key}" resource by "${path}" path`);
+      }
+    }
+
+    return scripts;
   }
 
   getConfig() {
     return cloneDeep(this[local.normalized]);
   }
 
-  getApplicationSrc() {
+  getName() {
+    let normalized = this[local.normalized];
+    let names = null;
+
+    if (normalized.originalSourceIsArray) {
+      names = normalized.names;
+    } else {
+      names = normalized.names[0];
+    }
+
+    return names;
+  }
+
+  getKey() {
+    return this[local.key];
+  }
+
+  getDestName() {
+    return this[local.normalized].destName;
+  }
+
+  hasDestName() {
+    return !!this[local.normalized].destName;
+  }
+
+  getProjectSrc() {
     return this[local.src];
   }
 
-  getApplicationDest() {
+  getProjectDest() {
     return this[local.dest];
   }
 
-  getSrc() {
-    var relativeSrc = this.getOriginalSrc();
-    var src = this[local.src];
-    var resourceSrc = null;
-
-    if (isArray(relativeSrc)) {
-      resourceSrc = relativeSrc.map(path => join(src, path));
-    } else {
-      resourceSrc = join(src, relativeSrc);
-    }
-
-    return collectScripts(resourceSrc, this[local.key]);
-  }
-
-  getOriginalSrc() {
-    var normalized = this[local.normalized];
-
-    var relativeSrc = null;
-    if (normalized.originalArraySource) {
-      relativeSrc = normalized.src;
-    } else {
-      relativeSrc = normalized.src[0];
-    }
-
-    return relativeSrc;
-  }
-
-  getDest() {
-    var relativeDest = this.getOriginalDest();
-    var dest = this[local.dest];
-
-    return join(dest, relativeDest);
-  }
-
-  getOriginalDest() {
-    var normalized = this[local.normalized];
-    return normalized.dest;
-  }
-
   getMask() {
-    var normalized = this[local.normalized];
-    var mask = null;
+    let normalized = this[local.normalized];
+    let mask = null;
 
     if (normalized.mask) {
-      var src = this[local.src];
+      let src = this[local.src];
 
       if (isArray(normalized.mask)) {
         mask = normalized.mask.map(path => join(src, path));
@@ -184,79 +168,61 @@ export default class Resource {
     return mask;
   }
 
-  /**
-   * TODO: redevelop this function.
-   * @returns {*}
-   */
-  getUrl() {
-    //if (!this.hasUrl()) {
-    //  var key = this[local.key];
-    //  throw new Error(`Can not calculate url because destination name is not describe for "${key}".`);
-    //}
+  getRelativeSrc() {
+    let normalized = this[local.normalized];
+    let relativeSrc = null;
 
-    var target = this.getRelativeTarget();
-    var destName = this.getDestName();
-
-    var url = null;
-    if (!destName) {
-      /**
-       * TODO: update getName method
-       */
-      var src = this.getSrc();
-
-      if (isArray(src)) {
-        url = [];
-
-        for (var resourcePath of src) {
-          var resourceUrl = joinUrl('/', target, getName(resourcePath));
-          url.push(resourceUrl);
-        }
-      } else {
-        url = joinUrl('/', target, getName(src));
-      }
-
-    } else{
-      url = joinUrl('/', target, destName);
-    }
-
-    return url;
-  }
-
-  //hasUrl() {
-  //  return this.hasDestName();
-  //}
-
-  /**
-   * TODO: update getName method - should base on resource src
-   */
-  getName() {
-    var normalized = this[local.normalized];
-    var names = null;
-
-    if (normalized.originalArraySource) {
-      names = normalized.names;
+    if (normalized.originalSourceIsArray) {
+      relativeSrc = normalized.src;
     } else {
-      names = normalized.names[0];
+      relativeSrc = normalized.src[0];
     }
 
-    return names;
+    return relativeSrc;
   }
 
-  getDestName() {
-    var normalized = this[local.normalized];
-    return normalized.destName;
+  getSrc() {
+    let relativeSrc = this.getRelativeSrc();
+    let src = this[local.src];
+    let resourceSrc = null;
+
+    if (isArray(relativeSrc)) {
+      resourceSrc = relativeSrc.map(path => join(src, path));
+    } else {
+      resourceSrc = join(src, relativeSrc);
+    }
+
+    return Resource.collectScripts(resourceSrc, this[local.key]);
   }
 
-  hasDestName() {
-    var normalized = this[local.normalized];
-    return !!normalized.destName;
+  getRelativeDest() {
+    return this[local.normalized].dest;
+  }
+
+  getDest() {
+    let relativeDest = this.getRelativeDest();
+    let dest = this[local.dest];
+    return join(dest, relativeDest);
+  }
+
+  getRelativeLocation() {
+    let normalized = this[local.normalized];
+    let relativeLocation = null;
+
+    if (normalized.originalSourceIsArray) {
+      relativeLocation = normalized.locations;
+    } else {
+      relativeLocation = normalized.locations[0];
+    }
+
+    return relativeLocation;
   }
 
   getLocation() {
-    var relativeLocation = this.getRelativeLocation();
-    var src = this[local.src];
+    let relativeLocation = this.getRelativeLocation();
+    let src = this[local.src];
 
-    var location = null;
+    let location = null;
     if (isArray(relativeLocation)) {
       location = relativeLocation.map(path => join(src, path));
     } else {
@@ -266,40 +232,97 @@ export default class Resource {
     return location;
   }
 
-  getRelativeLocation() {
-    var normalized = this[local.normalized];
-    var relativeLocation = null;
-
-    if (normalized.originalArraySource) {
-      relativeLocation = normalized.locations;
-    } else {
-      relativeLocation = normalized.locations[0];
-    }
-
-    return relativeLocation;
+  getRelativeTarget() {
+    return this[local.normalized].destDirName;
   }
 
   getTarget() {
-    var relativeTarget = this.getRelativeTarget();
-    var dest = this[local.dest];
+    let relativeTarget = this.getRelativeTarget();
+    let dest = this[local.dest];
 
     return join(dest, relativeTarget);
   }
 
-  getRelativeTarget() {
-    var normalized = this[local.normalized];
-    return normalized.target;
-  }
+  getOptions(optionPath) {
+    let normalized = this[local.normalized];
+    let options = null;
 
-  getOptions(key) {
-    var normalized = this[local.normalized];
-    var options = null;
-    if (!key) {
+    if (!optionPath) {
       options = normalized.options;
     } else {
-      options = getter(normalized.options, key) || null;
+      options = getter(normalized.options, optionPath) || null;
     }
 
     return options;
   }
+
+  getUrl() {
+    let target = this.getRelativeTarget();
+    let destName = this.getDestName();
+    let url = null;
+    if (!destName) {
+      let src = this.getSrc();
+      if (isArray(src)) {
+        url = [];
+        for (let resourcePath of src) {
+          let resourceUrl = resolveUrl("/", target, basename(resourcePath));
+          url.push(resourceUrl);
+        }
+      } else {
+        url = resolveUrl("/", target, basename(src));
+      }
+    } else {
+      url = resolveUrl("/", target, destName);
+    }
+    return url;
+  }
+
+  getPresetName() {
+    return this[local.normalized].preset;
+  }
+
+  getBuilderName() {
+    return this[local.normalized].builder;
+  }
+
+  get devtool() {
+    return this.getConfig().devtool || "source-map";
+  }
+
+  get target() {
+    return this.getConfig().target || "web";
+  }
+
+  get src() {
+    return this.getSrc();
+  }
+
+  get dest() {
+    return this.getDest();
+  }
+
+  get relativeDest() {
+    return this.getRelativeDest();
+  }
+
+  get extentions() {
+    return this.getConfig().extentions;
+  }
+
+  get alias() {
+    return this.getConfig().alias;
+  }
+
+  get resolve() {
+    return this.getConfig().resolve;
+  }
+
+  get preset() {
+    return this.getConfig().preset;
+  }
+
+  get stats() {
+    return this.getConfig().stats;
+  }
+
 }

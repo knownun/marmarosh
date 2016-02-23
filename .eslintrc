@@ -1,0 +1,50 @@
+extends: "eslint:recommended"
+parser: "babel-eslint"
+rules:
+  no-console: 0
+  indent:
+    - 2
+    - 2
+  quotes:
+    - 2
+    - double
+  linebreak-style:
+    - 2
+    - unix
+  semi:
+    - 2
+    - always
+env:
+  amd: true
+  es6: true
+  node: true
+  jquery: true
+  browser: true
+  commonjs: true
+ecmaFeatures:
+  forOf: false
+  generators: false
+  regexYFlag: false
+  regexUFlag: false
+  restParams: false
+  octalLiterals: false
+  binaryLiterals: false
+  jsx: true
+  spread: true
+  modules: true
+  classes: true
+  globalRetur: true
+  blockBindings: true
+  defaultParams: true
+  destructuring: true
+  arrowFunctions: true
+  templateStrings: true
+  superInFunctions: true
+  unicodeCodePointEscapes: true
+  experimentalObjectRestSpread: true
+  objectLiteralShorthandMethods: true
+  objectLiteralComputedProperties: true
+  objectLiteralDuplicateProperties: true
+  objectLiteralShorthandProperties: true
+plugins:
+  - react

@@ -1,92 +1,97 @@
-import isArray from 'lodash/lang/isArray';
-import isFunction from 'lodash/lang/isFunction';
+import isArray from "lodash/isArray";
+import isFunction from "lodash/isFunction";
+import merge from "lodash/merge";
 
-import { sep } from '../../../utils/helpers';
+import ExtractTextPlugin from "extract-text-webpack-plugin";
 
-import BaseConverter from '../base-converter';
+import { sep, join, resolve } from "../../../utils/helpers";
 
+import BaseConverter from "../base-converter";
 
-var webpackLoaders = new Map();
+let webpackLoaders = new Map;
 
-webpackLoaders.set('babel', 'babel-loader');
-webpackLoaders.set('traceur', 'traceur-loader');
-webpackLoaders.set('yaml', 'json-loader!yaml-loader');
-webpackLoaders.set('html', 'html-loader');
-webpackLoaders.set('json', 'json-loader');
-webpackLoaders.set('jade', 'jade-loader');
-webpackLoaders.set('script', 'script-loader');
-webpackLoaders.set('expose', 'expose-loader');
-
-function getLoaderMethodName(loader) {
-
-  var first = loader.charAt(0).toUpperCase();
-  return `get${ first + loader.substr(1).toLowerCase() }Loader`;
-}
+webpackLoaders.set("babel", "babel");
+webpackLoaders.set("traceur", "traceur-loader");
+webpackLoaders.set("yaml", "json-loader!yaml-loader");
+webpackLoaders.set("html", "html-loader");
+webpackLoaders.set("json", "json-loader");
+webpackLoaders.set("jade", "jade-loader");
+webpackLoaders.set("less", "css-loader?-autoprefixer&sourceMap!less-loader?sourceMap");
 
 export default class LoadersConverter extends BaseConverter {
 
-  getBabelLoader(pattern, isExperimental) {
-    var webpackLoader = webpackLoaders.get('babel');
-    var config = pattern.replace(/\//g, sep).split('?');
-    var test = config.shift();
-
-    var query = {};
-    if (isExperimental) {
-      query = {
-        stage: 0
-      }
-    }
-
-    return {
-      test: new RegExp(test),
-      loader: webpackLoader,
-      query: query
-    }
+  static getLoaderMethodName(loader) {
+    return `get${ loader.charAt(0).toUpperCase() + loader.substr(1).toLowerCase() }Loader`;
   }
 
-  getLoader(pattern, isExperimental, loader) {
-    var webpackLoader = webpackLoaders.get(loader);
+  static getLoader(pattern, loader) {
+    let webpackLoader = webpackLoaders.get(loader);
 
-    var config = pattern.replace(/\//g, sep).split('?');
-    var test = config.shift();
-    var query = config.shift();
+    let config = pattern.replace(/\//g, sep).split("?");
 
-    return {
+    let test = config.shift() || null;
+    let query = config.shift() || null;
+
+    let converted = {
       test: new RegExp(test),
-      loader: webpackLoader,
-      query: query
+      loader: webpackLoader
+    };
+
+    if (query) {
+      converted.query = query;
     }
+
+    return converted;
   }
 
-  getConfig(loaders, isExperimental) {
-    var converted = [];
-    var defaultLoaderMethod = 'getLoader';
+  static getBabelLoader(pattern, loader) {
+    let originalConfig = LoadersConverter.getLoader(pattern, loader);
+    originalConfig.exclude = /(node_modules|bower_components)/;
+    return originalConfig;
+  }
+
+  static getLessLoader(pattern, loader) {
+    let originalConfig = LoadersConverter.getLoader(pattern, loader);
+
+    let plugin = new ExtractTextPlugin("[name].css", {allChunks: true});
+    this.addPlugin(plugin);
+    originalConfig.loader = plugin.extract("style-loader", originalConfig.loader);
+
+    return originalConfig;
+  }
+
+  addPlugin(plugin) {
+    let plugins = this.plugins = this.plugins || [];
+    plugins.push(plugin);
+  }
+
+  getPlugins() {
+    return this.plugins || [];
+  }
+
+  getConfig(loaders) {
+    let converted = [];
 
     if (loaders) {
-      for (var loader of Object.keys(loaders)) {
+      for (let loader of Object.keys(loaders)) {
         if (!webpackLoaders.has(loader)) {
           throw new Error(`Loader "${loader}" doest not exist`);
         }
 
-        var loaderPattern = loaders[loader];
-        var patterns = null;
+        let loaderPattern = loaders[loader];
+        let patterns = null;
         if (isArray(loaderPattern)) {
           patterns = loaderPattern;
         } else {
           patterns = [loaderPattern];
         }
 
+        let customLoaderMethodName = LoadersConverter.getLoaderMethodName(loader);
+        let customLoaderMethod = LoadersConverter[customLoaderMethodName] || null;
+        let loaderMethod = isFunction(customLoaderMethod) ? customLoaderMethod.bind(this) : LoadersConverter.getLoader.bind(this);
 
-        var loaderMethodName = getLoaderMethodName(loader);
-        var loaderMethod = this.getLoader;
-
-        if (isFunction(this[loaderMethodName])) {
-          loaderMethod = this[loaderMethodName];
-        }
-
-        for (var pattern of patterns) {
-          var loaderConfig = loaderMethod(pattern, isExperimental, loader);
-
+        for (let pattern of patterns) {
+          let loaderConfig = loaderMethod(pattern, loader);
           converted.push(loaderConfig);
         }
       }

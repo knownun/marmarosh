@@ -1,33 +1,35 @@
-import { join } from '../utils/path';
+import { join } from "../utils/helpers";
 
-import WebpackBuilder from  '../builders/webpack/webpack-builder';
+import WebpackBuilder from  "../builders/webpack/webpack-builder";
+import TemplatesBuilder from  "../builders/marmarosh/templates-builder";
 
 var local = {
-  config: Symbol('config'),
-  builder: Symbol('builder')
+  config: Symbol("config"),
+  builder: Symbol("builder")
 };
 
-var builders = new Map();
-builders.set('webpack', WebpackBuilder);
+var builders = new Map;
+
+builders.set("webpack", WebpackBuilder);
+builders.set("marmarosh-templates", TemplatesBuilder);
 
 export default class Builder {
 
-  constructor(config) {
-    this[local.config] = config;
-    var builderName = config.builder;
+  constructor(name, resources) {
+    this[local.config] = resources;
 
-    if (!builders.has(builderName)) {
-      throw new Error(`builders "${builderName}" does not registered`);
+    if (!builders.has(name)) {
+      throw new Error(`builder type "${name}" does not registered`);
     }
 
-    var Builder = builders.get(builderName);
-    this[local.builder] = new Builder(config);
+    var Builder = builders.get(name);
+
+    this[local.builder] = new Builder(resources);
   }
 
   getConfig() {
     return this[local.config];
   }
-
 
   getApplicationBuilder() {
     return this[local.builder];

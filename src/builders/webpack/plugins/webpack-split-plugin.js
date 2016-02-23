@@ -1,5 +1,5 @@
-import isArray from 'lodash/lang/isArray';
-import values from 'lodash/object/values';
+import isArray from 'lodash/isArray';
+import values from 'lodash/values';
 import { sep } from '../../../utils/helpers';
 
 
@@ -16,7 +16,7 @@ export default class SplitByPathPlugin {
 
       this.buckets.push({
         name: bucket.name,
-        path: paths.map(path => new RegExp(path.replace(/\//g, sep)))
+        path: paths.map(p => new RegExp(p.replace(/\//g, sep)))
       });
     }
   }
@@ -25,8 +25,8 @@ export default class SplitByPathPlugin {
     var match = (chunk) => {
       var match = null;
       this.buckets.some(bucket => {
-        return bucket.path.some(path => {
-          if (path.test(chunk.userRequest)) {
+        return bucket.filePath.some(path => {
+          if (filePath.test(chunk.userRequest)) {
             match = bucket;
             return true;
           }
@@ -39,7 +39,7 @@ export default class SplitByPathPlugin {
     compiler.plugin('compilation', compilation => {
       var splitedChunks = {};
 
-      compilation.plugin('optimize-chunks', function(chunks) {
+      compilation.plugin('optimize-chunks', function (chunks) {
         var filtered = chunks.slice().filter(chunk => chunk.entry);
 
         var waitForRemove = [];

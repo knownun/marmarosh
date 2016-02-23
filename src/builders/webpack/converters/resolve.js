@@ -1,12 +1,10 @@
-import isEmpty from 'lodash/lang/isEmpty';
-import isObject from 'lodash/lang/isObject';
-import isArray from 'lodash/lang/isArray';
-import path from '../../../utils/path';
+import isEmpty from "lodash/isEmpty";
+import isObject from "lodash/isObject";
+import isArray from "lodash/isArray";
 
-import BaseConverter from '../base-converter';
+import BaseConverter from "../base-converter";
 
-
-export default class ResolveCoverter extends BaseConverter {
+export default class extends BaseConverter {
 
   getConfig(alias, resolve, extensions) {
     var config = null;
@@ -25,8 +23,6 @@ export default class ResolveCoverter extends BaseConverter {
       config = config || {};
       config.extensions = [""].concat(extensions);
     }
-
-    config.fallback = path.join(__dirname, "node_modules");
 
     return config;
   }

@@ -1,12 +1,8 @@
-import isObject from 'lodash/lang/isObject';
-import isString from 'lodash/lang/isString';
-import assign from 'lodash/object/assign';
+import assign from "lodash/assign";
 
+import { resolve } from "../../../utils/helpers";
 
-import { resolve } from '../../../utils/path';
-
-import BaseConverter from '../base-converter';
-
+import BaseConverter from "../base-converter";
 
 export default class OutputCoverter extends BaseConverter {
   getConfig(customOutputConfig) {
