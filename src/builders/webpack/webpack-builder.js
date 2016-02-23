@@ -131,9 +131,13 @@ export default class WebpackBuilder extends BaseBuilder {
       this.emit("build.waiting", {key: resource.getKey(), percentage, msg});
     }));
 
-    this.isProduction && config.plugins.push(new Webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
-    }));
+    let preDefinedVars = {
+      DEBUG: JSON.stringify(JSON.parse(this.env != "production" || "false")),
+      PRODUCTION: JSON.stringify(JSON.parse(this.env == "production" || "false")),
+      "process.env.NODE_ENV": JSON.stringify(JSON.parse(this.env || "development"))
+    };
+
+    config.plugins.push(new Webpack.DefinePlugin(preDefinedVars));
 
     let split = resource.getOptions("split");
 
