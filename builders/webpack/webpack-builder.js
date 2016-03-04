@@ -196,7 +196,7 @@ var WebpackBuilder = function (_BaseBuilder) {
       var preDefinedVars = {
         DEBUG: JSON.stringify(JSON.parse(this.env != "production" || "false")),
         PRODUCTION: JSON.stringify(JSON.parse(this.env == "production" || "false")),
-        "process.env.NODE_ENV": JSON.stringify(JSON.parse(this.env || "development"))
+        "process.env.NODE_ENV": JSON.stringify(this.env || "development")
       };
 
       config.plugins.push(new _webpack2.default.DefinePlugin(preDefinedVars));
