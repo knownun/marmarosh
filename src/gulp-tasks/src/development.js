@@ -8,10 +8,6 @@ export default class extends Base {
 
   run(done) {
 
-    if (this.sintez.isProduction) {
-      return this.logger.error("task is available only on Development environment");
-    }
-
     let MarmaroshDevServer = require("marmarosh-dev-server");
 
     let stylesResources = this.resources.getArray("styles");

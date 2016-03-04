@@ -32,10 +32,6 @@ var _class = function (_Base) {
     value: function run(done) {
       var _this2 = this;
 
-      if (this.sintez.isProduction) {
-        return this.logger.error("task is available only on Development environment");
-      }
-
       var MarmaroshDevServer = require("marmarosh-dev-server");
 
       var stylesResources = this.resources.getArray("styles");

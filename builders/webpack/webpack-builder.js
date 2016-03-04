@@ -193,9 +193,13 @@ var WebpackBuilder = function (_BaseBuilder) {
         _this2.emit("build.waiting", { key: resource.getKey(), percentage: percentage, msg: msg });
       }));
 
-      this.isProduction && config.plugins.push(new _webpack2.default.DefinePlugin({
-        'process.env.NODE_ENV': '"production"'
-      }));
+      var preDefinedVars = {
+        DEBUG: JSON.stringify(JSON.parse(this.env != "production" || "false")),
+        PRODUCTION: JSON.stringify(JSON.parse(this.env == "production" || "false")),
+        "process.env.NODE_ENV": JSON.stringify(JSON.parse(this.env || "development"))
+      };
+
+      config.plugins.push(new _webpack2.default.DefinePlugin(preDefinedVars));
 
       var split = resource.getOptions("split");
 
