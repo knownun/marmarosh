@@ -153,7 +153,7 @@ var ProdComponent = function (_Base) {
       }
 
       return helper.replace(/\$\d/gm, function (str) {
-        return args[str.substr(1) - 1];
+        return args[str.substr(1) - 1] || "null";
       });
     }
   }, {

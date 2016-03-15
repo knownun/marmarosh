@@ -96,7 +96,7 @@ export default class ProdComponent extends Base {
 
   includeServerHelper(helper, ...args) {
     return helper.replace(/\$\d/gm, (str)=> {
-      return args[str.substr(1) - 1];
+      return args[str.substr(1) - 1] || "null";
     });
   }
 
