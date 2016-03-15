@@ -94,6 +94,12 @@ export default class ProdComponent extends Base {
     return "\n}\n"
   }
 
+  includeServerHelper(helper, ...args) {
+    return helper.replace(/\$\d/gm, (str)=> {
+      return args[str.substr(1) - 1];
+    });
+  }
+
   renderString(prod, dev) {
     return prod || ""
   }

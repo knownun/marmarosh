@@ -146,6 +146,17 @@ var ProdComponent = function (_Base) {
       return "\n}\n";
     }
   }, {
+    key: "includeServerHelper",
+    value: function includeServerHelper(helper) {
+      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      return helper.replace(/\$\d/gm, function (str) {
+        return args[str.substr(1) - 1];
+      });
+    }
+  }, {
     key: "renderString",
     value: function renderString(prod, dev) {
       return prod || "";

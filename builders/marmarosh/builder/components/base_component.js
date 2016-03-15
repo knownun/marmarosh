@@ -253,6 +253,7 @@ var Base = function () {
   }, {
     key: "initTemplateLocals",
     value: function initTemplateLocals() {
+
       this.setTemplateLocal("include", this.include.bind(this));
       this.setTemplateLocal("getString", this.getString.bind(this));
       this.setTemplateLocal("getOption", this.getOption.bind(this));
@@ -260,6 +261,7 @@ var Base = function () {
       this.setTemplateLocal("getImageURL", this.getImageURL.bind(this));
 
       this.setTemplateLocal("includeBody", this.includeBody.bind(this));
+      this.setTemplateLocal("includeServerHelper", this.includeServerHelper.bind(this));
 
       // for layout
       this.setTemplateLocal("includeMeta", this.includeMeta.bind(this));
@@ -497,7 +499,12 @@ var Base = function () {
   }, {
     key: "itemIndex",
     value: function itemIndex() {
-      return 1;
+      return Math.round(Math.random() + 1000);
+    }
+  }, {
+    key: "includeServerHelper",
+    value: function includeServerHelper() {
+      return "";
     }
   }, {
     key: "hasIndexJS",
