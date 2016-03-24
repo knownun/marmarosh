@@ -170,7 +170,7 @@ var LoadersConverter = function (_BaseConverter) {
     key: "getBabelLoader",
     value: function getBabelLoader(pattern, loader) {
       var originalConfig = LoadersConverter.getLoader(pattern, loader);
-      originalConfig.exclude = /(node_modules|bower_components)/;
+      originalConfig.exclude = /(node_modules|bower_components)(?!.*portal-frontend-.*)/;
       return originalConfig;
     }
   }, {

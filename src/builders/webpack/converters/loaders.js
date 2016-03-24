@@ -46,7 +46,7 @@ export default class LoadersConverter extends BaseConverter {
 
   static getBabelLoader(pattern, loader) {
     let originalConfig = LoadersConverter.getLoader(pattern, loader);
-    originalConfig.exclude = /(node_modules|bower_components)/;
+    originalConfig.exclude = /(node_modules|bower_components)(?!.*portal-frontend-.*)/;
     return originalConfig;
   }
 
