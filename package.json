@@ -4,8 +4,8 @@
   "description": "Markup development tool",
   "main": "index.js",
   "scripts": {
-    "prepublish": "./node_modules/.bin/babel -d ./ ./src",
-    "dev": "./node_modules/.bin/babel -d ./ ./src --watch",
+    "prepublish": "babel ./src -d .",
+    "dev": "babel --watch ./src -d . ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
