@@ -3,7 +3,10 @@
   "version": "2.0.8",
   "description": "Markup development tool",
   "main": "index.js",
-  "bim": "index.js",
+  "bim": {
+    "marmarosh": "./bin",
+    "mrsh": "./bin"
+  },
   "scripts": {
     "prepublish": "babel ./src -d .",
     "dev": "babel --watch ./src -d . ",
