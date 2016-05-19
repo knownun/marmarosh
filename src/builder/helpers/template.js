@@ -1,6 +1,8 @@
 import isString from "lodash/isString";
 import getter from "lodash/get";
 
+import {basename} from "../../utils";
+
 let local = {
   builderConfig: Symbol("builderConfig"),
   serverConfig: Symbol("serverConfig")
@@ -22,7 +24,7 @@ export default (builderConfig) => class Helpers {
   }
 
   includeBody() {
-    return "\n" + this.getConfig("serverReplace.includeBody") + "\n";
+    return this.getConfig("serverReplace.includeBody") + "\n";
   }
 
   getString(name) {
@@ -50,7 +52,7 @@ export default (builderConfig) => class Helpers {
   }
 
   includeMeta() {
-    return "\n" + this.getConfig("serverReplace.includeMeta") + "\n";
+    return this.getConfig("serverReplace.includeMeta") + "\n";
   }
 
   getHtmlClass() {
@@ -58,27 +60,27 @@ export default (builderConfig) => class Helpers {
   }
 
   includeCSS() {
-    return "\n" + this.getConfig("serverReplace.includeCSS") + "\n";
+    return this.getConfig("serverReplace.includeCSS") + "\n";
   }
 
   includeJS() {
-    return "\n" + this.getConfig("serverReplace.includeJS") + "\n";
+    return this.getConfig("serverReplace.includeJS") + "\n";
   }
 
   includeJSOptions() {
-    return "\n" + this.getConfig("serverReplace.includeJSOptions") + "\n";
+    return this.getConfig("serverReplace.includeJSOptions") + "\n";
   }
 
   if(left, operand = "!=", right = "null") {
     var leftStr = parseSelector.bind(this)(left);
     var rightStr = parseSelector.bind(this)(right);
-    return "\n" + `@if(${leftStr} ${operand} ${rightStr})` + "{\n";
+    return `\n@if(${leftStr} ${operand} ${rightStr}){\n`;
   }
 
   ifnot(left, operand = "!=", right = "null") {
     var leftStr = parseSelector.bind(this)(left);
     var rightStr = parseSelector.bind(this)(right);
-    return "\n" + `@if(!(${leftStr} ${operand} ${rightStr}))` + "{\n";
+    return `\n@if(!(${leftStr} ${operand} ${rightStr})){\n`;
   }
 
   endif() {
@@ -93,6 +95,31 @@ export default (builderConfig) => class Helpers {
     return helper.replace(/\$\d/gm, (str)=> {
       return args[str.substr(1) - 1] || "null";
     });
+  }
+
+  include(addWidget, componentPath, widgetName) {
+    let typeName = basename(componentPath);
+    let name = widgetName || typeName;
+    let template = this.getConfig("builder.serverReplace.include");
+    let placeholder = getter(this.getServerConfig(), `widgets.${name}`);
+
+    addWidget(name, typeName);
+
+    let output = "";
+
+    if (placeholder || isString(template)) {
+      output = template.replace("${name}", name);
+    } else {
+      output = `@Widget("${name}")`;
+    }
+
+    return `${output}\n`;
+  }
+
+  includeSet(addWidget, componentPath, models) {
+    let name = basename(componentPath);
+    addWidget(name);
+    return `\n@RepeatWidget("${name}", ${models})\n`;
   }
 };
 

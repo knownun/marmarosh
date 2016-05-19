@@ -43,5 +43,3 @@ ecmaFeatures:
   objectLiteralComputedProperties: true
   objectLiteralDuplicateProperties: true
   objectLiteralShorthandProperties: true
-plugins:
-  - react

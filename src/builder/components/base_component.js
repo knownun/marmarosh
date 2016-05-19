@@ -4,20 +4,20 @@ import yaml from "js-yaml";
 import {sync as globSync} from "glob";
 
 import has from "lodash/has";
+import pick from "lodash/pick";
 import getter from "lodash/get";
 import setter from "lodash/set";
-import isObject from "lodash/isObject";
-import isNumber from "lodash/isNumber";
-import isFunction from "lodash/isFunction";
-import isUndefined from "lodash/isUndefined";
-import isArray from "lodash/isArray";
-import isString from "lodash/isString";
-import cloneDeep from "lodash/cloneDeep";
-import startsWith from "lodash/startsWith";
-import forOwn from "lodash/forOwn";
-import merge from "lodash/merge";
 import union from "lodash/union";
-import pick from "lodash/pick";
+import merge from "lodash/merge";
+import forOwn from "lodash/forOwn";
+import isArray from "lodash/isArray";
+import isObject from "lodash/isObject";
+import isString from "lodash/isString";
+import isNumber from "lodash/isNumber";
+import cloneDeep from "lodash/cloneDeep";
+import isFunction from "lodash/isFunction";
+import startsWith from "lodash/startsWith";
+import isUndefined from "lodash/isUndefined";
 
 import {resolve, join, dirname, basename} from "../../utils";
 
@@ -35,6 +35,7 @@ let local = {
 };
 
 export default class Base {
+
   constructor(config, overrideConfigObj, childInstance) {
     this.saveConfig(config, overrideConfigObj);
     if (overrideConfigObj) this.updateConfig(overrideConfigObj);
@@ -42,7 +43,7 @@ export default class Base {
     this.initTemplateLocals();
   }
 
-  isValidConfig(input) {
+  static isValidConfig(input) {
     let output = false;
     if (
       has(input, "name") &&
@@ -55,10 +56,47 @@ export default class Base {
     return output;
   }
 
+  static merge(input, sources) {
+    let output = cloneDeep(input);
+    return merge(output, sources);
+  }
+
+  static readConfig(url, overrideObj) {
+    let out = null;
+    let theme = getter(overrideObj, "route.theme");
+    if (isString(url)) {
+      let configPath = resolve(url);
+      let src = dirname(url);
+      let type = basename(dirname(src));
+      let name = basename(src);
+
+      if (theme) {
+        let theme_mask = resolve(join(src, "**", theme + ".yml"));
+        let theme_files = globSync(theme_mask);
+        configPath = (theme_files.length) ? theme_files[0] : configPath;
+      }
+
+      let config = yaml.safeLoad(fs.readFileSync(configPath, "utf8")) || {};
+      out = {name, src, config, configPath, type};
+    }
+    return out;
+  }
+
+  get hasIndexJS() {
+    let filePath = resolve(join(this.getSrc(), "index.js"));
+    let jsxFilePath = resolve(join(this.getSrc(), "index.jsx"));
+    return fs.existsSync(filePath) || fs.existsSync(jsxFilePath);
+  }
+
+  get serverConfigurations() {
+    let obj = this.getConfig("route.serverConfigurations");
+    return merge(obj, {"components": this._JSOptions});
+  }
+
   updateConfig(sources) {
     if (sources) {
       let config = this.getConfig();
-      config = this.merge(config, sources);
+      config = Base.merge(config, sources);
       this.setConfig(config);
       this.setTheme(getter(config, "route.theme"));
     }
@@ -66,8 +104,8 @@ export default class Base {
   }
 
   saveConfig(configPath, overrideObj) {
-    let data = this.readConfig(configPath, overrideObj);
-    if (this.isValidConfig(data)) {
+    let data = Base.readConfig(configPath, overrideObj);
+    if (Base.isValidConfig(data)) {
       this[local.src] = data.src;
       this[local.name] = data.name;
       this[local.type] = data.type;
@@ -76,12 +114,6 @@ export default class Base {
     } else {
       throw new Error("@readConfig method should be return { name, src, config, configPath}");
     }
-
-  }
-
-  merge(input, sources) {
-    let output = cloneDeep(input);
-    return merge(output, sources);
   }
 
   getConfig(path) {
@@ -123,12 +155,6 @@ export default class Base {
     return filePath ? compilerFn(filePath, compileOptions) : null;
   }
 
-  get hasIndexJS() {
-    let filePath = resolve(join(this.getSrc(), "index.js"));
-    let jsxFilePath = resolve(join(this.getSrc(), "index.jsx"));
-    return fs.existsSync(filePath) || fs.existsSync(jsxFilePath);
-  }
-
   getTemplatePathForTheme(theme) {
     let mask = resolve(join(this.getSrc(), "**", theme + ".jade"));
     let files = globSync(mask);
@@ -150,10 +176,8 @@ export default class Base {
   }
 
   getTemplate(theme) {
-    let html = "";
-    if (!this.templateFn) {
-      this.templateFn = this.readTemplate(theme);
-    }
+    let html = null;
+    this.templateFn = this.readTemplate(theme);
     if (isFunction(this.templateFn)) {
       html = this.templateFn(this.getTemplateLocals());
     }
@@ -169,20 +193,22 @@ export default class Base {
     setter(this[local.templateLocals], path, obj);
   }
 
-  renderString(prod, dev) {
-    return dev || "";
+  initTemplateLocals() {
+    const config = this.getConfig();
+    const Helpers = this.getConfig("builder.helpers");
+
+    const helpers = this[local.templateLocals] = new Helpers(config);
+    const addWidget = this.addWidgetToConfig;
+
+    this.setTemplateLocal("include", helpers.include.bind(helpers, addWidget.bind(this)));
+    this.setTemplateLocal("includeSet", helpers.includeSet.bind(helpers, addWidget.bind(this)));
   }
 
-  initTemplateLocals() {
-
-    let Helpers = this.getConfig("builder.helpers");
-
-    let config = this.getConfig();
-
-    this[local.templateLocals] = new Helpers(config);
-
-    this.setTemplateLocal("include", this.include.bind(this));
-    this.setTemplateLocal("includeSet", this.includeSet.bind(this));
+  addWidgetToConfig(name, typeName) {
+    this.widgets = this.widgets || {};
+    this.widgets[name] = {
+      "default": typeName || name
+    };
   }
 
   setBodyInstance(childInstance) {
@@ -205,11 +231,6 @@ export default class Base {
 
   setTheme(value) {
     if (isString(value)) this[local.theme] = value;
-  }
-
-  get serverConfigurations() {
-    let obj = this.getConfig("route.serverConfigurations");
-    return merge(obj, {"components": this._JSOptions});
   }
 
   addJSOptions(instance, name, options) {
@@ -256,31 +277,6 @@ export default class Base {
     return this[local.place];
   }
 
-  includeBody() {
-    let ins = this.getBodyInstance();
-    return (ins && ins.html) ? ins.html : "$BODY$";
-  }
-
-  getString(name) {
-    let config = this.getClientConfig();
-    return getter(config, `strings.${name}`);
-  }
-
-  getLink(name) {
-    let config = this.getClientConfig();
-    return getter(config, `links.${name}`);
-  }
-
-  getImageURL(name) {
-    let config = this.getClientConfig();
-    return getter(config, `images.${name}`);
-  }
-
-  getOption(name) {
-    let config = this.getClientConfig();
-    return getter(config, `template_options.${name}`);
-  }
-
   getHTML(theme) {
     return this.getTemplate(theme || this.getTheme());
   }
@@ -288,7 +284,6 @@ export default class Base {
   getClientConfig() {
     let config = this.getConfig();
     let cache = this[local.clientConfig];
-
     if (!cache) {
       cache = {
         template_options: this.getPropsFrom(config.template_options, "default"),
@@ -310,43 +305,6 @@ export default class Base {
       });
     }
     return output;
-  }
-
-  includeCSS() {
-    let out = "";
-    let themes = this.getConfig("route.themes");
-
-    themes.forEach((theme)=> {
-      out += `<link rel=stylesheet href=/webpack/styles/${theme}.css />\n`;
-    });
-
-    return out;
-  }
-
-  includeJSOptions() {
-    let data = JSON.stringify(this.serverConfigurations, null, 4);
-    return `<script>window["serverConfigurations"] = ${data}</script>`
-  }
-
-  readConfig(url, overrideObj) {
-    let out = null;
-    let theme = getter(overrideObj, "route.theme");
-    if (isString(url)) {
-      let configPath = resolve(url);
-      let src = dirname(url);
-      let type = basename(dirname(src));
-      let name = basename(src);
-
-      if (theme) {
-        let theme_mask = resolve(join(src, "**", theme + ".yml"));
-        let theme_files = globSync(theme_mask);
-        configPath = (theme_files.length) ? theme_files[0] : configPath;
-      }
-
-      let config = yaml.safeLoad(fs.readFileSync(configPath, "utf8")) || {};
-      out = {name, src, config, configPath, type};
-    }
-    return out;
   }
 
 }
