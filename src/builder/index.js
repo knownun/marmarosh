@@ -15,8 +15,8 @@ import merge from "lodash/merge";
 import glob from "glob";
 
 import ProdComponentClass from "./components/production_component";
-// import DefaultTemplateHelpersClass from "../helpers/template";
-import {join, normalize, dirname} from "../utils/helpers";
+import defaultTemplateHelpersClass from "./helpers/template";
+import {join, normalize, dirname} from "../utils";
 
 const local = {
   events: Symbol("events"),
@@ -28,23 +28,19 @@ export default class Builder {
   constructor(config) {
     this[local.events] = new events.EventEmitter();
     this.config = this.normalize(config);
-    // this.templateHelpers = Builder.initHelpers(config);
+    this.templateHelpers = Builder.initHelpers(config);
   }
 
-  // static initHelpers(config = {}) {
-  //   let result = null;
-  //   if (typeof config.TemplateHelpersClass === "function") {
-  //     const Helpers = new config.TemplateHelpersClass(config);
-  //     if (Helpers instanceof DefaultTemplateHelpersClass) {
-  //       result = Helpers;
-  //     } else {
-  //       throw new Error("Invalid config.templateHelpersClass");
-  //     }
-  //   } else {
-  //     result = new DefaultTemplateHelpersClass(config);
-  //   }
-  //   return result;
-  // }
+  static initHelpers(config = {}) {
+    let result = null;
+    let custom = config.helpers;
+    if (typeof custom === "function") {
+      result = custom(config);
+    } else {
+      result = defaultTemplateHelpersClass(config);
+    }
+    return result;
+  }
 
   on(event, fn) {
     this[local.events].on(event, fn);
@@ -234,7 +230,7 @@ export default class Builder {
           components.forEach((filePath, index) => {
             let instance = new Constructor(normalize(filePath), {
               builder: {
-                serverReplace: config.serverReplace
+                helpers: this.templateHelpers
               }
             });
 
@@ -249,7 +245,7 @@ export default class Builder {
                     theme: name
                   },
                   builder: {
-                    serverReplace: config.serverReplace
+                    helpers: this.templateHelpers
                   }
                 });
                 Builder.createCSHTML(themeInstance, output, name);

@@ -1,6 +1,6 @@
 import lo from "lodash";
 
-import {basename} from "../../utils/helpers";
+import {basename} from "../../utils";
 
 import Base from "./base_component";
 
@@ -20,86 +20,6 @@ export default class ProdComponent extends Base {
     var template = this.getConfig("builder.serverReplace.include");
     var placeholder = lo.get(this.getServerConfig(), `widgets.${name}`);
     return (placeholder || (lo.isString(template) ? template.replace("${name}", name) : `@Widget("${name}")`)) + "\n";
-  }
-
-  includeBody() {
-    var template = this.getConfig("builder.serverReplace.includeBody");
-    return (lo.isString(template) ? template : "@Body()") + "\n";
-  }
-
-  getString(name) {
-    var placeholder = lo.get(this.getServerConfig(), `strings.${name}`);
-    var template = this.getConfig("builder.serverReplace.getString");
-    return placeholder || lo.isString(template) ? template.replace("${name}", name) : `@ViewBag.strings.${name}`;
-  }
-
-  getLink(name) {
-    var placeholder = lo.get(this.getServerConfig(), `links.${name}`);
-    var template = this.getConfig("builder.serverReplace.getLink");
-    return placeholder || lo.isString(template) ? template.replace("${name}", name) : `@ViewBag.urls.${name}`;
-  }
-
-  getImageURL(name) {
-    var placeholder = lo.get(this.getServerConfig(), `images.${name}`);
-    var template = this.getConfig("builder.serverReplace.getImageURL");
-    return placeholder || lo.isString(template) ? template.replace("${name}", name) : `@ViewBag.images.${name}`;
-  }
-
-  getOption(name) {
-    var placeholder = lo.get(this.getServerConfig(), `template_options.${name}`);
-    var template = this.getConfig("builder.serverReplace.getOption");
-    return placeholder || lo.isString(template) ? template.replace("${name}", name) : `@ViewBag.template.${name}`;
-  }
-
-  includeMeta() {
-    var template = this.getConfig("builder.serverReplace.includeMeta");
-    return (lo.isString(template) ? template : "@Meta()") + "\n";
-  }
-
-  getHtmlClass() {
-    var template = this.getConfig("builder.serverReplace.getHtmlClass");
-    return (lo.isString(template) ? template : "@getHtmlClass()");
-  }
-
-  includeCSS() {
-    var template = this.getConfig("builder.serverReplace.includeCSS");
-    return (lo.isString(template) ? template : "@CssReferences()") + "\n";
-  }
-
-  includeJS() {
-    var template = this.getConfig("builder.serverReplace.includeJS");
-    return (lo.isString(template) ? template : "@ScriptsReferences()") + "\n";
-  }
-
-  includeJSOptions() {
-    var template = this.getConfig("builder.serverReplace.includeJSOptions");
-    return (lo.isString(template) ? template : "@ServerConfigurations()") + "\n";
-  }
-
-  IF(left, operand = "!=", right = "null") {
-    var leftStr = parseSelector.bind(this)(left);
-    var rightStr = parseSelector.bind(this)(right);
-    return "\n" + `@if(${leftStr} ${operand} ${rightStr})` + "{\n";
-  }
-
-  IF_NOT(left, operand = "!=", right = "null") {
-    var leftStr = parseSelector.bind(this)(left);
-    var rightStr = parseSelector.bind(this)(right);
-    return "\n" + `@if(!(${leftStr} ${operand} ${rightStr}))` + "{\n";
-  }
-
-  ENDIF() {
-    return "\n}\n";
-  }
-
-  includeServerHelper(helper, ...args) {
-    return helper.replace(/\$\d/gm, (str)=> {
-      return args[str.substr(1) - 1] || "null";
-    });
-  }
-
-  renderString(prod) {
-    return prod || "";
   }
 
   initTemplateLocals() {
@@ -144,37 +64,4 @@ export default class ProdComponent extends Base {
     }
     return html;
   }
-
-  includeSet(componentPath, models) {
-    var name = basename(componentPath);
-    this.widgets = this.widgets || {};
-    lo.set(this.widgets, name, {"default": name});
-    return "\n" + `@RepeatWidget("${name}", ${models})` + "\n";
-  }
-
-  itemIndex() {
-    return "@ViewBag.index";
-  }
-}
-
-function parseSelector(selector) {
-  var out = selector || "null";
-  if (selector && selector.split && selector.split(".").length == 2) {
-    switch (selector.split(".")[0]) {
-      case "strings":
-        out = this.getString(selector.split(".")[1]);
-        break;
-      case "links":
-        out = this.getLink(selector.split(".")[1]);
-        break;
-      case "images":
-        out = this.getImageURL(selector.split(".")[1]);
-        break;
-      case "layout_options":
-      case "template_options":
-        out = this.getOption(selector.split(".")[1]);
-        break;
-    }
-  }
-  return out;
 }

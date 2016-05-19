@@ -80,7 +80,7 @@ var _pick = require("lodash/pick");
 
 var _pick2 = _interopRequireDefault(_pick);
 
-var _helpers = require("../../utils/helpers");
+var _utils = require("../../utils");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -187,7 +187,7 @@ var Base = function () {
     }
   }, {
     key: "readTemplateForTheme",
-    value: function readTemplateForTheme(theme, name) {
+    value: function readTemplateForTheme(theme) {
       var compilerFn = _jade2.default.compileFile;
       var compileOptions = {
         pretty: true,
@@ -199,7 +199,7 @@ var Base = function () {
   }, {
     key: "getTemplatePathForTheme",
     value: function getTemplatePathForTheme(theme) {
-      var mask = (0, _helpers.resolve)((0, _helpers.join)(this.getSrc(), "**", theme + ".jade"));
+      var mask = (0, _utils.resolve)((0, _utils.join)(this.getSrc(), "**", theme + ".jade"));
       var files = (0, _glob.sync)(mask);
       return files.length ? files[0] : null;
     }
@@ -211,7 +211,7 @@ var Base = function () {
   }, {
     key: "getConfigPathForTheme",
     value: function getConfigPathForTheme(theme) {
-      var mask = (0, _helpers.resolve)((0, _helpers.join)(this.getSrc(), "**", theme + ".yml"));
+      var mask = (0, _utils.resolve)((0, _utils.join)(this.getSrc(), "**", theme + ".yml"));
       var files = (0, _glob.sync)(mask);
       return files.length ? files[0] : null;
     }
@@ -252,40 +252,13 @@ var Base = function () {
     key: "initTemplateLocals",
     value: function initTemplateLocals() {
 
+      var Helpers = this.getConfig("builder.helpers");
+
+      var config = this.getConfig();
+
+      this[local.templateLocals] = new Helpers(config);
+
       this.setTemplateLocal("include", this.include.bind(this));
-      this.setTemplateLocal("getString", this.getString.bind(this));
-      this.setTemplateLocal("getOption", this.getOption.bind(this));
-      this.setTemplateLocal("getLink", this.getLink.bind(this));
-      this.setTemplateLocal("getImageURL", this.getImageURL.bind(this));
-
-      this.setTemplateLocal("includeBody", this.includeBody.bind(this));
-      this.setTemplateLocal("includeServerHelper", this.includeServerHelper.bind(this));
-
-      // for layout
-      this.setTemplateLocal("includeMeta", this.includeMeta.bind(this));
-      this.setTemplateLocal("includeCSS", this.includeCSS.bind(this));
-      this.setTemplateLocal("includeJS", this.includeJS.bind(this));
-      this.setTemplateLocal("includeJSOptions", this.includeJSOptions.bind(this));
-      this.setTemplateLocal("getHtmlClass", this.getHtmlClass.bind(this));
-
-      this.setTemplateLocal("render", this.renderString.bind(this));
-
-      this.setTemplateLocal("includeSet", this.includeSet.bind(this));
-      this.setTemplateLocal("if", this.IF.bind(this));
-      this.setTemplateLocal("ifnot", this.IF_NOT.bind(this));
-      this.setTemplateLocal("endif", this.ENDIF.bind(this));
-
-      this.setTemplateLocal("itemIndex", this.itemIndex.bind(this));
-    }
-  }, {
-    key: "getHtmlClass",
-    value: function getHtmlClass() {
-      return "";
-    }
-  }, {
-    key: "include",
-    value: function include() {
-      throw new Error("@include method should be implemented");
     }
   }, {
     key: "setBodyInstance",
@@ -442,16 +415,6 @@ var Base = function () {
       return out;
     }
   }, {
-    key: "includeMeta",
-    value: function includeMeta() {
-      return "";
-    }
-  }, {
-    key: "includeJS",
-    value: function includeJS() {
-      return "";
-    }
-  }, {
     key: "includeJSOptions",
     value: function includeJSOptions() {
       var data = JSON.stringify(this.serverConfigurations, null, 4);
@@ -463,13 +426,13 @@ var Base = function () {
       var out = null;
       var theme = (0, _get2.default)(overrideObj, "route.theme");
       if ((0, _isString2.default)(url)) {
-        var configPath = (0, _helpers.resolve)(url);
-        var src = (0, _helpers.dirname)(url);
-        var type = (0, _helpers.basename)((0, _helpers.dirname)(src));
-        var name = (0, _helpers.basename)(src);
+        var configPath = (0, _utils.resolve)(url);
+        var src = (0, _utils.dirname)(url);
+        var type = (0, _utils.basename)((0, _utils.dirname)(src));
+        var name = (0, _utils.basename)(src);
 
         if (theme) {
-          var theme_mask = (0, _helpers.resolve)((0, _helpers.join)(src, "**", theme + ".yml"));
+          var theme_mask = (0, _utils.resolve)((0, _utils.join)(src, "**", theme + ".yml"));
           var theme_files = (0, _glob.sync)(theme_mask);
           configPath = theme_files.length ? theme_files[0] : configPath;
         }
@@ -480,35 +443,10 @@ var Base = function () {
       return out;
     }
   }, {
-    key: "IF",
-    value: function IF() {
-      return "";
-    }
-  }, {
-    key: "IF_NOT",
-    value: function IF_NOT() {
-      return "";
-    }
-  }, {
-    key: "ENDIF",
-    value: function ENDIF() {
-      return "";
-    }
-  }, {
-    key: "itemIndex",
-    value: function itemIndex() {
-      return Math.round(Math.random() + 1000);
-    }
-  }, {
-    key: "includeServerHelper",
-    value: function includeServerHelper() {
-      return "";
-    }
-  }, {
     key: "hasIndexJS",
     get: function get() {
-      var filePath = (0, _helpers.resolve)((0, _helpers.join)(this.getSrc(), "index.js"));
-      var jsxFilePath = (0, _helpers.resolve)((0, _helpers.join)(this.getSrc(), "index.jsx"));
+      var filePath = (0, _utils.resolve)((0, _utils.join)(this.getSrc(), "index.js"));
+      var jsxFilePath = (0, _utils.resolve)((0, _utils.join)(this.getSrc(), "index.jsx"));
       return _fs2.default.existsSync(filePath) || _fs2.default.existsSync(jsxFilePath);
     }
   }, {

@@ -5,8 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-// import DefaultTemplateHelpersClass from "../helpers/template";
-
 
 var _fs = require("fs");
 
@@ -64,7 +62,11 @@ var _production_component = require("./components/production_component");
 
 var _production_component2 = _interopRequireDefault(_production_component);
 
-var _helpers = require("../utils/helpers");
+var _template = require("./helpers/template");
+
+var _template2 = _interopRequireDefault(_template);
+
+var _utils = require("../utils");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -81,23 +83,8 @@ var Builder = function () {
 
     this[local.events] = new _events2.default.EventEmitter();
     this.config = this.normalize(config);
-    // this.templateHelpers = Builder.initHelpers(config);
+    this.templateHelpers = Builder.initHelpers(config);
   }
-
-  // static initHelpers(config = {}) {
-  //   let result = null;
-  //   if (typeof config.TemplateHelpersClass === "function") {
-  //     const Helpers = new config.TemplateHelpersClass(config);
-  //     if (Helpers instanceof DefaultTemplateHelpersClass) {
-  //       result = Helpers;
-  //     } else {
-  //       throw new Error("Invalid config.templateHelpersClass");
-  //     }
-  //   } else {
-  //     result = new DefaultTemplateHelpersClass(config);
-  //   }
-  //   return result;
-  // }
 
   _createClass(Builder, [{
     key: "on",
@@ -276,9 +263,9 @@ var Builder = function () {
 
             if (components) {
               components.forEach(function (filePath, index) {
-                var instance = new Constructor((0, _helpers.normalize)(filePath), {
+                var instance = new Constructor((0, _utils.normalize)(filePath), {
                   builder: {
-                    serverReplace: config.serverReplace
+                    helpers: _this2.templateHelpers
                   }
                 });
 
@@ -288,12 +275,12 @@ var Builder = function () {
 
                 themes.forEach(function (name) {
                   if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
-                    var themeInstance = new Constructor((0, _helpers.normalize)(filePath), {
+                    var themeInstance = new Constructor((0, _utils.normalize)(filePath), {
                       route: {
                         theme: name
                       },
                       builder: {
-                        serverReplace: config.serverReplace
+                        helpers: _this2.templateHelpers
                       }
                     });
                     Builder.createCSHTML(themeInstance, output, name);
@@ -326,6 +313,20 @@ var Builder = function () {
       this[local.normalized] = data;
     }
   }], [{
+    key: "initHelpers",
+    value: function initHelpers() {
+      var config = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+      var result = null;
+      var custom = config.helpers;
+      if (typeof custom === "function") {
+        result = custom(config);
+      } else {
+        result = (0, _template2.default)(config);
+      }
+      return result;
+    }
+  }, {
     key: "getNewFilename",
     value: function getNewFilename(instance, ext, theme) {
       var name = instance.getName();
@@ -335,9 +336,9 @@ var Builder = function () {
   }, {
     key: "createFile",
     value: function createFile(dir, fileName, data) {
-      var folder = (0, _helpers.join)(dir, (0, _helpers.dirname)(fileName));
+      var folder = (0, _utils.join)(dir, (0, _utils.dirname)(fileName));
       _mkdirp2.default.sync(folder);
-      _fs2.default.writeFileSync((0, _helpers.join)(dir, fileName), data, "utf8");
+      _fs2.default.writeFileSync((0, _utils.join)(dir, fileName), data, "utf8");
       return true;
     }
   }, {

@@ -19,7 +19,7 @@ import merge from "lodash/merge";
 import union from "lodash/union";
 import pick from "lodash/pick";
 
-import {resolve, join, dirname, basename} from "../../utils/helpers";
+import {resolve, join, dirname, basename} from "../../utils";
 
 let local = {
   src: Symbol("src"),
@@ -86,34 +86,34 @@ export default class Base {
 
   getConfig(path) {
     let cfg = this[local.config];
-    return path ? getter(cfg, path) : cfg
+    return path ? getter(cfg, path) : cfg;
   }
 
   setConfig(obj) {
-    this[local.config] = obj
+    this[local.config] = obj;
   }
 
   getName() {
-    return this[local.name]
+    return this[local.name];
   }
 
   getType() {
-    return this[local.type]
+    return this[local.type];
   }
 
   getConfigPath() {
-    return this[local.configPath]
+    return this[local.configPath];
   }
 
   getSrc() {
-    return this[local.src]
+    return this[local.src];
   }
 
   readTemplate(theme) {
     return this.readTemplateForTheme(theme) || this.readTemplateForTheme("main") || null;
   }
 
-  readTemplateForTheme(theme, name) {
+  readTemplateForTheme(theme) {
     let compilerFn = pug.compileFile;
     let compileOptions = {
       pretty: true,
@@ -161,7 +161,7 @@ export default class Base {
   }
 
   getTemplateLocals(path) {
-    return isUndefined(path) ? this[local.templateLocals] : getter(this[local.templateLocals], path)
+    return isUndefined(path) ? this[local.templateLocals] : getter(this[local.templateLocals], path);
   }
 
   setTemplateLocal(path, obj) {
@@ -170,44 +170,18 @@ export default class Base {
   }
 
   renderString(prod, dev) {
-    return dev || ""
+    return dev || "";
   }
 
   initTemplateLocals() {
 
+    let Helpers = this.getConfig("builder.helpers");
+
+    let config = this.getConfig();
+
+    this[local.templateLocals] = new Helpers(config);
+
     this.setTemplateLocal("include", this.include.bind(this));
-    this.setTemplateLocal("getString", this.getString.bind(this));
-    this.setTemplateLocal("getOption", this.getOption.bind(this));
-    this.setTemplateLocal("getLink", this.getLink.bind(this));
-    this.setTemplateLocal("getImageURL", this.getImageURL.bind(this));
-
-    this.setTemplateLocal("includeBody", this.includeBody.bind(this));
-    this.setTemplateLocal("includeServerHelper", this.includeServerHelper.bind(this));
-
-    // for layout
-    this.setTemplateLocal("includeMeta", this.includeMeta.bind(this));
-    this.setTemplateLocal("includeCSS", this.includeCSS.bind(this));
-    this.setTemplateLocal("includeJS", this.includeJS.bind(this));
-    this.setTemplateLocal("includeJSOptions", this.includeJSOptions.bind(this));
-    this.setTemplateLocal("getHtmlClass", this.getHtmlClass.bind(this));
-
-    this.setTemplateLocal("render", this.renderString.bind(this));
-
-    this.setTemplateLocal("includeSet", this.includeSet.bind(this));
-    this.setTemplateLocal("if", this.IF.bind(this));
-    this.setTemplateLocal("ifnot", this.IF_NOT.bind(this));
-    this.setTemplateLocal("endif", this.ENDIF.bind(this));
-
-    this.setTemplateLocal("itemIndex", this.itemIndex.bind(this));
-
-  }
-
-  getHtmlClass() {
-    return ""
-  }
-
-  include() {
-    throw new Error("@include method should be implemented")
   }
 
   setBodyInstance(childInstance) {
@@ -225,16 +199,16 @@ export default class Base {
   }
 
   getTheme() {
-    return this[local.theme]
+    return this[local.theme];
   }
 
   setTheme(value) {
-    if (isString(value)) this[local.theme] = value
+    if (isString(value)) this[local.theme] = value;
   }
 
   get serverConfigurations() {
     let obj = this.getConfig("route.serverConfigurations");
-    return merge(obj, {"components": this._JSOptions})
+    return merge(obj, {"components": this._JSOptions});
   }
 
   addJSOptions(instance, name, options) {
@@ -256,7 +230,7 @@ export default class Base {
   parseAttributes(obj, type = "attr") {
     let output = "";
     if (isString(obj)) {
-      output = obj
+      output = obj;
     } else if (isObject(obj)) {
       forOwn(obj, (value, key) => {
         if (isString(value) || isNumber(value)) {
@@ -288,22 +262,22 @@ export default class Base {
 
   getString(name) {
     let config = this.getClientConfig();
-    return getter(config, `strings.${name}`)
+    return getter(config, `strings.${name}`);
   }
 
   getLink(name) {
     let config = this.getClientConfig();
-    return getter(config, `links.${name}`)
+    return getter(config, `links.${name}`);
   }
 
   getImageURL(name) {
     let config = this.getClientConfig();
-    return getter(config, `images.${name}`)
+    return getter(config, `images.${name}`);
   }
 
   getOption(name) {
     let config = this.getClientConfig();
-    return getter(config, `template_options.${name}`)
+    return getter(config, `template_options.${name}`);
   }
 
   getHTML(theme) {
@@ -321,7 +295,7 @@ export default class Base {
         strings: this.getPropsFrom(config.strings, "default"),
         images: this.getPropsFrom(config.images, "default"),
         links: this.getPropsFrom(config.links, "default")
-      }
+      };
     }
     return cache;
   }
@@ -345,15 +319,7 @@ export default class Base {
       out += `<link rel=stylesheet href=/webpack/styles/${theme}.css />\n`;
     });
 
-    return out
-  }
-
-  includeMeta() {
-    return ""
-  }
-
-  includeJS() {
-    return ""
+    return out;
   }
 
   includeJSOptions() {
@@ -377,29 +343,9 @@ export default class Base {
       }
 
       let config = yaml.safeLoad(fs.readFileSync(configPath, "utf8")) || {};
-      out = {name, src, config, configPath, type}
+      out = {name, src, config, configPath, type};
     }
     return out;
-  }
-
-  IF() {
-    return ""
-  }
-
-  IF_NOT() {
-    return ""
-  }
-
-  ENDIF() {
-    return ""
-  }
-
-  itemIndex() {
-    return Math.round(Math.random() + 1000);
-  }
-
-  includeServerHelper() {
-    return ""
   }
 
 }
