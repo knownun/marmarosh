@@ -3,7 +3,7 @@
   "version": "2.0.8",
   "description": "Markup development tool",
   "main": "index.js",
-  "bim": {
+  "bin": {
     "marmarosh": "./bin",
     "mrsh": "./bin"
   },
