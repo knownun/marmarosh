@@ -182,6 +182,7 @@ export default class Base {
     this[local.templateLocals] = new Helpers(config);
 
     this.setTemplateLocal("include", this.include.bind(this));
+    this.setTemplateLocal("includeSet", this.includeSet.bind(this));
   }
 
   setBodyInstance(childInstance) {

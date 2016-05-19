@@ -1,8 +1,5 @@
 import isString from "lodash/isString";
 import getter from "lodash/get";
-import setter from "lodash/get";
-
-import {basename} from "../../utils";
 
 let local = {
   builderConfig: Symbol("builderConfig"),
@@ -24,62 +21,52 @@ export default (builderConfig) => class Helpers {
     return path ? getter(cfg, path) : cfg;
   }
 
-  get helpersList() {
-    return this.registered;
-  }
-
   includeBody() {
-    var template = this.getConfig("builder.serverReplace.includeBody");
-    return (isString(template) ? template : "@Body()") + "\n";
+    return "\n" + this.getConfig("serverReplace.includeBody") + "\n";
   }
 
   getString(name) {
     var placeholder = getter(this.getServerConfig(), `strings.${name}`);
-    var template = this.getConfig("builder.serverReplace.getString");
-    return placeholder || isString(template) ? template.replace("${name}", name) : `@ViewBag.strings.${name}`;
+    var template = this.getConfig("serverReplace.getString");
+    return placeholder || isString(template) ? template.replace("${name}", name) : "";
   }
 
   getLink(name) {
     var placeholder = getter(this.getServerConfig(), `links.${name}`);
-    var template = this.getConfig("builder.serverReplace.getLink");
-    return placeholder || isString(template) ? template.replace("${name}", name) : `@ViewBag.urls.${name}`;
+    var template = this.getConfig("serverReplace.getLink");
+    return placeholder || isString(template) ? template.replace("${name}", name) : "";
   }
 
   getImageURL(name) {
     var placeholder = getter(this.getServerConfig(), `images.${name}`);
-    var template = this.getConfig("builder.serverReplace.getImageURL");
-    return placeholder || isString(template) ? template.replace("${name}", name) : `@ViewBag.images.${name}`;
+    var template = this.getConfig("serverReplace.getImageURL");
+    return placeholder || isString(template) ? template.replace("${name}", name) : "";
   }
 
   getOption(name) {
     var placeholder = getter(this.getServerConfig(), `template_options.${name}`);
-    var template = this.getConfig("builder.serverReplace.getOption");
-    return placeholder || isString(template) ? template.replace("${name}", name) : `@ViewBag.template.${name}`;
+    var template = this.getConfig("serverReplace.getOption");
+    return placeholder || isString(template) ? template.replace("${name}", name) : "";
   }
 
   includeMeta() {
-    var template = this.getConfig("builder.serverReplace.includeMeta");
-    return (isString(template) ? template : "@Meta()") + "\n";
+    return "\n" + this.getConfig("serverReplace.includeMeta") + "\n";
   }
 
   getHtmlClass() {
-    var template = this.getConfig("builder.serverReplace.getHtmlClass");
-    return (isString(template) ? template : "@getHtmlClass()");
+    return this.getConfig("serverReplace.getHtmlClass");
   }
 
   includeCSS() {
-    var template = this.getConfig("builder.serverReplace.includeCSS");
-    return (isString(template) ? template : "@CssReferences()") + "\n";
+    return "\n" + this.getConfig("serverReplace.includeCSS") + "\n";
   }
 
   includeJS() {
-    var template = this.getConfig("builder.serverReplace.includeJS");
-    return (isString(template) ? template : "@ScriptsReferences()") + "\n";
+    return "\n" + this.getConfig("serverReplace.includeJS") + "\n";
   }
 
   includeJSOptions() {
-    var template = this.getConfig("builder.serverReplace.includeJSOptions");
-    return (isString(template) ? template : "@ServerConfigurations()") + "\n";
+    return "\n" + this.getConfig("serverReplace.includeJSOptions") + "\n";
   }
 
   if(left, operand = "!=", right = "null") {
@@ -96,13 +83,6 @@ export default (builderConfig) => class Helpers {
 
   endif() {
     return "\n}\n";
-  }
-
-  includeSet(componentPath, models) {
-    var name = basename(componentPath);
-    this.widgets = this.widgets || {};
-    setter(this.widgets, name, {"default": name});
-    return "\n" + `@RepeatWidget("${name}", ${models})` + "\n";
   }
 
   itemIndex() {

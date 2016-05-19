@@ -12,6 +12,10 @@ var _lodash = require("lodash");
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _set = require("lodash/set");
+
+var _set2 = _interopRequireDefault(_set);
+
 var _utils = require("../../utils");
 
 var _base_component = require("./base_component");
@@ -47,6 +51,14 @@ var ProdComponent = function (_Base) {
       var template = this.getConfig("builder.serverReplace.include");
       var placeholder = _lodash2.default.get(this.getServerConfig(), "widgets." + name);
       return (placeholder || (_lodash2.default.isString(template) ? template.replace("${name}", name) : "@Widget(\"" + name + "\")")) + "\n";
+    }
+  }, {
+    key: "includeSet",
+    value: function includeSet(componentPath, models) {
+      var name = (0, _utils.basename)(componentPath);
+      this.widgets = this.widgets || {};
+      (0, _set2.default)(this.widgets, name, { "default": name });
+      return "\n" + ("@RepeatWidget(\"" + name + "\", " + models + ")") + "\n";
     }
   }, {
     key: "initTemplateLocals",

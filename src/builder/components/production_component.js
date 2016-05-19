@@ -1,4 +1,5 @@
 import lo from "lodash";
+import setter from "lodash/set";
 
 import {basename} from "../../utils";
 
@@ -20,6 +21,13 @@ export default class ProdComponent extends Base {
     var template = this.getConfig("builder.serverReplace.include");
     var placeholder = lo.get(this.getServerConfig(), `widgets.${name}`);
     return (placeholder || (lo.isString(template) ? template.replace("${name}", name) : `@Widget("${name}")`)) + "\n";
+  }
+
+  includeSet(componentPath, models) {
+    var name = basename(componentPath);
+    this.widgets = this.widgets || {};
+    setter(this.widgets, name, {"default": name});
+    return "\n" + `@RepeatWidget("${name}", ${models})` + "\n";
   }
 
   initTemplateLocals() {

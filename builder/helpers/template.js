@@ -14,8 +14,6 @@ var _get = require("lodash/get");
 
 var _get2 = _interopRequireDefault(_get);
 
-var _utils = require("../../utils");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -48,66 +46,60 @@ exports.default = function (builderConfig) {
     }, {
       key: "includeBody",
       value: function includeBody() {
-        var template = this.getConfig("builder.serverReplace.includeBody");
-        return ((0, _isString2.default)(template) ? template : "@Body()") + "\n";
+        return "\n" + this.getConfig("serverReplace.includeBody") + "\n";
       }
     }, {
       key: "getString",
       value: function getString(name) {
         var placeholder = (0, _get2.default)(this.getServerConfig(), "strings." + name);
-        var template = this.getConfig("builder.serverReplace.getString");
-        return placeholder || (0, _isString2.default)(template) ? template.replace("${name}", name) : "@ViewBag.strings." + name;
+        var template = this.getConfig("serverReplace.getString");
+        return placeholder || (0, _isString2.default)(template) ? template.replace("${name}", name) : "";
       }
     }, {
       key: "getLink",
       value: function getLink(name) {
         var placeholder = (0, _get2.default)(this.getServerConfig(), "links." + name);
-        var template = this.getConfig("builder.serverReplace.getLink");
-        return placeholder || (0, _isString2.default)(template) ? template.replace("${name}", name) : "@ViewBag.urls." + name;
+        var template = this.getConfig("serverReplace.getLink");
+        return placeholder || (0, _isString2.default)(template) ? template.replace("${name}", name) : "";
       }
     }, {
       key: "getImageURL",
       value: function getImageURL(name) {
         var placeholder = (0, _get2.default)(this.getServerConfig(), "images." + name);
-        var template = this.getConfig("builder.serverReplace.getImageURL");
-        return placeholder || (0, _isString2.default)(template) ? template.replace("${name}", name) : "@ViewBag.images." + name;
+        var template = this.getConfig("serverReplace.getImageURL");
+        return placeholder || (0, _isString2.default)(template) ? template.replace("${name}", name) : "";
       }
     }, {
       key: "getOption",
       value: function getOption(name) {
         var placeholder = (0, _get2.default)(this.getServerConfig(), "template_options." + name);
-        var template = this.getConfig("builder.serverReplace.getOption");
-        return placeholder || (0, _isString2.default)(template) ? template.replace("${name}", name) : "@ViewBag.template." + name;
+        var template = this.getConfig("serverReplace.getOption");
+        return placeholder || (0, _isString2.default)(template) ? template.replace("${name}", name) : "";
       }
     }, {
       key: "includeMeta",
       value: function includeMeta() {
-        var template = this.getConfig("builder.serverReplace.includeMeta");
-        return ((0, _isString2.default)(template) ? template : "@Meta()") + "\n";
+        return "\n" + this.getConfig("serverReplace.includeMeta") + "\n";
       }
     }, {
       key: "getHtmlClass",
       value: function getHtmlClass() {
-        var template = this.getConfig("builder.serverReplace.getHtmlClass");
-        return (0, _isString2.default)(template) ? template : "@getHtmlClass()";
+        return this.getConfig("serverReplace.getHtmlClass");
       }
     }, {
       key: "includeCSS",
       value: function includeCSS() {
-        var template = this.getConfig("builder.serverReplace.includeCSS");
-        return ((0, _isString2.default)(template) ? template : "@CssReferences()") + "\n";
+        return "\n" + this.getConfig("serverReplace.includeCSS") + "\n";
       }
     }, {
       key: "includeJS",
       value: function includeJS() {
-        var template = this.getConfig("builder.serverReplace.includeJS");
-        return ((0, _isString2.default)(template) ? template : "@ScriptsReferences()") + "\n";
+        return "\n" + this.getConfig("serverReplace.includeJS") + "\n";
       }
     }, {
       key: "includeJSOptions",
       value: function includeJSOptions() {
-        var template = this.getConfig("builder.serverReplace.includeJSOptions");
-        return ((0, _isString2.default)(template) ? template : "@ServerConfigurations()") + "\n";
+        return "\n" + this.getConfig("serverReplace.includeJSOptions") + "\n";
       }
     }, {
       key: "if",
@@ -135,14 +127,6 @@ exports.default = function (builderConfig) {
         return "\n}\n";
       }
     }, {
-      key: "includeSet",
-      value: function includeSet(componentPath, models) {
-        var name = (0, _utils.basename)(componentPath);
-        this.widgets = this.widgets || {};
-        (0, _get2.default)(this.widgets, name, { "default": name });
-        return "\n" + ("@RepeatWidget(\"" + name + "\", " + models + ")") + "\n";
-      }
-    }, {
       key: "itemIndex",
       value: function itemIndex() {
         return "@ViewBag.index";
@@ -157,11 +141,6 @@ exports.default = function (builderConfig) {
         return helper.replace(/\$\d/gm, function (str) {
           return args[str.substr(1) - 1] || "null";
         });
-      }
-    }, {
-      key: "helpersList",
-      get: function get() {
-        return this.registered;
       }
     }]);
 
