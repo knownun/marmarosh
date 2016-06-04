@@ -14,9 +14,9 @@ import merge from "lodash/merge";
 
 import glob from "glob";
 
-import ProdComponentClass from "./components/production_component";
-import defaultTemplateHelpersClass from "./helpers/template";
-import {join, normalize, dirname} from "../utils";
+import ProdComponentClass from "./component";
+import defaultTemplateHelpers from "./tplHelpers";
+import {join, normalize, dirname, relative} from "../utils";
 
 const local = {
   events: Symbol("events"),
@@ -27,19 +27,12 @@ export default class Builder {
 
   constructor(config) {
     this[local.events] = new events.EventEmitter();
-    this.config = this.normalize(config);
-    this.templateHelpers = Builder.initHelpers(config);
+    this[local.normalized] = this.normalize(config);
+    this.templateHelpers = Builder.getHelpers(config);
   }
 
-  static initHelpers(config = {}) {
-    let result = null;
-    let custom = config.helpers;
-    if (typeof custom === "function") {
-      result = custom(config);
-    } else {
-      result = defaultTemplateHelpersClass(config);
-    }
-    return result;
+  static getHelpers(config = {}) {
+    return merge({}, defaultTemplateHelpers, config.helpers);
   }
 
   on(event, fn) {
@@ -102,29 +95,68 @@ export default class Builder {
     return this[local.normalized];
   }
 
-  set config(data) {
-    this[local.normalized] = data;
+  static createFile(filePath, data) {
+    return new Promise((done, failled)=> {
+      mkdirp(dirname(filePath), (err) => {
+        if (err) return failled(err);
+        fs.writeFile(filePath, data, "utf8", (err)=> {
+          if (err) return failled(err);
+          done(filePath);
+        });
+      });
+    });
   }
 
-  static getNewFilename(instance, ext, theme) {
-    var name = instance.getName();
-    var dir = `${instance.getType()}/${instance.getName()}`;
-    return theme ? `${dir}/themes/${theme}/${name}.${ext}` : `${dir}/${name}.${ext}`;
+  static createJSON({name, config, includes, hasJS}) {
+    let data = {};
+
+    if (config.isMasterPage) {
+      data.isMasterPage = config.isMasterPage;
+    }
+
+    if (config.hasJS || hasJS) {
+      data.hasJs = true;
+    }
+
+    if (startsWith(name, "react")) {
+      data.isReact = true;
+    }
+
+    if (isObject(config.template_options)) {
+      data.template_options = Builder.getVars(config.template_options, ["default", "values"]);
+    }
+
+    if (isObject(config.layout_options)) {
+      data.layout_options = Builder.getVars(config.layout_options, ["default", "values"]);
+    }
+
+    if (isObject(config.script_options)) {
+      data.script_options = Builder.getVars(config.script_options, ["default", "values"]);
+    }
+
+    if (isObject(config.strings)) {
+      data.strings = Builder.getVars(config.strings, ["default"], "default");
+    }
+
+    if (isObject(config.images)) {
+      data.images = Builder.getVars(config.images, ["default"], "default");
+    }
+
+    if (isObject(config.links)) {
+      data.links = Builder.getVars(config.links, ["default"], "default");
+    }
+
+    data.widgets = merge(includes, config.widgets);
+
+    return JSON.stringify(data, null, 2);
   }
 
-  static createFile(dir, fileName, data) {
-    var folder = join(dir, dirname(fileName));
-    mkdirp.sync(folder);
-    fs.writeFileSync(join(dir, fileName), data, "utf8");
-    return true;
-  }
-
-  getVars(input, properties, map) {
-    var output = {};
+  static getVars(input, properties, map) {
+    let output = {};
     forOwn(input, (value, key) => {
       if (!startsWith(key, "$")) {
         if (isObject(value)) {
-          var obj = null;
+          let obj = null;
           if (!isUndefined(value)) {
             obj = properties ? pick(value, properties) : value;
             if (!isEmpty(obj)) {
@@ -144,70 +176,7 @@ export default class Builder {
     return output;
   }
 
-  static createCSHTML(instance, output, theme) {
-    var name = Builder.getNewFilename(instance, "cshtml", theme);
-    var data = instance.getHTML(theme || "main") || "";
-    return Builder.createFile(output, name, data);
-  }
-
-  createJSON(instance, output, theme) {
-    var name = Builder.getNewFilename(instance, "json", theme);
-    var config = instance.getConfig();
-
-    var getVars = this.getVars;
-
-    var data = {};
-
-    if (config.isMasterPage) {
-      data.isMasterPage = config.isMasterPage;
-    }
-
-    if (instance.hasIndexJS) {
-      data.hasJs = true;
-    }
-
-    if (startsWith(instance.getName(), "react")) {
-      data.isReact = true;
-    }
-
-    if (isObject(config.template_options)) {
-      data.template_options = getVars(config.template_options, ["default", "values"]);
-    }
-
-    if (isObject(config.layout_options)) {
-      data.layout_options = getVars(config.layout_options, ["default", "values"]);
-    }
-
-    if (isObject(config.script_options)) {
-      data.script_options = getVars(config.script_options, ["default", "values"]);
-    }
-
-    if (isObject(config.strings)) {
-      data.strings = getVars(config.strings, ["default"], "default");
-    }
-
-    if (isObject(config.images)) {
-      data.images = getVars(config.images, ["default"], "default");
-    }
-
-    if (isObject(config.links)) {
-      data.links = getVars(config.links, ["default"], "default");
-    }
-
-    data.widgets = instance.widgets || {};
-
-    if (theme) {
-      JSON.stringify(instance.widgets);
-    }
-
-    if (isObject(config.widgets)) {
-      data.widgets = merge(data.widgets, config.widgets);
-    }
-
-    return Builder.createFile(output, name, JSON.stringify(data, null, 2));
-  }
-
-  getSecondaryThemesConfig(config) {
+  static getSecondaryThemesConfig(config) {
     let normalizedSecondaryConfig = [];
     forOwn(config, (val, key)=> {
       if (startsWith(val, "?")) {
@@ -217,58 +186,95 @@ export default class Builder {
     return normalizedSecondaryConfig;
   }
 
-  run(done) {
+  run() {
+
+    const errHandler = (err) => this.emit("error", err);
 
     this.config.forEach((config)=> {
-      try {
-        const Constructor = ProdComponentClass;
-        const components = config.src;
-        const output = config.dest;
-        const themes = this.getSecondaryThemesConfig(config.themes);
+      const Constructor = ProdComponentClass;
+      const components = config.src;
+      const themes = Builder.getSecondaryThemesConfig(config.themes);
+      if (components) {
+        components.forEach((filePath) => {
+          let MainInstance = new Constructor();
+          let MainConfigPath = normalize(filePath);
+          MainInstance.setHelpers(this.templateHelpers);
 
-        if (components) {
-          components.forEach((filePath, index) => {
-            let instance = new Constructor(normalize(filePath), {
-              builder: {
-                helpers: this.templateHelpers
-              }
-            });
+          MainInstance
+            .load(MainConfigPath)
+            .then(({component}) => {
+              return component.getTemplate();
+            }, errHandler)
+            .then(({component, data}) => {
 
-            Builder.createCSHTML(instance, output);
+              let dest = config.dest;
+              let name = component.name;
+              let type = component.type;
 
-            this.createJSON(instance, output);
+              let cshtmlFilePath = join(dest, type, name, `${name}.cshtml`);
+              let jsonFilePath = join(dest, type, name, `${name}.json`);
 
-            themes.forEach((name)=> {
-              if (instance.hasTemplateForTheme(name) || instance.hasConfigForTheme(name)) {
-                const themeInstance = new Constructor(normalize(filePath), {
-                  route: {
-                    theme: name
-                  },
-                  builder: {
-                    helpers: this.templateHelpers
+              let jsonData = Builder.createJSON({
+                name: component.name,
+                config: component.config,
+                includes: component.widgets
+              });
+
+              Builder.createFile(cshtmlFilePath, data);
+              Builder.createFile(jsonFilePath, jsonData);
+
+              return Promise.resolve({component});
+            }, errHandler)
+            .then(({component})=> {
+              return component.getAvailableThemes(themes);
+            }, errHandler)
+            .then(({component, data})=> {
+              data.forEach(({theme, isAvailable}) => {
+                  if (isAvailable) {
+                    let ThemeInstance = new Constructor();
+                    ThemeInstance.setHelpers(this.templateHelpers);
+
+                    component
+                      .getConfigPath(theme)
+                      .then((path)=> {
+                        return Promise.resolve(path);
+                      }, () => {
+                        return Promise.resolve(MainConfigPath);
+                      })
+                      .then((themeConfigPath) => {
+                        ThemeInstance
+                          .load(themeConfigPath)
+                          .then(({component}) => {
+                            return component.getTemplate(theme);
+                          }, errHandler)
+                          .then(({component, data})=> {
+
+                            let dest = config.dest;
+
+                            let type = MainInstance.type;
+                            let name = MainInstance.name;
+
+                            let cshtmlFilePath = join(dest, type, name, "themes", theme, `${name}.cshtml`);
+                            let jsonFilePath = join(dest, type, name, "themes", theme, `${name}.json`);
+
+                            let jsonData = Builder.createJSON({
+                              name: component.name,
+                              config: component.config,
+                              includes: component.widgets,
+                              hasJS: MainInstance.hasIndexJS
+                            });
+
+                            Builder.createFile(cshtmlFilePath, data);
+                            Builder.createFile(jsonFilePath, jsonData);
+
+                          }, errHandler);
+                      }).catch(errHandler);
                   }
-                });
-                Builder.createCSHTML(themeInstance, output, name);
-                this.createJSON(themeInstance, output, name);
-              }
-            });
-
-            const itemIndex = index + 1;
-            const allLength = components.length;
-            const msg = `${itemIndex}/${allLength} built templates`;
-
-            this.emit("done", {msg});
-
-          });
-          this.emit("end", {files: components.length});
-        }
-      } catch (e) {
-        this.emit("error", {message: e.message});
+                }
+              );
+            }).catch(errHandler);
+        });
       }
-
     });
-
-    done && done();
-
   }
 }
