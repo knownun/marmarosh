@@ -93,12 +93,17 @@ var Resource = function () {
         }
       }
 
-      normalized.destDirName = (0, _helpers.dirname)(normalized.dest);
-      normalized.destName = (0, _helpers.basename)(normalized.dest) || !normalized.originalSourceIsArray ? (0, _helpers.basename)(config.src) : null;
-
       normalized.names = normalized.src.map(function (path) {
         return (0, _helpers.basename)(path);
       });
+
+      normalized.destDirName = (0, _helpers.dirname)(normalized.dest);
+
+      normalized.destName = (0, _helpers.basename)(normalized.dest);
+
+      if (!normalized.originalSourceIsArray) {
+        normalized.destName = normalized.names[0];
+      }
 
       var locations = normalized.src.map(function (path) {
         return (0, _helpers.dirname)(path);

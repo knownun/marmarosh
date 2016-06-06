@@ -1,5 +1,5 @@
-import { resolve as resolveUrl } from "url";
-import { sync as globSync } from "glob";
+import {resolve as resolveUrl} from "url";
+import {sync as globSync} from "glob";
 
 import cloneDeep from "lodash/cloneDeep";
 import merge from "lodash/merge";
@@ -9,12 +9,12 @@ import isString from "lodash/isString";
 import uniq from "lodash/uniq";
 import concat from "lodash/concat";
 
-import { join, basename, dirname } from "../utils/helpers";
+import {join, basename, dirname} from "../utils/helpers";
 
 let local = {
-  src: Symbol("src"),
-  dest: Symbol("dest"),
-  key: Symbol("key"),
+  src:        Symbol("src"),
+  dest:       Symbol("dest"),
+  key:        Symbol("key"),
   normalized: Symbol("normalized")
 };
 
@@ -57,10 +57,17 @@ export default class Resource {
       }
     }
 
-    normalized.destDirName = dirname(normalized.dest);
-    normalized.destName = basename(normalized.dest) || (!normalized.originalSourceIsArray) ? basename(config.src) : null;
+    normalized.names = normalized.src.map((path) => {
+      return basename(path)
+    });
 
-    normalized.names = normalized.src.map(path => basename(path));
+    normalized.destDirName = dirname(normalized.dest);
+
+    normalized.destName = basename(normalized.dest);
+
+    if (!normalized.originalSourceIsArray) {
+      normalized.destName = normalized.names[0];
+    }
 
     let locations = normalized.src.map(path => dirname(path));
     normalized.locations = uniq(locations);
