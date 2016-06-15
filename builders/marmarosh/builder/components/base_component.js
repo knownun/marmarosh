@@ -259,6 +259,8 @@ var Base = function () {
       this.setTemplateLocal("getOption", this.getOption.bind(this));
       this.setTemplateLocal("getLink", this.getLink.bind(this));
       this.setTemplateLocal("getImageURL", this.getImageURL.bind(this));
+      this.setTemplateLocal("getImageAltText", this.getImageAltText.bind(this));
+      this.setTemplateLocal("getImageTitle", this.getImageTitle.bind(this));
 
       this.setTemplateLocal("includeBody", this.includeBody.bind(this));
       this.setTemplateLocal("includeServerHelper", this.includeServerHelper.bind(this));

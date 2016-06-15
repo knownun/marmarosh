@@ -81,7 +81,21 @@ var ProdComponent = function (_Base) {
     value: function getImageURL(name) {
       var placeholder = _lodash2.default.get(this.getServerConfig(), "images." + name);
       var template = this.getConfig("builder.serverReplace.getImageURL");
-      return placeholder || _lodash2.default.isString(template) ? template.replace("${name}", name) : "@ViewBag.images." + name;
+      return placeholder || _lodash2.default.isString(template) ? template.replace("${name}", name) : "@ViewBag.images." + name + ".href";
+    }
+  }, {
+    key: "getImageAltText",
+    value: function getImageAltText(name) {
+      var placeholder = _lodash2.default.get(this.getServerConfig(), "images." + name);
+      var template = this.getConfig("builder.serverReplace.getImageAltText");
+      return placeholder || _lodash2.default.isString(template) ? template.replace("${name}", name) : "@ViewBag.images." + name + ".alt";
+    }
+  }, {
+    key: "getImageTitle",
+    value: function getImageTitle(name) {
+      var placeholder = _lodash2.default.get(this.getServerConfig(), "images." + name);
+      var template = this.getConfig("builder.serverReplace.getImageTitle");
+      return placeholder || _lodash2.default.isString(template) ? template.replace("${name}", name) : "@ViewBag.images." + name + ".title";
     }
   }, {
     key: "getOption",

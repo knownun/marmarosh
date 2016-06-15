@@ -44,7 +44,19 @@ export default class ProdComponent extends Base {
   getImageURL(name) {
     var placeholder = lo.get(this.getServerConfig(), `images.${name}`);
     var template = this.getConfig("builder.serverReplace.getImageURL");
-    return placeholder || lo.isString(template) ? template.replace("${name}", name) : `@ViewBag.images.${name}`
+    return placeholder || lo.isString(template) ? template.replace("${name}", name) : `@ViewBag.images.${name}.href`
+  }
+
+  getImageAltText(name) {
+    var placeholder = lo.get(this.getServerConfig(), `images.${name}`);
+    var template = this.getConfig("builder.serverReplace.getImageAltText");
+    return placeholder || lo.isString(template) ? template.replace("${name}", name) : `@ViewBag.images.${name}.alt`
+  }
+
+  getImageTitle(name) {
+    var placeholder = lo.get(this.getServerConfig(), `images.${name}`);
+    var template = this.getConfig("builder.serverReplace.getImageTitle");
+    return placeholder || lo.isString(template) ? template.replace("${name}", name) : `@ViewBag.images.${name}.title`
   }
 
   getOption(name) {
