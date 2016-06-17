@@ -123,7 +123,7 @@ var _class = function (_Base) {
       });
 
       builder.run(function (err) {
-        if (err) throw new Error("Error in style task");
+        if (err) throw new Error(err);
 
         var filesToDelete = (0, _uniq2.default)((0, _flattenDeep2.default)(resources.map(function (res) {
           return _glob2.default.sync((0, _helpers.resolve)(res.getTarget(), "**.?(js|js.map)"));

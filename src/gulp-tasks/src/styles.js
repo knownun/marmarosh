@@ -55,7 +55,7 @@ export default class extends Base {
 
 
     builder.run((err)=> {
-      if (err) throw new Error("Error in style task");
+      if (err) throw new Error(err);
 
       let filesToDelete = uniq(flatten(resources.map((res)=> {
         return glob.sync(resolve(res.getTarget(), "**.?(js|js.map)"))
