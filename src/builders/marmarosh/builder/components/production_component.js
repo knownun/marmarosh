@@ -2,7 +2,7 @@ import fs from "fs";
 import yaml from "js-yaml";
 import lo from "lodash";
 
-import { basename } from "../../../../utils/helpers";
+import {basename} from "../../../../utils/helpers";
 
 import Base from "./base_component";
 
@@ -183,6 +183,7 @@ function parseSelector(selector) {
         break;
       case "images":
         out = this.getImageURL(selector.split(".")[1]);
+        out = out.substring(0, out.length - 5);
         break;
       case "layout_options":
       case "template_options":
