@@ -107,7 +107,9 @@ export default class Builder {
               output[key] = obj
             }
           }
-        } else if (!isEmpty(value)) {
+        } else if (isEmpty(value)) {
+          output[key] = '$EMPTY_VALUE$'
+        } else {
           output[key] = value
         }
       }

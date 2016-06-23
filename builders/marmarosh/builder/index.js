@@ -162,7 +162,9 @@ var Builder = function () {
                 output[key] = obj;
               }
             }
-          } else if (!(0, _isEmpty2.default)(value)) {
+          } else if ((0, _isEmpty2.default)(value)) {
+            output[key] = '$EMPTY_VALUE$';
+          } else {
             output[key] = value;
           }
         }
