@@ -146,6 +146,7 @@ var WebpackBuilder = function (_BaseBuilder) {
         target: target,
         output: output,
         debug: debug,
+        cache: false,
         plugins: [],
         module: {}
       };

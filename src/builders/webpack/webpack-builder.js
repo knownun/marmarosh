@@ -19,7 +19,7 @@ import EntryConverter from "./converters/entry";
 import webpackScriptsPreset from "./presets/webpack-scripts";
 import webpackStylesPreset from "./presets/webpack-styles";
 
-import { join, resolve as res } from "../../utils/helpers";
+import {join, resolve as res} from "../../utils/helpers";
 
 let webpackPresets = new Map;
 
@@ -84,6 +84,7 @@ export default class WebpackBuilder extends BaseBuilder {
       target,
       output,
       debug,
+      cache: false,
       plugins: [],
       module: {}
     };
