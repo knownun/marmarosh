@@ -1,6 +1,6 @@
 {
   "name": "marmarosh",
-  "version": "2.0.11",
+  "version": "2.0.14",
   "description": "Markup development tool",
   "main": "index.js",
   "scripts": {
